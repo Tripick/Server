@@ -19,6 +19,8 @@ services:
     environment:
       STAGE: 'production'
       DOMAINS: 'tripick.app -> http://app:5013'
-  networks:
-    nginx-network:
-      external: true
+    networks:
+      - nginx-network
+networks:
+  nginx-network:
+    external: true
