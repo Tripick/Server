@@ -9,6 +9,7 @@ services:
       dockerfile: Dockerfile
   https-portal:
     image: steveltn/https-portal:1
+    container_name: nginx-server
     ports:
       - '80:80'
       - '443:443'
@@ -16,5 +17,8 @@ services:
       - app
     restart: always
     environment:
-      DOMAINS: 'tripick.app -> http://app:5013'
       STAGE: 'production'
+      DOMAINS: 'tripick.app -> http://app:5013'
+  networks:
+    nginx-network:
+      external: true
