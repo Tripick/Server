@@ -4,8 +4,8 @@ EXPOSE 5000
 
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
 WORKDIR /src
-COPY ["TripickServer/TripickServer/TripickServer.csproj", "TripickServer/"]
-RUN dotnet restore "TripickServer/TripickServer/TripickServer.csproj"
+COPY ["TripickServer.csproj", "TripickServer/"]
+RUN dotnet restore "TripickServer.csproj"
 COPY . .
 WORKDIR "/src/TripickServer"
 RUN dotnet build "TripickServer.csproj" -c Release -o /app/build
