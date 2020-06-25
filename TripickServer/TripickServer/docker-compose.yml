@@ -16,5 +16,5 @@ services:
       - app
     restart: always
     environment:
-      DOMAINS: 'tripick.app -> https://app'
+      DOMAINS: 'tripick.app -> http://app:5013'
       STAGE: 'production'
