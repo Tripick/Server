@@ -33,7 +33,7 @@ namespace TripickServer.Controllers
         [Route("test")]
         public IActionResult test()
         {
-            return Ok("Request received");
+            return Ok("Request received UPGRADED");
         }
 
         [AllowAnonymous]
