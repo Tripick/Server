@@ -7,3 +7,14 @@ services:
     build:
       context:  ./
       dockerfile: Dockerfile
+  https-portal:
+    image: steveltn/https-portal:1
+    ports:
+      - '80:80'
+      - '443:443'
+    links:
+      - app
+    restart: always
+    environment:
+      DOMAINS: 'tripick.app -> http://app:5013'
+      STAGE: 'production'
