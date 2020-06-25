@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30204.135
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TripickServer", "TripickServer\TripickServer.csproj", "{5157D8A1-3914-4164-BE7E-F1FF9B7B51A7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5157D8A1-3914-4164-BE7E-F1FF9B7B51A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5157D8A1-3914-4164-BE7E-F1FF9B7B51A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5157D8A1-3914-4164-BE7E-F1FF9B7B51A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5157D8A1-3914-4164-BE7E-F1FF9B7B51A7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4767B147-466E-4BEC-8AF4-AE3080AEF6EE}
+	EndGlobalSection
+EndGlobal
