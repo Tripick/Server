@@ -7,6 +7,23 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\20200629145637_TestEmpty1.cs" />
+    <Compile Remove="Migrations\20200629145637_TestEmpty1.Designer.cs" />
+    <Compile Remove="Migrations\20200629145711_TestEmpty1.cs" />
+    <Compile Remove="Migrations\20200629145711_TestEmpty1.Designer.cs" />
+    <Compile Remove="Migrations\20200629150745_TestEmpty1.cs" />
+    <Compile Remove="Migrations\20200629150745_TestEmpty1.Designer.cs" />
+    <Compile Remove="Migrations\20200629150807_TestEmpty1.cs" />
+    <Compile Remove="Migrations\20200629150807_TestEmpty1.Designer.cs" />
+    <Compile Remove="Migrations\20200629150836_TestEmpty1.cs" />
+    <Compile Remove="Migrations\20200629150836_TestEmpty1.Designer.cs" />
+    <Compile Remove="Migrations\20200629150910_TestEmpty1.cs" />
+    <Compile Remove="Migrations\20200629150910_TestEmpty1.Designer.cs" />
+    <Compile Remove="Migrations\20200629150941_TestEmpty1.cs" />
+    <Compile Remove="Migrations\20200629150941_TestEmpty1.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Dapper" Version="2.0.35" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.5">

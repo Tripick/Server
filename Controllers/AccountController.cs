@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using TripickServer.Models;
+using TripickServer.Requests;
 using TripickServer.Utils;
 
 namespace TripickServer.Controllers
@@ -33,6 +34,7 @@ namespace TripickServer.Controllers
         [Route("test")]
         public IActionResult test()
         {
+
             return Ok("Request received UPGRADED");
         }
 
@@ -52,8 +54,7 @@ namespace TripickServer.Controllers
                 Email = credentials.Email,
                 UserName = credentials.Email.Substring(0, credentials.Email.IndexOf('@')).ToCleanUsername(),
                 FirstName = string.Empty,
-                LastName = string.Empty,
-                Photo = string.Empty
+                LastName = string.Empty
             };
 
             IdentityResult userCreationResult = null;

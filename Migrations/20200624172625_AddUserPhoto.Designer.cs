@@ -9,7 +9,7 @@ using TripickServer.Models;
 
 namespace TripickServer.Migrations
 {
-    [DbContext(typeof(ApplicationDbContext))]
+    [DbContext(typeof(TripickContext))]
     [Migration("20200624172625_AddUserPhoto")]
     partial class AddUserPhoto
     {

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TripickServer.Models;
@@ -9,9 +10,10 @@ using TripickServer.Models;
 namespace TripickServer.Migrations
 {
     [DbContext(typeof(TripickContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200629151103_CreateWholeModel")]
+    partial class CreateWholeModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -201,6 +203,9 @@ namespace TripickServer.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("Photo")
+                        .HasColumnType("text");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");
 
@@ -292,6 +297,9 @@ namespace TripickServer.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
+                    b.Property<string>("Cover")
+                        .HasColumnType("text");
+
                     b.Property<int>("IdTrip")
                         .HasColumnType("integer");
 
@@ -359,30 +367,6 @@ namespace TripickServer.Migrations
                     b.ToTable("Hashtags");
                 });
 
-            modelBuilder.Entity("TripickServer.Models.ImageAppUser", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<int>("IdOwner")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Image")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IdOwner")
-                        .IsUnique();
-
-                    b.ToTable("ImageAppUser");
-                });
-
             modelBuilder.Entity("TripickServer.Models.ImageGuide", b =>
                 {
                     b.Property<int>("Id")
@@ -427,9 +411,6 @@ namespace TripickServer.Migrations
 
                     b.Property<string>("Image")
                         .HasColumnType("text");
-
-                    b.Property<bool>("IsCover")
-                        .HasColumnType("boolean");
 
                     b.Property<bool>("IsVerified")
                         .HasColumnType("boolean");
@@ -1007,15 +988,6 @@ namespace TripickServer.Migrations
                     b.HasOne("TripickServer.Models.Guide", null)
                         .WithMany("Hashtags")
                         .HasForeignKey("GuideId");
-                });
-
-            modelBuilder.Entity("TripickServer.Models.ImageAppUser", b =>
-                {
-                    b.HasOne("TripickServer.Models.AppUser", "Owner")
-                        .WithOne("Photo")
-                        .HasForeignKey("TripickServer.Models.ImageAppUser", "IdOwner")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("TripickServer.Models.ImageGuide", b =>
