@@ -4,19 +4,24 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace TripickServer.Migrations
 {
-    public partial class CreateWholeModel : Migration
+    public partial class Creation : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<int>(
-                name: "AppUserId",
-                table: "AspNetUsers",
-                nullable: true);
-
-            migrationBuilder.AddColumn<int>(
-                name: "TripId",
-                table: "AspNetUsers",
-                nullable: true);
+            migrationBuilder.CreateTable(
+                name: "AspNetRoles",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(maxLength: 256, nullable: true),
+                    NormalizedName = table.Column<string>(maxLength: 256, nullable: true),
+                    ConcurrencyStamp = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetRoles", x => x.Id);
+                });
 
             migrationBuilder.CreateTable(
                 name: "Places",
@@ -42,38 +47,6 @@ namespace TripickServer.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Places", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Trips",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    IsPublic = table.Column<bool>(nullable: false),
-                    CoverImage = table.Column<string>(nullable: true),
-                    Name = table.Column<string>(nullable: true),
-                    Description = table.Column<string>(nullable: true),
-                    Note = table.Column<string>(nullable: true),
-                    StartDate = table.Column<DateTime>(nullable: false),
-                    EndDate = table.Column<DateTime>(nullable: false),
-                    StartLatitude = table.Column<double>(nullable: false),
-                    StartLongitude = table.Column<double>(nullable: false),
-                    EndLatitude = table.Column<double>(nullable: false),
-                    EndLongitude = table.Column<double>(nullable: false),
-                    IsDeleted = table.Column<bool>(nullable: false),
-                    DeleteDate = table.Column<DateTime>(nullable: true),
-                    IdOwner = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Trips", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Trips_AspNetUsers_IdOwner",
-                        column: x => x.IdOwner,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -119,6 +92,189 @@ namespace TripickServer.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AspNetRoleClaims",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    RoleId = table.Column<int>(nullable: false),
+                    ClaimType = table.Column<string>(nullable: true),
+                    ClaimValue = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetRoleClaims", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AspNetRoleClaims_AspNetRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUserRoles",
+                columns: table => new
+                {
+                    UserId = table.Column<int>(nullable: false),
+                    RoleId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUserRoles", x => new { x.UserId, x.RoleId });
+                    table.ForeignKey(
+                        name: "FK_AspNetUserRoles_AspNetRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUserClaims",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserId = table.Column<int>(nullable: false),
+                    ClaimType = table.Column<string>(nullable: true),
+                    ClaimValue = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUserClaims", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUserLogins",
+                columns: table => new
+                {
+                    LoginProvider = table.Column<string>(nullable: false),
+                    ProviderKey = table.Column<string>(nullable: false),
+                    ProviderDisplayName = table.Column<string>(nullable: true),
+                    UserId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUserLogins", x => new { x.LoginProvider, x.ProviderKey });
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUserTokens",
+                columns: table => new
+                {
+                    UserId = table.Column<int>(nullable: false),
+                    LoginProvider = table.Column<string>(nullable: false),
+                    Name = table.Column<string>(nullable: false),
+                    Value = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUserTokens", x => new { x.UserId, x.LoginProvider, x.Name });
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Guides",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(nullable: true),
+                    Description = table.Column<string>(nullable: true),
+                    TypeId = table.Column<int>(nullable: true),
+                    Price = table.Column<double>(nullable: false),
+                    IdAuthor = table.Column<int>(nullable: false),
+                    IdTrip = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Guides", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Guides_TypeGuide_TypeId",
+                        column: x => x.TypeId,
+                        principalTable: "TypeGuide",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Hashtags",
+                columns: table => new
+                {
+                    Name = table.Column<string>(nullable: false),
+                    GuideId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Hashtags", x => x.Name);
+                    table.ForeignKey(
+                        name: "FK_Hashtags_Guides_GuideId",
+                        column: x => x.GuideId,
+                        principalTable: "Guides",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ImageGuides",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Image = table.Column<string>(nullable: true),
+                    CreationDate = table.Column<DateTime>(nullable: false),
+                    IsVerified = table.Column<bool>(nullable: false),
+                    IdGuide = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ImageGuides", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ImageGuides_Guides_IdGuide",
+                        column: x => x.IdGuide,
+                        principalTable: "Guides",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TypeGroups",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(nullable: true),
+                    NbPersons = table.Column<int>(nullable: false),
+                    Icon = table.Column<string>(nullable: true),
+                    GuideId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TypeGroups", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TypeGroups_Guides_GuideId",
+                        column: x => x.GuideId,
+                        principalTable: "Guides",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ImageAppUser",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Image = table.Column<string>(nullable: true),
+                    CreationDate = table.Column<DateTime>(nullable: false),
+                    IdOwner = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ImageAppUser", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ImagePlaces",
                 columns: table => new
                 {
@@ -127,6 +283,7 @@ namespace TripickServer.Migrations
                     Image = table.Column<string>(nullable: true),
                     CreationDate = table.Column<DateTime>(nullable: false),
                     IsVerified = table.Column<bool>(nullable: false),
+                    IsCover = table.Column<bool>(nullable: false),
                     IdPlace = table.Column<int>(nullable: false),
                     IdUploader = table.Column<int>(nullable: false)
                 },
@@ -139,10 +296,50 @@ namespace TripickServer.Migrations
                         principalTable: "Places",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Picks",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Rating = table.Column<int>(nullable: false),
+                    IdPlace = table.Column<int>(nullable: false),
+                    IdUser = table.Column<int>(nullable: false),
+                    IdTrip = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Picks", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ImagePlaces_AspNetUsers_IdUploader",
-                        column: x => x.IdUploader,
-                        principalTable: "AspNetUsers",
+                        name: "FK_Picks_Places_IdPlace",
+                        column: x => x.IdPlace,
+                        principalTable: "Places",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ReviewGuides",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Rating = table.Column<int>(nullable: false),
+                    Title = table.Column<string>(nullable: true),
+                    Message = table.Column<string>(nullable: true),
+                    CreationDate = table.Column<DateTime>(nullable: false),
+                    IdGuide = table.Column<int>(nullable: false),
+                    IdAuthor = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ReviewGuides", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ReviewGuides_Guides_IdGuide",
+                        column: x => x.IdGuide,
+                        principalTable: "Guides",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -164,17 +361,79 @@ namespace TripickServer.Migrations
                 {
                     table.PrimaryKey("PK_ReviewPlace", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ReviewPlace_AspNetUsers_IdAuthor",
-                        column: x => x.IdAuthor,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
                         name: "FK_ReviewPlace_Places_IdPlace",
                         column: x => x.IdPlace,
                         principalTable: "Places",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Trips",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    IsPublic = table.Column<bool>(nullable: false),
+                    CoverImage = table.Column<string>(nullable: true),
+                    Name = table.Column<string>(nullable: true),
+                    Description = table.Column<string>(nullable: true),
+                    Note = table.Column<string>(nullable: true),
+                    StartDate = table.Column<DateTime>(nullable: false),
+                    EndDate = table.Column<DateTime>(nullable: false),
+                    StartLatitude = table.Column<double>(nullable: false),
+                    StartLongitude = table.Column<double>(nullable: false),
+                    EndLatitude = table.Column<double>(nullable: false),
+                    EndLongitude = table.Column<double>(nullable: false),
+                    IsDeleted = table.Column<bool>(nullable: false),
+                    DeleteDate = table.Column<DateTime>(nullable: true),
+                    IdOwner = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Trips", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUsers",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserName = table.Column<string>(maxLength: 256, nullable: true),
+                    NormalizedUserName = table.Column<string>(maxLength: 256, nullable: true),
+                    Email = table.Column<string>(maxLength: 256, nullable: true),
+                    NormalizedEmail = table.Column<string>(maxLength: 256, nullable: true),
+                    EmailConfirmed = table.Column<bool>(nullable: false),
+                    PasswordHash = table.Column<string>(nullable: true),
+                    SecurityStamp = table.Column<string>(nullable: true),
+                    ConcurrencyStamp = table.Column<string>(nullable: true),
+                    PhoneNumber = table.Column<string>(nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(nullable: true),
+                    LockoutEnabled = table.Column<bool>(nullable: false),
+                    AccessFailedCount = table.Column<int>(nullable: false),
+                    FirstName = table.Column<string>(nullable: true),
+                    LastName = table.Column<string>(nullable: true),
+                    AppUserId = table.Column<int>(nullable: true),
+                    TripId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AspNetUsers_AspNetUsers_AppUserId",
+                        column: x => x.AppUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_AspNetUsers_Trips_TripId",
+                        column: x => x.TripId,
+                        principalTable: "Trips",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -185,7 +444,6 @@ namespace TripickServer.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     IsMapFrame = table.Column<bool>(nullable: false),
                     Name = table.Column<string>(nullable: true),
-                    Cover = table.Column<string>(nullable: true),
                     IdTrip = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
@@ -222,73 +480,30 @@ namespace TripickServer.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Picks",
+                name: "VoteReviewGuides",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Rating = table.Column<int>(nullable: false),
-                    IdPlace = table.Column<int>(nullable: false),
-                    IdUser = table.Column<int>(nullable: false),
-                    IdTrip = table.Column<int>(nullable: false)
+                    IsUp = table.Column<bool>(nullable: false),
+                    IdReviewGuide = table.Column<int>(nullable: false),
+                    IdAuthor = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Picks", x => x.Id);
+                    table.PrimaryKey("PK_VoteReviewGuides", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Picks_Places_IdPlace",
-                        column: x => x.IdPlace,
-                        principalTable: "Places",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Picks_Trips_IdTrip",
-                        column: x => x.IdTrip,
-                        principalTable: "Trips",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Picks_AspNetUsers_IdUser",
-                        column: x => x.IdUser,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Guides",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(nullable: true),
-                    Description = table.Column<string>(nullable: true),
-                    TypeId = table.Column<int>(nullable: true),
-                    Price = table.Column<double>(nullable: false),
-                    IdAuthor = table.Column<int>(nullable: false),
-                    IdTrip = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Guides", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Guides_AspNetUsers_IdAuthor",
+                        name: "FK_VoteReviewGuides_AspNetUsers_IdAuthor",
                         column: x => x.IdAuthor,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Guides_Trips_IdTrip",
-                        column: x => x.IdTrip,
-                        principalTable: "Trips",
+                        name: "FK_VoteReviewGuides_ReviewGuides_IdReviewGuide",
+                        column: x => x.IdReviewGuide,
+                        principalTable: "ReviewGuides",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Guides_TypeGuide_TypeId",
-                        column: x => x.TypeId,
-                        principalTable: "TypeGuide",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -364,98 +579,6 @@ namespace TripickServer.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Hashtags",
-                columns: table => new
-                {
-                    Name = table.Column<string>(nullable: false),
-                    GuideId = table.Column<int>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Hashtags", x => x.Name);
-                    table.ForeignKey(
-                        name: "FK_Hashtags_Guides_GuideId",
-                        column: x => x.GuideId,
-                        principalTable: "Guides",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ImageGuides",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Image = table.Column<string>(nullable: true),
-                    CreationDate = table.Column<DateTime>(nullable: false),
-                    IsVerified = table.Column<bool>(nullable: false),
-                    IdGuide = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ImageGuides", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ImageGuides_Guides_IdGuide",
-                        column: x => x.IdGuide,
-                        principalTable: "Guides",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ReviewGuides",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Rating = table.Column<int>(nullable: false),
-                    Title = table.Column<string>(nullable: true),
-                    Message = table.Column<string>(nullable: true),
-                    CreationDate = table.Column<DateTime>(nullable: false),
-                    IdGuide = table.Column<int>(nullable: false),
-                    IdAuthor = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ReviewGuides", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ReviewGuides_AspNetUsers_IdAuthor",
-                        column: x => x.IdAuthor,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ReviewGuides_Guides_IdGuide",
-                        column: x => x.IdGuide,
-                        principalTable: "Guides",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "TypeGroups",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(nullable: true),
-                    NbPersons = table.Column<int>(nullable: false),
-                    Icon = table.Column<string>(nullable: true),
-                    GuideId = table.Column<int>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TypeGroups", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_TypeGroups_Guides_GuideId",
-                        column: x => x.GuideId,
-                        principalTable: "Guides",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Steps",
                 columns: table => new
                 {
@@ -527,37 +650,47 @@ namespace TripickServer.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "VoteReviewGuides",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    IsUp = table.Column<bool>(nullable: false),
-                    IdReviewGuide = table.Column<int>(nullable: false),
-                    IdAuthor = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_VoteReviewGuides", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_VoteReviewGuides_AspNetUsers_IdAuthor",
-                        column: x => x.IdAuthor,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_VoteReviewGuides_ReviewGuides_IdReviewGuide",
-                        column: x => x.IdReviewGuide,
-                        principalTable: "ReviewGuides",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetRoleClaims_RoleId",
+                table: "AspNetRoleClaims",
+                column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "RoleNameIndex",
+                table: "AspNetRoles",
+                column: "NormalizedName",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUserClaims_UserId",
+                table: "AspNetUserClaims",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUserLogins_UserId",
+                table: "AspNetUserLogins",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUserRoles_RoleId",
+                table: "AspNetUserRoles",
+                column: "RoleId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetUsers_AppUserId",
                 table: "AspNetUsers",
                 column: "AppUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "EmailIndex",
+                table: "AspNetUsers",
+                column: "NormalizedEmail");
+
+            migrationBuilder.CreateIndex(
+                name: "UserNameIndex",
+                table: "AspNetUsers",
+                column: "NormalizedUserName",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetUsers_TripId",
@@ -598,6 +731,12 @@ namespace TripickServer.Migrations
                 name: "IX_Hashtags_GuideId",
                 table: "Hashtags",
                 column: "GuideId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ImageAppUser_IdOwner",
+                table: "ImageAppUser",
+                column: "IdOwner",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_ImageGuides_IdGuide",
@@ -711,37 +850,139 @@ namespace TripickServer.Migrations
                 column: "IdReviewPlace");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_AspNetUsers_AspNetUsers_AppUserId",
-                table: "AspNetUsers",
-                column: "AppUserId",
+                name: "FK_AspNetUserRoles_AspNetUsers_UserId",
+                table: "AspNetUserRoles",
+                column: "UserId",
                 principalTable: "AspNetUsers",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
+                onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
-                name: "FK_AspNetUsers_Trips_TripId",
-                table: "AspNetUsers",
-                column: "TripId",
+                name: "FK_AspNetUserClaims_AspNetUsers_UserId",
+                table: "AspNetUserClaims",
+                column: "UserId",
+                principalTable: "AspNetUsers",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_AspNetUserLogins_AspNetUsers_UserId",
+                table: "AspNetUserLogins",
+                column: "UserId",
+                principalTable: "AspNetUsers",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_AspNetUserTokens_AspNetUsers_UserId",
+                table: "AspNetUserTokens",
+                column: "UserId",
+                principalTable: "AspNetUsers",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Guides_AspNetUsers_IdAuthor",
+                table: "Guides",
+                column: "IdAuthor",
+                principalTable: "AspNetUsers",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Guides_Trips_IdTrip",
+                table: "Guides",
+                column: "IdTrip",
                 principalTable: "Trips",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_ImageAppUser_AspNetUsers_IdOwner",
+                table: "ImageAppUser",
+                column: "IdOwner",
+                principalTable: "AspNetUsers",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_ImagePlaces_AspNetUsers_IdUploader",
+                table: "ImagePlaces",
+                column: "IdUploader",
+                principalTable: "AspNetUsers",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Picks_AspNetUsers_IdUser",
+                table: "Picks",
+                column: "IdUser",
+                principalTable: "AspNetUsers",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Picks_Trips_IdTrip",
+                table: "Picks",
+                column: "IdTrip",
+                principalTable: "Trips",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_ReviewGuides_AspNetUsers_IdAuthor",
+                table: "ReviewGuides",
+                column: "IdAuthor",
+                principalTable: "AspNetUsers",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_ReviewPlace_AspNetUsers_IdAuthor",
+                table: "ReviewPlace",
+                column: "IdAuthor",
+                principalTable: "AspNetUsers",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Trips_AspNetUsers_IdOwner",
+                table: "Trips",
+                column: "IdOwner",
+                principalTable: "AspNetUsers",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_AspNetUsers_AspNetUsers_AppUserId",
-                table: "AspNetUsers");
+                name: "FK_Trips_AspNetUsers_IdOwner",
+                table: "Trips");
 
-            migrationBuilder.DropForeignKey(
-                name: "FK_AspNetUsers_Trips_TripId",
-                table: "AspNetUsers");
+            migrationBuilder.DropTable(
+                name: "AspNetRoleClaims");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserClaims");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserLogins");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserRoles");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
                 name: "BoundingBox");
 
             migrationBuilder.DropTable(
                 name: "Hashtags");
+
+            migrationBuilder.DropTable(
+                name: "ImageAppUser");
 
             migrationBuilder.DropTable(
                 name: "ImageGuides");
@@ -763,6 +1004,9 @@ namespace TripickServer.Migrations
 
             migrationBuilder.DropTable(
                 name: "VoteReviewPlace");
+
+            migrationBuilder.DropTable(
+                name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "Destinations");
@@ -795,26 +1039,13 @@ namespace TripickServer.Migrations
                 name: "Places");
 
             migrationBuilder.DropTable(
-                name: "Trips");
-
-            migrationBuilder.DropTable(
                 name: "TypeGuide");
 
-            migrationBuilder.DropIndex(
-                name: "IX_AspNetUsers_AppUserId",
-                table: "AspNetUsers");
+            migrationBuilder.DropTable(
+                name: "AspNetUsers");
 
-            migrationBuilder.DropIndex(
-                name: "IX_AspNetUsers_TripId",
-                table: "AspNetUsers");
-
-            migrationBuilder.DropColumn(
-                name: "AppUserId",
-                table: "AspNetUsers");
-
-            migrationBuilder.DropColumn(
-                name: "TripId",
-                table: "AspNetUsers");
+            migrationBuilder.DropTable(
+                name: "Trips");
         }
     }
 }

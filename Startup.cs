@@ -33,8 +33,8 @@ namespace TripickServer
                 Configuration.GetConnectionString("DefaultConnection"),
                 b => b.ProvideClientCertificatesCallback(clientCerts =>
                 {
-                    var databaseCertificate = @"~/Resources/databaseCert.pfx";
-                    var cert = new X509Certificate2(databaseCertificate);
+                    var databaseCertificate = Configuration.GetValue<string>(WebHostDefaults.ContentRootKey) + "/Resources/databaseCert.pfx";
+                    var cert = new X509Certificate2(databaseCertificate, Configuration.GetValue<string>("Settings:databaseCertPassword"));
                     clientCerts.Add(cert);
                 }
             )));
