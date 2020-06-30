@@ -1,16 +1,34 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
 namespace TripickServer.Models
 {
     public class TripickContext : IdentityDbContext<AppUser, AppRole, int>
     {
-        public TripickContext(DbContextOptions<TripickContext> options) : base(options) { }
+        public IConfiguration configuration { get; }
+
+        public TripickContext(IConfiguration configuration, DbContextOptions<TripickContext> options) : base(options)
+        {
+            this.configuration = configuration;
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            string connectionString = configuration.GetConnectionString("DefaultConnection");
+            optionsBuilder.UseNpgsql(connectionString, b => b.ProvideClientCertificatesCallback(clientCerts =>
+            {
+                var databaseCertificate = @"~/Resources/databaseCert.pfx";
+                var cert = new X509Certificate2(databaseCertificate);
+                clientCerts.Add(cert);
+            }));
+        }
 
         // Commons
         public DbSet<Hashtag> Hashtags { get; set; }
