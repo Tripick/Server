@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -28,7 +29,15 @@ namespace TripickServer
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddIdentity<AppUser, AppRole>(options => { options.User.RequireUniqueEmail = true; }).AddEntityFrameworkStores<TripickContext>();
-            services.AddDbContext<TripickContext>(options => options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<TripickContext>(options => options.UseNpgsql(
+                Configuration.GetConnectionString("DefaultConnection"),
+                b => b.ProvideClientCertificatesCallback(clientCerts =>
+                {
+                    var databaseCertificate = @"~/Resources/databaseCert.pfx";
+                    var cert = new X509Certificate2(databaseCertificate);
+                    clientCerts.Add(cert);
+                }
+            )));
 
             services.AddControllers();
         }

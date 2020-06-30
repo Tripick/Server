@@ -21,8 +21,7 @@ namespace TripickServer.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            string connectionString = configuration.GetConnectionString("DefaultConnection");
-            optionsBuilder.UseNpgsql(connectionString, b => b.ProvideClientCertificatesCallback(clientCerts =>
+            optionsBuilder.UseNpgsql(configuration.GetConnectionString("DefaultConnection"), b => b.ProvideClientCertificatesCallback(clientCerts =>
             {
                 var databaseCertificate = @"~/Resources/databaseCert.pfx";
                 var cert = new X509Certificate2(databaseCertificate);
