@@ -43,7 +43,7 @@ namespace TripickServer.Controllers
         [Route("Register")]
         public async Task<IActionResult> Register([FromBody] RequestRegister credentials)
         {
-            if (credentials == null || string.IsNullOrWhiteSpace(credentials.Email) || string.IsNullOrWhiteSpace(credentials.Password))
+            if (credentials == null || string.IsNullOrWhiteSpace(credentials.Email) || string.IsNullOrWhiteSpace(credentials.Username) || string.IsNullOrWhiteSpace(credentials.Password))
                 return BadRequest("Invalid credentials.");
 
             if (credentials.Password != credentials.ConfirmPassword)
@@ -52,7 +52,7 @@ namespace TripickServer.Controllers
             AppUser newUser = new AppUser
             {
                 Email = credentials.Email,
-                UserName = credentials.Email.Substring(0, credentials.Email.IndexOf('@')).ToCleanUsername(),
+                UserName = credentials.Username,
                 FirstName = string.Empty,
                 LastName = string.Empty
             };
@@ -66,6 +66,10 @@ namespace TripickServer.Controllers
             catch (SqlException)
             {
                 return StatusCode((int)HttpStatusCode.InternalServerError, "Server error, please try again.");
+            }
+            catch (Exception e)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, "Server error, please try again : " + e.Message);
             }
 
             if (!userCreationResult.Succeeded)
