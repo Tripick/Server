@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using System.Web;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -20,7 +23,8 @@ namespace TripickServer.Controllers
     public class AccountController : ControllerBase
     {
         private readonly ILogger<AccountController> logger;
-        private UserManager<AppUser> userManager { get; }
+
+        private UserManager<AppUser> userManager;
         private SignInManager<AppUser> signInManager { get; }
 
         public AccountController(ILogger<AccountController> logger, UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
@@ -122,10 +126,38 @@ namespace TripickServer.Controllers
                 return ServerResponse<AppUser>.ToJson(false, "Wrong login or password.");
 
             ServerResponse<AppUser> response = new ServerResponse<AppUser>(user);
-            StringValues token;
-            Response.Headers.TryGetValue(Constants.AuthenticationTokenCookieName, out token);
-            response.Message = token.FirstOrDefault();
+            await userManager.RemoveAuthenticationTokenAsync(user, Constants.AppName, Constants.AuthenticationTokenName);
+            var newToken = await userManager.GenerateUserTokenAsync(user, Constants.AppName, Constants.AuthenticationTokenName);
+            await userManager.SetAuthenticationTokenAsync(user, Constants.AppName, Constants.AuthenticationTokenName, newToken);
+            response.Message = HttpUtility.UrlEncode(newToken);
             return new JsonResult(response);
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("LoginByToken")]
+        public async Task<JsonResult> LoginByToken([FromBody] RequestLoginByToken credentials)
+        {
+            if (credentials == null || string.IsNullOrWhiteSpace(credentials.Token))
+                return ServerResponse<AppUser>.ToJson(false, "Token required.");
+
+            AppUser user = await userManager.FindByEmailAsync(credentials.Email);
+            if (user == null)
+                return ServerResponse<string>.ToJson(false, "This account doesn't exist.");
+
+            await Logout();
+
+            string existingToken = await userManager.GetAuthenticationTokenAsync(user, Constants.AppName, Constants.AuthenticationTokenName);
+            bool tokenIsValid = existingToken == HttpUtility.UrlDecode(credentials.Token);
+            if(tokenIsValid)
+            {
+                await signInManager.SignInAsync(user, isPersistent: true);
+                return ServerResponse<AppUser>.ToJson(user);
+            }
+            else
+            {
+                return ServerResponse<AppUser>.ToJson(false, "Token invalid or expired.");
+            }
         }
 
         [AllowAnonymous]
@@ -133,13 +165,21 @@ namespace TripickServer.Controllers
         [Route("Logout")]
         public async Task<JsonResult> Logout()
         {
+            if(this.User != null && signInManager.IsSignedIn(this.User))
+            {
+                AppUser user = await userManager.FindByIdAsync(userManager.GetUserId(this.User));
+                if (user == null)
+                    return ServerResponse<string>.ToJson(false, "This account doesn't exist.");
+                await userManager.UpdateSecurityStampAsync(user);
+            }
+
             await signInManager.SignOutAsync();
-            Response.Cookies.Delete(Constants.AuthenticationTokenCookieName);
+            Response.Cookies.Delete(Constants.AuthenticationTokenName);
             return ServerResponse<string>.ToJson("Logged out.");
         }
 
         [AllowAnonymous]
-        [HttpPost]
+        [HttpDelete]
         [Route("Delete")]
         public async Task<JsonResult> Delete([FromBody] RequestLogin credentials)
         {
@@ -148,7 +188,7 @@ namespace TripickServer.Controllers
 
            AppUser user = await userManager.FindByEmailAsync(credentials.Email);
             if (user == null)
-                return ServerResponse<string>.ToJson(false, "Incorrect credentials.");
+                return ServerResponse<string>.ToJson(false, "This account doesn't exist.");
 
             Microsoft.AspNetCore.Identity.SignInResult passwordSignInResult = await signInManager.PasswordSignInAsync(user, credentials.Password, isPersistent: true, lockoutOnFailure: false);
             if (!passwordSignInResult.Succeeded)

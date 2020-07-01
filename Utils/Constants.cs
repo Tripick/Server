@@ -7,7 +7,8 @@ namespace TripickServer.Utils
 {
     public static class Constants
     {
+        public const string AppName = "Tripick";
         public const bool AuthenticationConfirmEmail = false;
-        public const string AuthenticationTokenCookieName = "TripickAuthentication";
+        public const string AuthenticationTokenName = "TripickAuthentication";
     }
 }

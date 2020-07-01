@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -13,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using TripickServer.Models;
+using TripickServer.Utils;
 
 namespace TripickServer
 {
@@ -28,15 +30,19 @@ namespace TripickServer
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddIdentity<AppUser, AppRole>(options => { options.User.RequireUniqueEmail = true; }).AddEntityFrameworkStores<TripickContext>();
-            services.AddDbContext<TripickContext>(options => options.UseNpgsql(
-                Configuration.GetConnectionString("DefaultConnection"),
-                b => b.ProvideClientCertificatesCallback(clientCerts =>
-                {
-                    var databaseCertificate = Configuration.GetValue<string>(WebHostDefaults.ContentRootKey) + "/Resources/databaseCert.pfx";
-                    var cert = new X509Certificate2(databaseCertificate, Configuration.GetValue<string>("Settings:databaseCertPassword"));
-                    clientCerts.Add(cert);
-                }
+            services
+                .AddIdentity<AppUser, AppRole>(options => { options.User.RequireUniqueEmail = true; })
+                .AddEntityFrameworkStores<TripickContext>()
+                .AddTokenProvider(Constants.AppName, typeof(DataProtectorTokenProvider<AppUser>));
+            services
+                .AddDbContext<TripickContext>(options => options.UseNpgsql(
+                    Configuration.GetConnectionString("DefaultConnection"),
+                    b => b.ProvideClientCertificatesCallback(clientCerts =>
+                    {
+                        var databaseCertificate = Configuration.GetValue<string>(WebHostDefaults.ContentRootKey) + "/Resources/databaseCert.pfx";
+                        var cert = new X509Certificate2(databaseCertificate, Configuration.GetValue<string>("Settings:databaseCertPassword"));
+                        clientCerts.Add(cert);
+                    }
             )));
 
             services.AddControllers();
