@@ -37,17 +37,17 @@ namespace TripickServer.Controllers
         [AllowAnonymous]
         [HttpGet]
         [Route("test")]
-        public IActionResult test()
+        public JsonResult test()
         {
-            return Ok("Request received UPGRADED");
+            return ServerResponse<string>.ToJson("test success.");
         }
 
         [AllowAnonymous]
         [HttpPost]
         [Route("testpost")]
-        public IActionResult testpost([FromBody] Testpost testpost)
+        public JsonResult testpost([FromBody] Testpost testpost)
         {
-            return Ok("Request testpost received.");
+            return ServerResponse<string>.ToJson("testpost success.");
         }
 
         [AllowAnonymous]
