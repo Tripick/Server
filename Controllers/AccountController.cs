@@ -39,7 +39,16 @@ namespace TripickServer.Controllers
 
         [AllowAnonymous]
         [HttpPost]
+        [Route("testpost")]
+        public IActionResult testpost([FromBody] Testpost testpost)
+        {
+            return Ok("Request testpost received.");
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
         [Route("Register")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register([FromBody] RequestRegister credentials)
         {
             if (credentials == null || string.IsNullOrWhiteSpace(credentials.Email) || string.IsNullOrWhiteSpace(credentials.Username) || string.IsNullOrWhiteSpace(credentials.Password))
