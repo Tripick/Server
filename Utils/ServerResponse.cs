@@ -11,6 +11,12 @@
             this.IsSuccess = true;
             this.Message = string.Empty;
         }
+        public ServerResponse(bool isSuccess, string message)
+        {
+            this.IsSuccess = isSuccess;
+            this.Message = message;
+            this.Result = default(T);
+        }
         public ServerResponse(T t)
         {
             this.IsSuccess = true;

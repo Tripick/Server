@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Primitives;
 using TripickServer.Models;
 using TripickServer.Requests;
 using TripickServer.Utils;
@@ -48,14 +49,18 @@ namespace TripickServer.Controllers
         [AllowAnonymous]
         [HttpPost]
         [Route("Register")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register([FromBody] RequestRegister credentials)
+        public async Task<ServerResponse<AppUser>> Register([FromBody] RequestRegister credentials)
         {
-            if (credentials == null || string.IsNullOrWhiteSpace(credentials.Email) || string.IsNullOrWhiteSpace(credentials.Username) || string.IsNullOrWhiteSpace(credentials.Password))
-                return BadRequest("Invalid credentials.");
+            ServerResponse<AppUser> response = new ServerResponse<AppUser>();
+
+            if (credentials == null ||
+                string.IsNullOrWhiteSpace(credentials.Email) ||
+                string.IsNullOrWhiteSpace(credentials.Username) ||
+                string.IsNullOrWhiteSpace(credentials.Password))
+                return new ServerResponse<AppUser>(false, "Invalid credentials.");
 
             if (credentials.Password != credentials.ConfirmPassword)
-                return BadRequest("Passwords don't match.");
+                return new ServerResponse<AppUser>(false, "Passwords don't match.");
 
             AppUser newUser = new AppUser
             {
@@ -73,17 +78,15 @@ namespace TripickServer.Controllers
             }
             catch (SqlException)
             {
-                return StatusCode((int)HttpStatusCode.InternalServerError, "Server error, please try again.");
+                return new ServerResponse<AppUser>(false, "Server error, please try again.");
             }
             catch (Exception e)
             {
-                return StatusCode((int)HttpStatusCode.InternalServerError, "Server error, please try again : " + e.Message);
+                return new ServerResponse<AppUser>(false, "Server error, please try again : " + e.Message);
             }
 
             if (!userCreationResult.Succeeded)
-            {
-                return BadRequest($"- {string.Join($"{Environment.NewLine}- ", userCreationResult.Errors.Select(x => x.Description).ToList())}");
-            }
+                return new ServerResponse<AppUser>(false, $"- {string.Join($"{Environment.NewLine}- ", userCreationResult.Errors.Select(x => x.Description).ToList())}");
 
             // If a confirmation is required
             if (Constants.AuthenticationConfirmEmail)
@@ -96,64 +99,65 @@ namespace TripickServer.Controllers
                 //return Ok($"Registration completed, please verify your email - {newUser.Email}");
             }
 
-            return Ok($"Registration successful.");
+            return await Login(new RequestLogin() { Email = credentials.Email, Password = credentials.Password });
         }
 
         [AllowAnonymous]
         [HttpPost]
         [Route("Login")]
-        public async Task<IActionResult> Login([FromBody] RequestLogin credentials)
+        public async Task<ServerResponse<AppUser>> Login([FromBody] RequestLogin credentials)
         {
             if (credentials == null || string.IsNullOrWhiteSpace(credentials.Email) || string.IsNullOrWhiteSpace(credentials.Password))
-                return BadRequest("Invalid credentials.");
+                return new ServerResponse<AppUser>(false, "Invalid credentials.");
 
             AppUser user = await userManager.FindByEmailAsync(credentials.Email);
             if (user == null)
-                return BadRequest("Incorrect credential.");
+                return new ServerResponse<AppUser>(false, "This account doesn't exist.");
 
             await Logout();
 
-            if (Constants.AuthenticationConfirmEmail)
-            {
-                if (!user.EmailConfirmed)
-                    return BadRequest("Email not confirmed, please check your email for confirmation link.");
-            }
+            if (Constants.AuthenticationConfirmEmail && !user.EmailConfirmed)
+                return new ServerResponse<AppUser>(false, "Email not confirmed, please check your email for confirmation link.");
 
             Microsoft.AspNetCore.Identity.SignInResult passwordSignInResult = await signInManager.PasswordSignInAsync(user, credentials.Password, isPersistent: true, lockoutOnFailure: false);
             if (!passwordSignInResult.Succeeded)
-                return BadRequest("Incorrect credential.");
+                return new ServerResponse<AppUser>(false, "Wrong login or password.");
 
-            return Ok(user);
+            ServerResponse<AppUser> response = new ServerResponse<AppUser>(user);
+            StringValues token;
+            Response.Headers.TryGetValue(Constants.AuthenticationTokenCookieName, out token);
+            response.Message = token.FirstOrDefault();
+            return response;
         }
 
         [AllowAnonymous]
         [HttpDelete]
         [Route("Logout")]
-        public async Task<IActionResult> Logout()
+        public async Task<ServerResponse<string>> Logout()
         {
             await signInManager.SignOutAsync();
             Response.Cookies.Delete(Constants.AuthenticationTokenCookieName);
-            return Ok("Log out successful.");
+            return new ServerResponse<string>("Logged out.");
         }
 
         [AllowAnonymous]
         [HttpPost]
         [Route("Delete")]
-        public async Task<IActionResult> Delete([FromBody] RequestLogin credentials)
+        public async Task<ServerResponse<string>> Delete([FromBody] RequestLogin credentials)
         {
             if (credentials == null || string.IsNullOrWhiteSpace(credentials.Email) || string.IsNullOrWhiteSpace(credentials.Password))
-                return BadRequest("Invalid credentials.");
+                return new ServerResponse<string>(false, "Invalid credentials.");
 
            AppUser user = await userManager.FindByEmailAsync(credentials.Email);
             if (user == null)
-                return BadRequest("Incorrect credential.");
+                return new ServerResponse<string>(false, "Incorrect credentials.");
 
             Microsoft.AspNetCore.Identity.SignInResult passwordSignInResult = await signInManager.PasswordSignInAsync(user, credentials.Password, isPersistent: true, lockoutOnFailure: false);
             if (!passwordSignInResult.Succeeded)
-                return BadRequest("Incorrect credential.");
+                return new ServerResponse<string>(false, "Incorrect credentials.");
 
             await userManager.DeleteAsync(user);
-            return Ok("Account deleted successfully.");
+            return new ServerResponse<string>( "Account deleted.");
         }
     }
 }
