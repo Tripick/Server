@@ -45,7 +45,10 @@ namespace TripickServer
                     }
             )));
 
-            services.AddControllers();
+            services.AddControllers(options => {
+                //options.Filters.Add(new CheckAuthKeysAndConnect()); // To apply the attribute on all controllers
+            });
+            services.AddScoped<CheckAuthKeysAndConnect>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -60,7 +63,7 @@ namespace TripickServer
 
             app.UseRouting();
 
-            app.UseAuthorization();
+            //app.UseAuthorization();
 
             app.UseAuthentication();
 

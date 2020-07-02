@@ -1,15 +1,18 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using TripickServer.Managers;
 using TripickServer.Models;
+using TripickServer.Requests;
 using TripickServer.Utils;
 
 namespace TripickServer.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class TripController : BaseController
@@ -22,7 +25,11 @@ namespace TripickServer.Controllers
 
         #region Constructor
 
-        public TripController(IHttpContextAccessor contextAccessor, ILogger<ServerLogger> logger, TripickContext tripickContext) : base(contextAccessor, logger)
+        public TripController(
+            ILogger<ServerLogger> logger,
+            UserManager<AppUser> userManager,
+            TripickContext tripickContext)
+        : base(logger, userManager)
         {
             this.managerTrip = new ManagerTrip(logger, this.ConnectedUser, tripickContext);
         }
@@ -31,9 +38,11 @@ namespace TripickServer.Controllers
 
         [HttpPost]
         [Route("Create")]
-        public ServerResponse<Trip> Create(Trip trip)
+        public JsonResult Create([FromBody] Request<Trip> request)
         {
-            return this.managerTrip.Create(trip);
+            if (request.Data == null)
+                return Error("The trip to create is null.");
+            return managerTrip.SafeCall(() => managerTrip.Create(request.Data));
         }
 
         [HttpGet]

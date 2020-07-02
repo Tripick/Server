@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using TripickServer.Models;
 using TripickServer.Utils;
 using TripickServer.Repos;
+using Microsoft.AspNetCore.Mvc;
 
 namespace TripickServer.Managers
 {
@@ -27,6 +28,22 @@ namespace TripickServer.Managers
         #endregion
 
         #region Public
+
+        public JsonResult SafeCall<T>(Func<T> method)
+        {
+            try
+            {
+                return ServerResponse<T>.ToJson(method());
+            }
+            catch (Exception e)
+            {
+                return ServerResponse<T>.ToJson(false, e.Message);
+            }
+        }
+
+        #endregion
+
+        #region Private
 
         public ServerResponse<List<Trip>> GetAll(int pageIndex = 0, int pageSize = 10)
         {
@@ -60,31 +77,19 @@ namespace TripickServer.Managers
             return response;
         }
 
-        public ServerResponse<Trip> Create(Trip trip)
+        public Trip Create(Trip trip)
         {
-            ServerResponse<Trip> response = new ServerResponse<Trip>();
-            try
-            {
-                // Verify the entity to create is not null
-                if (trip == null)
-                    throw new NullReferenceException("The trip to create cannot be null");
+            // Verify the entity to create is not null
+            if (trip == null)
+                throw new NullReferenceException("The trip to create cannot be null");
 
-                // Create
-                trip.IdOwner = this.ConnectedUser.Id;
-                this.repoTrip.Add(trip);
+            // Create
+            trip.IdOwner = this.ConnectedUser.Id;
+            this.repoTrip.Add(trip);
 
-                // Commit
-                this.TripickContext.SaveChanges();
-                response.Result = trip;
-            }
-            catch(Exception e)
-            {
-                string error = $"Create trip error : {e.Message}.";
-                this.Logger.LogError(error);
-                response.IsSuccess = false;
-                response.Message = error;
-            }
-            return response;
+            // Commit
+            this.TripickContext.SaveChanges();
+            return trip;
         }
 
         public ServerResponse<Trip> Update(Trip trip)

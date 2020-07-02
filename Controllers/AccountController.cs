@@ -34,7 +34,12 @@ namespace TripickServer.Controllers
             this.signInManager = signInManager;
         }
 
-        [AllowAnonymous]
+        [HttpGet]
+        public JsonResult ConnectionError(string error)
+        {
+            return ServerResponse<string>.ToJson(error);
+        }
+
         [HttpGet]
         [Route("test")]
         public JsonResult test()
@@ -42,7 +47,6 @@ namespace TripickServer.Controllers
             return ServerResponse<string>.ToJson("test success.");
         }
 
-        [AllowAnonymous]
         [HttpPost]
         [Route("testpost")]
         public JsonResult testpost([FromBody] Testpost testpost)
@@ -50,7 +54,6 @@ namespace TripickServer.Controllers
             return ServerResponse<string>.ToJson("testpost success.");
         }
 
-        [AllowAnonymous]
         [HttpPost]
         [Route("Register")]
         public async Task<JsonResult> Register([FromBody] RequestRegister credentials)
@@ -59,10 +62,10 @@ namespace TripickServer.Controllers
                 string.IsNullOrWhiteSpace(credentials.Email) ||
                 string.IsNullOrWhiteSpace(credentials.Username) ||
                 string.IsNullOrWhiteSpace(credentials.Password))
-                return ServerResponse<AppUser>.ToJson(false, "Invalid credentials.");
+                return ServerResponse<UserContext>.ToJson(false, "Invalid credentials.");
 
             if (credentials.Password != credentials.ConfirmPassword)
-                return ServerResponse<AppUser>.ToJson(false, "Passwords don't match.");
+                return ServerResponse<UserContext>.ToJson(false, "Passwords don't match.");
 
             AppUser newUser = new AppUser
             {
@@ -80,15 +83,15 @@ namespace TripickServer.Controllers
             }
             catch (SqlException)
             {
-                return ServerResponse<AppUser>.ToJson(false, "Server error, please try again.");
+                return ServerResponse<UserContext>.ToJson(false, "Server error, please try again.");
             }
             catch (Exception e)
             {
-                return ServerResponse<AppUser>.ToJson(false, "Server error, please try again : " + e.Message);
+                return ServerResponse<UserContext>.ToJson(false, "Server error, please try again : " + e.Message);
             }
 
             if (!userCreationResult.Succeeded)
-                return ServerResponse<AppUser>.ToJson(false, $"- {string.Join($"{Environment.NewLine}- ", userCreationResult.Errors.Select(x => x.Description).ToList())}");
+                return ServerResponse<UserContext>.ToJson(false, $"- {string.Join($"{Environment.NewLine}- ", userCreationResult.Errors.Select(x => x.Description).ToList())}");
 
             // If a confirmation is required
             if (Constants.AuthenticationConfirmEmail)
@@ -101,85 +104,83 @@ namespace TripickServer.Controllers
                 //return Ok($"Registration completed, please verify your email - {newUser.Email}");
             }
 
-            return new JsonResult(await Login(new RequestLogin() { Email = credentials.Email, Password = credentials.Password }));
+            return await Login(new RequestLogin() { Email = credentials.Email, Password = credentials.Password });
         }
 
-        [AllowAnonymous]
         [HttpPost]
         [Route("Login")]
         public async Task<JsonResult> Login([FromBody] RequestLogin credentials)
         {
             if (credentials == null || string.IsNullOrWhiteSpace(credentials.Email) || string.IsNullOrWhiteSpace(credentials.Password))
-                return ServerResponse<AppUser>.ToJson(false, "Invalid credentials.");
+                return ServerResponse<UserContext>.ToJson(false, "Invalid credentials.");
 
             AppUser user = await userManager.FindByEmailAsync(credentials.Email);
             if (user == null)
-                return ServerResponse<AppUser>.ToJson(false, "This account doesn't exist.");
+                return ServerResponse<UserContext>.ToJson(false, "This account doesn't exist.");
 
-            await Logout();
+            await signInManager.SignOutAsync();
 
             if (Constants.AuthenticationConfirmEmail && !user.EmailConfirmed)
-                return ServerResponse<AppUser>.ToJson(false, "Email not confirmed, please check your email for confirmation link.");
+                return ServerResponse<UserContext>.ToJson(false, "Email not confirmed, please check your email for confirmation link.");
 
             Microsoft.AspNetCore.Identity.SignInResult passwordSignInResult = await signInManager.PasswordSignInAsync(user, credentials.Password, isPersistent: true, lockoutOnFailure: false);
             if (!passwordSignInResult.Succeeded)
-                return ServerResponse<AppUser>.ToJson(false, "Wrong login or password.");
+                return ServerResponse<UserContext>.ToJson(false, "Wrong login or password.");
 
-            ServerResponse<AppUser> response = new ServerResponse<AppUser>(user);
+            // Generate new token
             await userManager.RemoveAuthenticationTokenAsync(user, Constants.AppName, Constants.AuthenticationTokenName);
             var newToken = await userManager.GenerateUserTokenAsync(user, Constants.AppName, Constants.AuthenticationTokenName);
             await userManager.SetAuthenticationTokenAsync(user, Constants.AppName, Constants.AuthenticationTokenName, newToken);
-            response.Message = HttpUtility.UrlEncode(newToken);
+
+            // Send User and AuthenticationKeys
+            ServerResponse<UserContext> response = new ServerResponse<UserContext>(new UserContext(user, HttpUtility.UrlEncode(newToken)));
             return new JsonResult(response);
         }
 
-        [AllowAnonymous]
         [HttpPost]
         [Route("LoginByToken")]
-        public async Task<JsonResult> LoginByToken([FromBody] RequestLoginByToken credentials)
+        public async Task<JsonResult> LoginByToken([FromBody] Request<string> request)
         {
-            if (credentials == null || string.IsNullOrWhiteSpace(credentials.Token))
-                return ServerResponse<AppUser>.ToJson(false, "Token required.");
+            if (request == null || request.AuthenticationKeys == null || string.IsNullOrWhiteSpace(request.AuthenticationKeys.AccessToken))
+                return ServerResponse<UserContext>.ToJson(false, "Token required.");
 
-            AppUser user = await userManager.FindByEmailAsync(credentials.Email);
+            AppUser user = await userManager.FindByIdAsync(request.AuthenticationKeys.Id.ToString());
             if (user == null)
                 return ServerResponse<string>.ToJson(false, "This account doesn't exist.");
 
-            await Logout();
-
             string existingToken = await userManager.GetAuthenticationTokenAsync(user, Constants.AppName, Constants.AuthenticationTokenName);
-            bool tokenIsValid = existingToken == HttpUtility.UrlDecode(credentials.Token);
+            bool tokenIsValid = existingToken == HttpUtility.UrlDecode(request.AuthenticationKeys.AccessToken);
             if(tokenIsValid)
             {
                 await signInManager.SignInAsync(user, isPersistent: true);
-                return ServerResponse<AppUser>.ToJson(user);
+                return ServerResponse<UserContext>.ToJson(new UserContext(user, request.AuthenticationKeys.AccessToken));
             }
             else
             {
-                return ServerResponse<AppUser>.ToJson(false, "Token invalid or expired.");
+                return ServerResponse<UserContext>.ToJson(false, "Token invalid or expired.");
             }
         }
 
-        [AllowAnonymous]
-        [HttpDelete]
+        [HttpPost]
         [Route("Logout")]
-        public async Task<JsonResult> Logout()
+        public async Task<JsonResult> Logout([FromBody] Request<string> request)
         {
-            if(this.User != null && signInManager.IsSignedIn(this.User))
-            {
-                AppUser user = await userManager.FindByIdAsync(userManager.GetUserId(this.User));
-                if (user == null)
-                    return ServerResponse<string>.ToJson(false, "This account doesn't exist.");
-                await userManager.UpdateSecurityStampAsync(user);
-            }
+            if (request == null || request.AuthenticationKeys == null || string.IsNullOrWhiteSpace(request.AuthenticationKeys.AccessToken))
+                return ServerResponse<UserContext>.ToJson(false, "Token required.");
 
-            await signInManager.SignOutAsync();
-            Response.Cookies.Delete(Constants.AuthenticationTokenName);
+            AppUser user = await userManager.FindByIdAsync(request.AuthenticationKeys.Id.ToString());
+            if (user == null)
+                return ServerResponse<string>.ToJson(false, "This account doesn't exist.");
+
+            // Generate new token
+            await userManager.RemoveAuthenticationTokenAsync(user, Constants.AppName, Constants.AuthenticationTokenName);
+            var newToken = await userManager.GenerateUserTokenAsync(user, Constants.AppName, Constants.AuthenticationTokenName);
+            await userManager.SetAuthenticationTokenAsync(user, Constants.AppName, Constants.AuthenticationTokenName, newToken);
+
             return ServerResponse<string>.ToJson("Logged out.");
         }
 
-        [AllowAnonymous]
-        [HttpDelete]
+        [HttpPost]
         [Route("Delete")]
         public async Task<JsonResult> Delete([FromBody] RequestLogin credentials)
         {
@@ -189,6 +190,8 @@ namespace TripickServer.Controllers
            AppUser user = await userManager.FindByEmailAsync(credentials.Email);
             if (user == null)
                 return ServerResponse<string>.ToJson(false, "This account doesn't exist.");
+
+            await signInManager.SignOutAsync();
 
             Microsoft.AspNetCore.Identity.SignInResult passwordSignInResult = await signInManager.PasswordSignInAsync(user, credentials.Password, isPersistent: true, lockoutOnFailure: false);
             if (!passwordSignInResult.Succeeded)

@@ -1,73 +1,63 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Security.Claims;
+using System.Threading.Tasks;
+using System.Web;
 using TripickServer.Models;
 using TripickServer.Utils;
 
 namespace TripickServer.Controllers
 {
-    [Authorize]
+    [ServiceFilter(typeof(CheckAuthKeysAndConnect))]
     public class BaseController : ControllerBase
     {
         #region Properties
 
         protected readonly ILogger<ServerLogger> Logger;
-        protected ClaimsPrincipal ConnectedUserClaim;
-        private AppUser user;
-        protected AppUser ConnectedUser
-        {
-            get
-            {
-                if (user == null)
-                {
-                    user = new AppUser()
-                    {
-                        Id = int.Parse(ConnectedUserClaim.GetUserId()),
-                        UserName = ConnectedUserClaim.GetUserName(),
-                        Email = ConnectedUserClaim.GetUserEmail()
-                    };
-                }
-                return this.user;
-            }
-        }
+        private UserManager<AppUser> userManager;
+        protected AppUser ConnectedUser { get; private set; }
 
         #endregion
 
         #region Constructor
 
         public BaseController(
-            IHttpContextAccessor contextAccessor,
-            ILogger<ServerLogger> logger)
+            ILogger<ServerLogger> logger,
+            UserManager<AppUser> userManager)
         {
-            this.ConnectedUserClaim = contextAccessor.HttpContext.User;
             this.Logger = logger;
+            this.userManager = userManager;
         }
 
         #endregion
 
         #region Methods
 
-        protected IActionResult SafeCall<T>(Func<T> call)
+        public JsonResult Error(string error)
         {
-            ServerResponse<T> response = new ServerResponse<T>();
-            try
-            {
-                T result = call();
-                response.IsSuccess = true;
-                response.Result = result;
-                response.Message = string.Empty;
-                return Ok(response);
-            }
-            catch (Exception e)
-            {
-                response.IsSuccess = false;
-                response.Result = default(T);
-                response.Message = e.Message;
-                return BadRequest(response);
-            }
+            return ServerResponse<string>.ToJson(false, error);
+        }
+
+        public async Task<bool> ConnectCurrentUser(AuthenticationKeys authenticationKeys)
+        {
+            if (authenticationKeys == null || string.IsNullOrWhiteSpace(authenticationKeys.AccessToken))
+                return false;
+
+            AppUser user = await userManager.FindByIdAsync(authenticationKeys.Id.ToString());
+            if (user == null)
+                return false;
+
+            string existingToken = await userManager.GetAuthenticationTokenAsync(user, Constants.AppName, Constants.AuthenticationTokenName);
+            bool authenticationKeysValid = existingToken == HttpUtility.UrlDecode(authenticationKeys.AccessToken);
+
+            if (authenticationKeysValid)
+                this.ConnectedUser = user;
+
+            return authenticationKeysValid;
         }
 
         #endregion
