@@ -35,7 +35,7 @@ namespace TripickServer
                 .AddEntityFrameworkStores<TripickContext>()
                 .AddTokenProvider(Constants.AppName, typeof(DataProtectorTokenProvider<AppUser>));
             services
-                .AddDbContext<TripickContext>(options => options.UseNpgsql(
+                .AddDbContextPool<TripickContext>(options => options.UseNpgsql(
                     Configuration.GetConnectionString("DefaultConnection"),
                     b => b.ProvideClientCertificatesCallback(clientCerts =>
                     {

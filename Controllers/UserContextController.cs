@@ -42,7 +42,7 @@ namespace TripickServer.Controllers
             {
                 List<Trip> trips = managerTrip.GetAll();
                 UserContext userContext = new UserContext(trips, new List<Guide>());
-                return ServerResponse<UserContext>.ToJson();
+                return ServerResponse<UserContext>.ToJson(userContext);
             }
             catch (Exception e)
             {
