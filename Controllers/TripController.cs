@@ -9,6 +9,7 @@ using System.Linq;
 using TripickServer.Managers;
 using TripickServer.Models;
 using TripickServer.Requests;
+using TripickServer.Requests.Trip;
 using TripickServer.Utils;
 
 namespace TripickServer.Controllers
@@ -47,9 +48,9 @@ namespace TripickServer.Controllers
 
         [HttpGet]
         [Route("GetAll")]
-        public ServerResponse<List<Trip>> GetAll(int pageIndex = 0, int pageSize = 10)
+        public JsonResult GetAll([FromBody] Request<RequestGetAll> request)
         {
-            return this.managerTrip.GetAll(pageIndex, pageSize);
+            return managerTrip.SafeCall(() => managerTrip.GetAll(request.Data.PageIndex, request.Data.PageSize));
         }
 
         [HttpGet]
