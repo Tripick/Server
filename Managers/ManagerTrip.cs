@@ -84,8 +84,22 @@ namespace TripickServer.Managers
                 throw new NullReferenceException("The trip to create cannot be null");
 
             // Create
-            trip.IdOwner = this.ConnectedUser.Id;
-            this.repoTrip.Add(trip);
+            Trip tripToSave = new Trip()
+            {
+                IdOwner = this.ConnectedUser.Id,
+                IsPublic = trip.IsPublic,
+                CoverImage = trip.CoverImage,
+                Name = trip.Name,
+                Description = trip.Description,
+                Note = trip.Note,
+                StartDate = trip.StartDate,
+                EndDate = trip.EndDate,
+                StartLatitude = trip.StartLatitude,
+                StartLongitude = trip.StartLongitude,
+                EndLatitude = trip.EndLatitude,
+                EndLongitude = trip.EndLongitude
+            };
+            this.repoTrip.Add(tripToSave);
 
             // Commit
             this.TripickContext.SaveChanges();
