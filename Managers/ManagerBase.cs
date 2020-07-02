@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using System;
 using TripickServer.Models;
 using TripickServer.Utils;
 
@@ -9,7 +10,7 @@ namespace TripickServer.Managers
         #region Properties
 
         protected readonly ILogger<ServerLogger> Logger;
-        protected readonly AppUser ConnectedUser;
+        protected readonly Func<AppUser> ConnectedUser;
         protected readonly TripickContext TripickContext;
         
 
@@ -17,7 +18,7 @@ namespace TripickServer.Managers
 
         #region Constructor
 
-        public ManagerBase(ILogger<ServerLogger> logger, AppUser user, TripickContext tripickContext)
+        public ManagerBase(ILogger<ServerLogger> logger, Func<AppUser> user, TripickContext tripickContext)
         {
             this.Logger = logger;
             this.ConnectedUser = user;

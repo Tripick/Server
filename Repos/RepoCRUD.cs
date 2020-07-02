@@ -17,7 +17,7 @@ namespace TripickServer.Repos
 
         #region Constructor
 
-        public RepoCRUD(AppUser connectedUser, TripickContext tripickContext) : base(connectedUser, tripickContext)
+        public RepoCRUD(Func<AppUser> connectedUser, TripickContext tripickContext) : base(connectedUser, tripickContext)
         {
             this.dbSet = this.TripickContext.Set<TEntity>();
         }

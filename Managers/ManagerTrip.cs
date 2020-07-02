@@ -20,7 +20,7 @@ namespace TripickServer.Managers
 
         #region Constructor
 
-        public ManagerTrip(ILogger<ServerLogger> logger, AppUser user, TripickContext tripickContext) : base(logger, user, tripickContext)
+        public ManagerTrip(ILogger<ServerLogger> logger, Func<AppUser> user, TripickContext tripickContext) : base(logger, user, tripickContext)
         {
             this.repoTrip = new RepoTrip(this.ConnectedUser, tripickContext);
         }
@@ -45,36 +45,21 @@ namespace TripickServer.Managers
 
         #region Private
 
-        public ServerResponse<List<Trip>> GetAll(int pageIndex = 0, int pageSize = 10)
+        public List<Trip> GetAll(int pageIndex = 0, int pageSize = 10)
         {
-            ServerResponse<List<Trip>> response = new ServerResponse<List<Trip>>();
-            List<Trip> trips = this.repoTrip.GetAll(pageIndex, pageSize);
-            response.Result = trips;
-            return response;
+            return this.repoTrip.GetAll(pageIndex, pageSize);
         }
 
-        public ServerResponse<Trip> GetById(int id, bool full = false)
+        public Trip GetById(int id, bool full = false)
         {
-            ServerResponse<Trip> response = new ServerResponse<Trip>();
-            try
-            {
-                // Get the entity
-                Trip trip = full ? this.repoTrip.GetFullById(id) : this.repoTrip.GetById(id);
+            // Get the entity
+            Trip trip = full ? this.repoTrip.GetFullById(id) : this.repoTrip.GetById(id);
 
-                // Verify the entity is mine
-                if (trip.IdOwner != this.ConnectedUser.Id)
-                    throw new NullReferenceException("The trip does not belong to you");
-                else
-                    response.Result = trip;
-            }
-            catch (Exception e)
-            {
-                string error = $"GetById trip error : {e.Message}.";
-                this.Logger.LogError(error);
-                response.IsSuccess = false;
-                response.Message = error;
-            }
-            return response;
+            // Verify the entity is mine
+            if (trip.IdOwner != this.ConnectedUser().Id)
+                throw new NullReferenceException("The trip does not belong to you");
+            else
+                return trip;
         }
 
         public Trip Create(Trip trip)
@@ -86,7 +71,7 @@ namespace TripickServer.Managers
             // Create
             Trip tripToSave = new Trip()
             {
-                IdOwner = this.ConnectedUser.Id,
+                IdOwner = this.ConnectedUser().Id,
                 IsPublic = trip.IsPublic,
                 CoverImage = trip.CoverImage,
                 Name = trip.Name,
@@ -106,68 +91,44 @@ namespace TripickServer.Managers
             return trip;
         }
 
-        public ServerResponse<Trip> Update(Trip trip)
+        public Trip Update(Trip trip)
         {
-            ServerResponse<Trip> response = new ServerResponse<Trip>();
-            try
-            {
-                // Verify the entity to update is not null
-                if (trip == null)
-                    throw new NullReferenceException("The trip to create cannot be null");
+            // Verify the entity to update is not null
+            if (trip == null)
+                throw new NullReferenceException("The trip to create cannot be null");
 
-                // Verify the entity to update exists
-                Trip existing = this.repoTrip.GetFullById(trip.Id);
-                if (existing == null)
-                    throw new NullReferenceException($"The trip [Id={trip.Id}] does not exist");
-                // Verify the entity is mine
-                if (existing.IdOwner != this.ConnectedUser.Id)
-                    throw new NullReferenceException("The trip does not belong to you");
+            // Verify the entity to update exists
+            Trip existing = this.repoTrip.GetFullById(trip.Id);
+            if (existing == null)
+                throw new NullReferenceException($"The trip [Id={trip.Id}] does not exist");
+            // Verify the entity is mine
+            if (existing.IdOwner != this.ConnectedUser().Id)
+                throw new NullReferenceException("The trip does not belong to you");
 
-                // Update
-                this.repoTrip.Update(trip);
+            // Update
+            this.repoTrip.Update(trip);
 
-                // Commit
-                this.TripickContext.SaveChanges();
-                response.Result = trip;
-            }
-            catch (Exception e)
-            {
-                string error = $"Update trip error : {e.Message}.";
-                this.Logger.LogError(error);
-                response.IsSuccess = false;
-                response.Message = error;
-            }
-            return response;
+            // Commit
+            this.TripickContext.SaveChanges();
+            return trip;
         }
 
-        public ServerResponse<bool> Delete(int id)
+        public bool Delete(int id)
         {
-            ServerResponse<bool> response = new ServerResponse<bool>();
-            try
-            {
-                // Verify the entity to update exists
-                Trip existing = this.repoTrip.GetById(id);
-                if (existing == null)
-                    throw new NullReferenceException($"The trip [Id={id}] does not exist");
-                // Verify the entity is mine
-                if (existing.IdOwner != this.ConnectedUser.Id)
-                    throw new NullReferenceException("The trip does not belong to you");
+            // Verify the entity to update exists
+            Trip existing = this.repoTrip.GetById(id);
+            if (existing == null)
+                throw new NullReferenceException($"The trip [Id={id}] does not exist");
+            // Verify the entity is mine
+            if (existing.IdOwner != this.ConnectedUser().Id)
+                throw new NullReferenceException("The trip does not belong to you");
 
-                // Delete
-                this.repoTrip.Delete(existing);
+            // Delete
+            this.repoTrip.Delete(existing);
 
-                // Commit
-                this.TripickContext.SaveChanges();
-                response.Result = true;
-            }
-            catch (Exception e)
-            {
-                string error = $"Delete trip error : {e.Message}.";
-                this.Logger.LogError(error);
-                response.IsSuccess = false;
-                response.Message = error;
-            }
-            return response;
+            // Commit
+            this.TripickContext.SaveChanges();
+            return true;
         }
 
         #endregion

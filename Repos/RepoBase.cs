@@ -1,4 +1,5 @@
-﻿using TripickServer.Models;
+﻿using System;
+using TripickServer.Models;
 
 namespace TripickServer.Repos
 {
@@ -6,14 +7,14 @@ namespace TripickServer.Repos
     {
         #region Properties
 
-        protected readonly AppUser ConnectedUser;
+        protected readonly Func<AppUser> ConnectedUser;
         protected readonly TripickContext TripickContext;
 
         #endregion
 
         #region Constructor
 
-        public RepoBase(AppUser connectedUser, TripickContext tripickContext)
+        public RepoBase(Func<AppUser> connectedUser, TripickContext tripickContext)
         {
             this.ConnectedUser = connectedUser;
             this.TripickContext = tripickContext;

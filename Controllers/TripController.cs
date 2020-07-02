@@ -1,11 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using TripickServer.Managers;
 using TripickServer.Models;
 using TripickServer.Requests;
@@ -32,7 +27,7 @@ namespace TripickServer.Controllers
             TripickContext tripickContext)
         : base(logger, userManager)
         {
-            this.managerTrip = new ManagerTrip(logger, this.ConnectedUser, tripickContext);
+            this.managerTrip = new ManagerTrip(logger, () => this.ConnectedUser, tripickContext);
         }
 
         #endregion
@@ -42,7 +37,7 @@ namespace TripickServer.Controllers
         public JsonResult Create([FromBody] Request<Trip> request)
         {
             if (request.Data == null)
-                return Error("The trip to create is null.");
+                return Error("Trip - Create : Data required.");
             return managerTrip.SafeCall(() => managerTrip.Create(request.Data));
         }
 
@@ -50,35 +45,45 @@ namespace TripickServer.Controllers
         [Route("GetAll")]
         public JsonResult GetAll([FromBody] Request<RequestGetAll> request)
         {
+            if (request.Data == null)
+                return Error("Trip - GetAll : Data required.");
             return managerTrip.SafeCall(() => managerTrip.GetAll(request.Data.PageIndex, request.Data.PageSize));
         }
 
         [HttpPost]
         [Route("Get")]
-        public ServerResponse<Trip> Get(int id)
+        public JsonResult Get([FromBody] Request<RequestGet> request)
         {
-            return this.managerTrip.GetById(id, false);
+            if (request.Data == null)
+                return Error("Trip - Get : Data required.");
+            return managerTrip.SafeCall(() => managerTrip.GetById(request.Data.Id, false));
         }
 
         [HttpPost]
         [Route("GetFull")]
-        public ServerResponse<Trip> GetFull(int id)
+        public JsonResult GetFull([FromBody] Request<RequestGet> request)
         {
-            return this.managerTrip.GetById(id, true);
+            if (request.Data == null)
+                return Error("Trip - Get : Data required.");
+            return managerTrip.SafeCall(() => managerTrip.GetById(request.Data.Id, true));
         }
 
         [HttpPost]
         [Route("Update")]
-        public ServerResponse<Trip> Update(Trip trip)
+        public JsonResult Update([FromBody] Request<RequestUpdate> request)
         {
-            return this.managerTrip.Update(trip);
+            if (request.Data == null)
+                return Error("Trip - Get : Data required.");
+            return managerTrip.SafeCall(() => managerTrip.Update(request.Data.Trip));
         }
 
         [HttpPost]
         [Route("Delete")]
-        public ServerResponse<bool> Delete(int id)
+        public JsonResult Delete([FromBody] Request<RequestDelete> request)
         {
-            return this.managerTrip.Delete(id);
+            if (request.Data == null)
+                return Error("Trip - Get : Data required.");
+            return managerTrip.SafeCall(() => managerTrip.Delete(request.Data.Id));
         }
     }
 }
