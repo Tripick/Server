@@ -133,7 +133,7 @@ namespace TripickServer.Controllers
             await userManager.SetAuthenticationTokenAsync(user, Constants.AppName, Constants.AuthenticationTokenName, newToken);
 
             // Send User and AuthenticationKeys
-            ServerResponse<UserContext> response = new ServerResponse<UserContext>(new UserContext(user, HttpUtility.UrlEncode(newToken)));
+            ServerResponse<UserContext> response = new ServerResponse<UserContext>(new UserContext(user, newToken));
             return new JsonResult(response);
         }
 
@@ -149,7 +149,7 @@ namespace TripickServer.Controllers
                 return ServerResponse<string>.ToJson(false, "This account doesn't exist.");
 
             string existingToken = await userManager.GetAuthenticationTokenAsync(user, Constants.AppName, Constants.AuthenticationTokenName);
-            bool tokenIsValid = existingToken == HttpUtility.UrlDecode(request.AuthenticationKeys.AccessToken);
+            bool tokenIsValid = existingToken == request.AuthenticationKeys.AccessToken;
             if(tokenIsValid)
             {
                 await signInManager.SignInAsync(user, isPersistent: true);
