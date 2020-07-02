@@ -10,6 +10,12 @@ namespace TripickServer.Models
         public List<Trip> Trips { get; set; }
         public List<Guide> RecommendedGuides { get; set; }
 
+        public UserContext(List<Trip> trips, List<Guide> guides)
+        {
+            this.Trips = trips;
+            this.RecommendedGuides = guides;
+        }
+
         public UserContext(AppUser user, string accessToken)
         {
             this.User = user;
