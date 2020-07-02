@@ -46,21 +46,21 @@ namespace TripickServer.Controllers
             return managerTrip.SafeCall(() => managerTrip.Create(request.Data));
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("GetAll")]
         public JsonResult GetAll([FromBody] Request<RequestGetAll> request)
         {
             return managerTrip.SafeCall(() => managerTrip.GetAll(request.Data.PageIndex, request.Data.PageSize));
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("Get")]
         public ServerResponse<Trip> Get(int id)
         {
             return this.managerTrip.GetById(id, false);
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("GetFull")]
         public ServerResponse<Trip> GetFull(int id)
         {
@@ -74,7 +74,7 @@ namespace TripickServer.Controllers
             return this.managerTrip.Update(trip);
         }
 
-        [HttpDelete]
+        [HttpPost]
         [Route("Delete")]
         public ServerResponse<bool> Delete(int id)
         {
