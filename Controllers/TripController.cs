@@ -34,11 +34,9 @@ namespace TripickServer.Controllers
 
         [HttpPost]
         [Route("Create")]
-        public JsonResult Create([FromBody] Request<Trip> request)
+        public JsonResult Create([FromBody] Request<string> request)
         {
-            if (request.Data == null)
-                return Error("Trip - Create : Data required.");
-            return managerTrip.SafeCall(() => managerTrip.Create(request.Data));
+            return managerTrip.SafeCall(() => managerTrip.Create());
         }
 
         [HttpPost]

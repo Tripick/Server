@@ -7,6 +7,7 @@ using TripickServer.Models;
 using TripickServer.Utils;
 using TripickServer.Repos;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace TripickServer.Managers
 {
@@ -14,6 +15,7 @@ namespace TripickServer.Managers
     {
         #region Properties
 
+        private RepoConfiguration repoConfiguration;
         private RepoTrip repoTrip;
 
         #endregion
@@ -22,6 +24,7 @@ namespace TripickServer.Managers
 
         public ManagerTrip(ILogger<ServerLogger> logger, Func<AppUser> user, TripickContext tripickContext) : base(logger, user, tripickContext)
         {
+            this.repoConfiguration = new RepoConfiguration(this.ConnectedUser, tripickContext);
             this.repoTrip = new RepoTrip(this.ConnectedUser, tripickContext);
         }
 
@@ -62,33 +65,30 @@ namespace TripickServer.Managers
                 return trip;
         }
 
-        public Trip Create(Trip trip)
+        public Trip Create()
         {
-            // Verify the entity to create is not null
-            if (trip == null)
-                throw new NullReferenceException("The trip to create cannot be null");
-
+            List<Configuration> configs = repoConfiguration.GetAll();
             // Create
             Trip tripToSave = new Trip()
             {
                 IdOwner = this.ConnectedUser().Id,
-                IsPublic = trip.IsPublic,
-                CoverImage = trip.CoverImage,
-                Name = trip.Name,
-                Description = trip.Description,
-                Note = trip.Note,
-                StartDate = trip.StartDate,
-                EndDate = trip.EndDate,
-                StartLatitude = trip.StartLatitude,
-                StartLongitude = trip.StartLongitude,
-                EndLatitude = trip.EndLatitude,
-                EndLongitude = trip.EndLongitude
+                IsPublic = false,
+                CoverImage = configs.FirstOrDefault(c => c.Name == "TripCoverImage")?.Value,
+                Name = "My new trip",
+                Description = string.Empty,
+                Note = string.Empty,
+                StartDate = DateTime.Today.AddDays(1),
+                StartLatitude = null,
+                StartLongitude = null,
+                EndDate = DateTime.Today.AddDays(7),
+                EndLatitude = null,
+                EndLongitude = null
             };
             this.repoTrip.Add(tripToSave);
 
             // Commit
             this.TripickContext.SaveChanges();
-            return trip;
+            return tripToSave;
         }
 
         public Trip Update(Trip trip)

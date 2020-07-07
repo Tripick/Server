@@ -15,14 +15,22 @@ namespace TripickServer.Models
         public string Name { get; set; }
         public string Description { get; set; }
         public string Note { get; set; }
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
-        public double StartLatitude { get; set; }
-        public double StartLongitude { get; set; }
-        public double EndLatitude { get; set; }
-        public double EndLongitude { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+        public double? StartLatitude { get; set; }
+        public double? StartLongitude { get; set; }
+        public double? EndLatitude { get; set; }
+        public double? EndLongitude { get; set; }
         public bool IsDeleted { get; set; }
         public DateTime? DeleteDate { get; set; }
+
+        // Filters
+        public int FilterIntense { get; set; } = 3;
+        public int FilterSportive { get; set; } = 3;
+        public int FilterCity { get; set; } = 3;
+        public int FilterFamous { get; set; } = 3;
+        public int FilterFar { get; set; } = 3;
+        public int FilterExpensive { get; set; } = 3;
 
         [ForeignKey("Owner")]
         public int IdOwner { get; set; }
