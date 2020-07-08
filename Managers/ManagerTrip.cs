@@ -67,13 +67,14 @@ namespace TripickServer.Managers
 
         public Trip Create()
         {
-            List<Configuration> configs = repoConfiguration.GetAll();
+            int numberOfTrips = this.repoTrip.Count() % 5;
+            Configuration configs = repoConfiguration.Get("TripCoverImage" + numberOfTrips);
             // Create
             Trip tripToSave = new Trip()
             {
                 IdOwner = this.ConnectedUser().Id,
                 IsPublic = false,
-                CoverImage = configs.FirstOrDefault(c => c.Name == "TripCoverImage")?.Value,
+                CoverImage = configs?.Value,
                 Name = "My new trip",
                 Description = string.Empty,
                 Note = string.Empty,

@@ -24,6 +24,12 @@ namespace TripickServer.Repos
                 .Include(t => t.Destinations)
                 .ToList();
         }
+        public int Count()
+        {
+            return this.TripickContext.Trips
+                .Where(t => !t.IsDeleted && t.IdOwner == this.ConnectedUser().Id)
+                .Count();
+        }
 
         public Trip GetFullById(int id)
         {
