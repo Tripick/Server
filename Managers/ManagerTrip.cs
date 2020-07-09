@@ -106,12 +106,31 @@ namespace TripickServer.Managers
             if (existing.IdOwner != this.ConnectedUser().Id)
                 throw new NullReferenceException("The trip does not belong to you");
 
+            //CoverImage = existing.CoverImage;
+            existing.IsPublic = trip.IsPublic;
+            existing.Name = trip.Name;
+            existing.Description = trip.Description;
+            existing.Note = trip.Note;
+            existing.DateMode = trip.DateMode;
+            existing.StartDate = trip.StartDate;
+            existing.StartLatitude = trip.StartLatitude;
+            existing.StartLongitude = trip.StartLongitude;
+            existing.EndDate = trip.EndDate;
+            existing.EndLatitude = trip.EndLatitude;
+            existing.EndLongitude = trip.EndLongitude;
+            existing.FilterIntense = trip.FilterIntense;
+            existing.FilterSportive = trip.FilterSportive;
+            existing.FilterCity = trip.FilterCity;
+            existing.FilterFamous = trip.FilterFamous;
+            existing.FilterFar = trip.FilterFar;
+            existing.FilterExpensive = trip.FilterExpensive;
+
             // Update
-            this.repoTrip.Update(trip);
+            //this.repoTrip.Update(existing);
 
             // Commit
             this.TripickContext.SaveChanges();
-            return trip;
+            return existing;
         }
 
         public bool Delete(int id)
