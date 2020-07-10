@@ -112,6 +112,7 @@ namespace TripickServer.Managers
             existing.Description = trip.Description;
             existing.Note = trip.Note;
             existing.DateMode = trip.DateMode;
+            existing.NumberOfDays = trip.NumberOfDays;
             existing.StartDate = trip.StartDate;
             existing.StartLatitude = trip.StartLatitude;
             existing.StartLongitude = trip.StartLongitude;
