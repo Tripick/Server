@@ -18,6 +18,7 @@ namespace TripickServer.Models
         public int DateMode { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
+        public int NumberOfDays { get; set; }
         public double? StartLatitude { get; set; }
         public double? StartLongitude { get; set; }
         public double? EndLatitude { get; set; }

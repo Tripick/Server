@@ -96,7 +96,7 @@ namespace TripickServer.Managers
         {
             // Verify the entity to update is not null
             if (trip == null)
-                throw new NullReferenceException("The trip to create cannot be null");
+                throw new NullReferenceException("The trip to update cannot be null");
 
             // Verify the entity to update exists
             Trip existing = this.repoTrip.GetFullById(trip.Id);
