@@ -130,6 +130,9 @@ namespace TripickServer.Managers
 
             // Commit
             this.TripickContext.SaveChanges();
+
+            // Do not send the image again
+            existing.CoverImage = null;
             return existing;
         }
 
