@@ -15,12 +15,16 @@ namespace TripickServer.Models
         public string Name { get; set; }
         public string Description { get; set; }
         public string Note { get; set; }
-        public int DateMode { get; set; }
+        public bool EnabledStartDate { get; set; }
         public DateTime? StartDate { get; set; }
+        public bool EnabledEndDate { get; set; }
         public DateTime? EndDate { get; set; }
+        public bool EnabledNumberOfDays { get; set; }
         public int NumberOfDays { get; set; }
+        public bool EnabledStartPoint { get; set; }
         public double? StartLatitude { get; set; }
         public double? StartLongitude { get; set; }
+        public bool EnabledEndPoint { get; set; }
         public double? EndLatitude { get; set; }
         public double? EndLongitude { get; set; }
         public bool IsDeleted { get; set; }
