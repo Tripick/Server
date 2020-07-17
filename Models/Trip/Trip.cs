@@ -24,9 +24,13 @@ namespace TripickServer.Models
         public bool EnabledStartPoint { get; set; }
         public double? StartLatitude { get; set; }
         public double? StartLongitude { get; set; }
+        public double? StartLatitudeDelta { get; set; }
+        public double? StartLongitudeDelta { get; set; }
         public bool EnabledEndPoint { get; set; }
         public double? EndLatitude { get; set; }
         public double? EndLongitude { get; set; }
+        public double? EndLatitudeDelta { get; set; }
+        public double? EndLongitudeDelta { get; set; }
         public bool IsDeleted { get; set; }
         public DateTime? DeleteDate { get; set; }
 

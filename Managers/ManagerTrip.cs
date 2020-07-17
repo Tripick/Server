@@ -120,9 +120,13 @@ namespace TripickServer.Managers
             existing.StartDate = trip.StartDate;
             existing.StartLatitude = trip.StartLatitude;
             existing.StartLongitude = trip.StartLongitude;
+            existing.StartLatitudeDelta = trip.StartLatitudeDelta;
+            existing.StartLongitudeDelta = trip.StartLongitudeDelta;
             existing.EndDate = trip.EndDate;
             existing.EndLatitude = trip.EndLatitude;
             existing.EndLongitude = trip.EndLongitude;
+            existing.EndLatitudeDelta = trip.EndLatitudeDelta;
+            existing.EndLongitudeDelta = trip.EndLongitudeDelta;
             existing.FilterIntense = trip.FilterIntense;
             existing.FilterSportive = trip.FilterSportive;
             existing.FilterCity = trip.FilterCity;
