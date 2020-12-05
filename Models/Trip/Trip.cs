@@ -32,6 +32,7 @@ namespace TripickServer.Models
         public double? EndLatitudeDelta { get; set; }
         public double? EndLongitudeDelta { get; set; }
         public bool IsDeleted { get; set; }
+        public DateTime CreationDate { get; set; } = DateTime.Now;
         public DateTime? DeleteDate { get; set; }
 
         // Filters

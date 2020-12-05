@@ -50,7 +50,7 @@ namespace TripickServer.Managers
 
         public List<Trip> GetAll(int pageIndex = 0, int pageSize = 10)
         {
-            return this.repoTrip.GetAll(pageIndex, pageSize);
+            return this.repoTrip.GetAll(pageIndex, pageSize).OrderByDescending(x => x.CreationDate).ToList();
         }
 
         public Trip GetById(int id, bool full = false)
