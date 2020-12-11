@@ -35,7 +35,7 @@ namespace TripickServer
                 .AddEntityFrameworkStores<TripickContext>()
                 .AddTokenProvider(Constants.AppName, typeof(DataProtectorTokenProvider<AppUser>));
             services
-                .AddDbContextPool<TripickContext>(options => options.UseNpgsql( // When doing a migration, comment Pool (in AddDbContextPool)
+                .AddDbContext<TripickContext>(options => options.UseNpgsql( // When doing a migration, comment Pool (in AddDbContextPool)
                     Configuration.GetConnectionString("DefaultConnection"),
                     b => b.ProvideClientCertificatesCallback(clientCerts =>
                     {
@@ -47,7 +47,9 @@ namespace TripickServer
 
             services.AddControllers(options => {
                 //options.Filters.Add(new CheckAuthKeysAndConnect()); // To apply the attribute on all controllers
-            });
+            }).AddNewtonsoftJson(options =>
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+            );
             services.AddScoped<CheckAuthKeysAndConnect>();
         }
 

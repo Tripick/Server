@@ -22,13 +22,9 @@ namespace TripickServer.Repos
                 .Take(pageSize)
                 .Include(t => t.Region)
                 .Include(t => t.Polygon)
-                .Include(t => t.Tiles)
                 .Include(t => t.Members)
                 .Include(t => t.Destinations)
                 .ToList();
-            trips.ForEach(t => t.Region.Trip = null);
-            trips.ForEach(t => t.Polygon.ForEach(p => p.Trip = null));
-            trips.ForEach(t => t.Tiles.ForEach(tile => tile.Trip = null));
             return trips;
         }
         public int Count()
@@ -44,17 +40,12 @@ namespace TripickServer.Repos
                 .Where(t => !t.IsDeleted && t.IdOwner == this.ConnectedUser().Id && t.Id == id)
                 .Include(t => t.Region)
                 .Include(t => t.Polygon)
-                .Include(t => t.Tiles)
                 .Include(t => t.Members)
                 .Include(t => t.Destinations)
                 .Include(t => t.Itinerary).ThenInclude(i => i.Days).ThenInclude(d => d.ToBrings)
                 .Include(t => t.Itinerary).ThenInclude(i => i.Days).ThenInclude(d => d.Steps)
                 .Include(t => t.Picks).ThenInclude(p => p.Place)
                 .FirstOrDefault();
-
-            trip.Region.Trip = null;
-            trip.Polygon.ForEach(p => p.Trip = null);
-            trip.Tiles.ForEach(tile => tile.Trip = null);
 
             return trip;
         }
@@ -65,7 +56,6 @@ namespace TripickServer.Repos
                 .Where(t => !t.IsDeleted && t.IdOwner == this.ConnectedUser().Id && t.Id == id)
                 .Include(t => t.Region)
                 .Include(t => t.Polygon)
-                .Include(t => t.Tiles)
                 .Include(t => t.Members)
                 .Include(t => t.Destinations)
                 .Include(t => t.Itinerary).ThenInclude(i => i.Days).ThenInclude(d => d.ToBrings)
@@ -73,9 +63,10 @@ namespace TripickServer.Repos
                 .Include(t => t.Picks).ThenInclude(p => p.Place)
                 .FirstOrDefault();
 
-            trip.Region.Trip = null;
-            trip.Polygon.ForEach(p => p.Trip = null);
-            trip.Tiles.ForEach(tile => tile.Trip = null);
+            List<MapTile> tiles = new List<MapTile>();
+            if(trip != null)
+                this.TripickContext.Tiles.Where(t => t.IdTrip == trip.Id).ToList();
+            trip.Tiles = tiles;
 
             return trip;
         }
