@@ -16,7 +16,7 @@ namespace TripickServer.Repos
 
         public List<Trip> GetAll(int pageIndex = 0, int pageSize = 10)
         {
-            return this.TripickContext.Trips
+            List<Trip> trips = this.TripickContext.Trips
                 .Where(t => !t.IsDeleted && t.IdOwner == this.ConnectedUser().Id)
                 .Skip(pageIndex * pageSize)
                 .Take(pageSize)
@@ -26,6 +26,10 @@ namespace TripickServer.Repos
                 .Include(t => t.Members)
                 .Include(t => t.Destinations)
                 .ToList();
+            trips.ForEach(t => t.Region.Trip = null);
+            trips.ForEach(t => t.Polygon.ForEach(p => p.Trip = null));
+            trips.ForEach(t => t.Tiles.ForEach(tile => tile.Trip = null));
+            return trips;
         }
         public int Count()
         {
@@ -36,7 +40,7 @@ namespace TripickServer.Repos
 
         public override Trip GetById(int id)
         {
-            return this.TripickContext.Trips
+            Trip trip = this.TripickContext.Trips
                 .Where(t => !t.IsDeleted && t.IdOwner == this.ConnectedUser().Id && t.Id == id)
                 .Include(t => t.Region)
                 .Include(t => t.Polygon)
@@ -47,11 +51,17 @@ namespace TripickServer.Repos
                 .Include(t => t.Itinerary).ThenInclude(i => i.Days).ThenInclude(d => d.Steps)
                 .Include(t => t.Picks).ThenInclude(p => p.Place)
                 .FirstOrDefault();
+
+            trip.Region.Trip = null;
+            trip.Polygon.ForEach(p => p.Trip = null);
+            trip.Tiles.ForEach(tile => tile.Trip = null);
+
+            return trip;
         }
 
         public Trip GetFullById(int id)
         {
-            return this.TripickContext.Trips
+            Trip trip = this.TripickContext.Trips
                 .Where(t => !t.IsDeleted && t.IdOwner == this.ConnectedUser().Id && t.Id == id)
                 .Include(t => t.Region)
                 .Include(t => t.Polygon)
@@ -62,6 +72,12 @@ namespace TripickServer.Repos
                 .Include(t => t.Itinerary).ThenInclude(i => i.Days).ThenInclude(d => d.Steps)
                 .Include(t => t.Picks).ThenInclude(p => p.Place)
                 .FirstOrDefault();
+
+            trip.Region.Trip = null;
+            trip.Polygon.ForEach(p => p.Trip = null);
+            trip.Tiles.ForEach(tile => tile.Trip = null);
+
+            return trip;
         }
     }
 }
