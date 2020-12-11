@@ -28,8 +28,8 @@ namespace TripickServer.Models
         public double? EndLongitude { get; set; }
         public double? EndLatitudeDelta { get; set; }
         public double? EndLongitudeDelta { get; set; }
-        public string Region { get; set; }
-        public string Polygon { get; set; }
+        public Location Region { get; set; }
+        public List<MapPoint> Polygon { get; set; }
         public List<MapTile> Tiles { get; set; }
 
         // Filters
