@@ -77,13 +77,7 @@ namespace TripickServer.Managers
                 CoverImage = configs?.Value,
                 Name = "My new trip",
                 Description = string.Empty,
-                Note = string.Empty,
-                StartDate = DateTime.Today.AddDays(1),
-                StartLatitude = null,
-                StartLongitude = null,
-                EndDate = DateTime.Today.AddDays(7),
-                EndLatitude = null,
-                EndLongitude = null
+                Note = string.Empty
             };
             this.repoTrip.Add(tripToSave);
 
@@ -136,7 +130,6 @@ namespace TripickServer.Managers
             }
             else
                 existing.Region = trip.Region;
-            //existing.Region = trip.Region;
             if(trip.Polygon != null)
             {
                 for (int i = 0; i < trip.Polygon.Count; i++)
