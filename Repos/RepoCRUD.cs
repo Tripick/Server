@@ -38,7 +38,7 @@ namespace TripickServer.Repos
                 return query.ToList();
         }
 
-        public virtual TEntity GetById(object id)
+        public virtual TEntity GetById(int id)
         {
             return dbSet.Find(id);
         }
@@ -54,7 +54,7 @@ namespace TripickServer.Repos
             this.TripickContext.Entry(entity).State = EntityState.Modified;
         }
 
-        public virtual void Delete(object id)
+        public virtual void Delete(int id)
         {
             TEntity entityToDelete = dbSet.Find(id);
             Delete(entityToDelete);
