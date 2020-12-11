@@ -148,6 +148,7 @@ namespace TripickServer.Managers
 
             // Do not send the image again
             existing.CoverImage = null;
+            existing.Tiles = null;
             return existing;
         }
 
