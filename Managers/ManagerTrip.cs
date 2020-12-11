@@ -111,12 +111,6 @@ namespace TripickServer.Managers
             existing.Name = trip.Name;
             existing.Description = trip.Description;
             existing.Note = trip.Note;
-            existing.EnabledStartDate = trip.EnabledStartDate;
-            existing.EnabledEndDate= trip.EnabledEndDate;
-            existing.EnabledNumberOfDays = trip.EnabledNumberOfDays;
-            existing.EnabledStartPoint = trip.EnabledStartPoint;
-            existing.EnabledEndPoint = trip.EnabledEndPoint;
-            existing.NumberOfDays = trip.NumberOfDays;
             existing.StartDate = trip.StartDate;
             existing.StartLatitude = trip.StartLatitude;
             existing.StartLongitude = trip.StartLongitude;
@@ -133,6 +127,9 @@ namespace TripickServer.Managers
             existing.FilterFamous = trip.FilterFamous;
             existing.FilterFar = trip.FilterFar;
             existing.FilterExpensive = trip.FilterExpensive;
+            existing.Region = trip.Region;
+            existing.Polygon = trip.Polygon;
+            existing.Tiles = trip.Tiles;
 
             // Update
             //this.repoTrip.Update(existing);
