@@ -18,19 +18,19 @@ namespace TripickServer.Models
         public TripickContext(DbContextOptions<TripickContext> options) : base(options) { }
 
         // When doing a migration, uncomment this :
-        public TripickContext(IConfiguration configuration, DbContextOptions<TripickContext> options) : base(options)
-        {
-            this.configuration = configuration;
-        }
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseNpgsql(configuration.GetConnectionString("DefaultConnection"), b => b.ProvideClientCertificatesCallback(clientCerts =>
-            {
-                var databaseCertificate = configuration.GetValue<string>(WebHostDefaults.ContentRootKey) + "/Resources/databaseCert.pfx";
-                var cert = new X509Certificate2(databaseCertificate, configuration.GetValue<string>("Settings:databaseCertPassword"));
-                clientCerts.Add(cert);
-            }));
-        }
+        //public TripickContext(IConfiguration configuration, DbContextOptions<TripickContext> options) : base(options)
+        //{
+        //    this.configuration = configuration;
+        //}
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    optionsBuilder.UseNpgsql(configuration.GetConnectionString("DefaultConnection"), b => b.ProvideClientCertificatesCallback(clientCerts =>
+        //    {
+        //        var databaseCertificate = configuration.GetValue<string>(WebHostDefaults.ContentRootKey) + "/Resources/databaseCert.pfx";
+        //        var cert = new X509Certificate2(databaseCertificate, configuration.GetValue<string>("Settings:databaseCertPassword"));
+        //        clientCerts.Add(cert);
+        //    }));
+        //}
 
         // Commons
         public DbSet<Configuration> Configurations { get; set; }
