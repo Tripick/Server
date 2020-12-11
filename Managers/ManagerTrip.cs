@@ -127,16 +127,23 @@ namespace TripickServer.Managers
             existing.FilterFamous = trip.FilterFamous;
             existing.FilterFar = trip.FilterFar;
             existing.FilterExpensive = trip.FilterExpensive;
-            //if (existing.Region != null)
-            //{
-            //    existing.Region.Latitude = trip.Region.Latitude;
-            //    existing.Region.Longitude = trip.Region.Longitude;
-            //    existing.Region.LatitudeDelta = trip.Region.LatitudeDelta;
-            //    existing.Region.LongitudeDelta = trip.Region.LongitudeDelta;
-            //}
-            //else
-            //    existing.Region = trip.Region;
-            existing.Region = trip.Region;
+            if (existing.Region != null)
+            {
+                existing.Region.Latitude = trip.Region.Latitude;
+                existing.Region.Longitude = trip.Region.Longitude;
+                existing.Region.LatitudeDelta = trip.Region.LatitudeDelta;
+                existing.Region.LongitudeDelta = trip.Region.LongitudeDelta;
+            }
+            else
+                existing.Region = trip.Region;
+            //existing.Region = trip.Region;
+            if(trip.Polygon != null)
+            {
+                for (int i = 0; i < trip.Polygon.Count; i++)
+                {
+                    trip.Polygon[i].Index = i;
+                }
+            }
             existing.Polygon = trip.Polygon;
             existing.Tiles = trip.Tiles;
 

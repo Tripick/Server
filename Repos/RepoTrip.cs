@@ -25,6 +25,7 @@ namespace TripickServer.Repos
                 .Include(t => t.Members)
                 .Include(t => t.Destinations)
                 .ToList();
+            trips.ForEach(t => t.Polygon = t.Polygon.OrderBy(p => p.Index).ToList());
             return trips;
         }
         public int Count()
@@ -46,7 +47,7 @@ namespace TripickServer.Repos
                 .Include(t => t.Itinerary).ThenInclude(i => i.Days).ThenInclude(d => d.Steps)
                 .Include(t => t.Picks).ThenInclude(p => p.Place)
                 .FirstOrDefault();
-
+            trip.Polygon = trip.Polygon.OrderBy(p => p.Index).ToList();
             return trip;
         }
 
@@ -62,6 +63,7 @@ namespace TripickServer.Repos
                 .Include(t => t.Itinerary).ThenInclude(i => i.Days).ThenInclude(d => d.Steps)
                 .Include(t => t.Picks).ThenInclude(p => p.Place)
                 .FirstOrDefault();
+            trip.Polygon = trip.Polygon.OrderBy(p => p.Index).ToList();
 
             List<MapTile> tiles = new List<MapTile>();
             if(trip != null)
