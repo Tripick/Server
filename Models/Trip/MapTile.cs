@@ -15,7 +15,7 @@ namespace TripickServer.Models
         public double Width { get; set; }
 
         [ForeignKey("Trip")]
-        public int? IdTrip { get; set; }
+        public int IdTrip { get; set; }
         public virtual Trip Trip { get; set; }
     }
 }
