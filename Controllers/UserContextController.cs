@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using TripickServer.Managers;
 using TripickServer.Models;
 using TripickServer.Requests;
@@ -17,6 +20,7 @@ namespace TripickServer.Controllers
     {
         #region Properties
 
+        private UserManager<AppUser> userManager;
         private readonly ManagerTrip managerTrip;
 
         #endregion
@@ -29,6 +33,7 @@ namespace TripickServer.Controllers
             TripickContext tripickContext)
         : base(logger, userManager)
         {
+            this.userManager = userManager;
             this.managerTrip = new ManagerTrip(logger, () => this.ConnectedUser, tripickContext);
         }
 
@@ -36,12 +41,21 @@ namespace TripickServer.Controllers
 
         [HttpPost]
         [Route("Get")]
-        public JsonResult Get([FromBody] Request<string> request)
+        public async Task<JsonResult> Get([FromBody] Request<string> request)
         {
             try
             {
+                List<Friend> friends = new List<Friend>();
+                AppUser user = await userManager.Users.Include(x => x.Friendships).SingleAsync(x => x.Id == this.ConnectedUser.Id);
+                if (user != null && user.Friendships != null)
+                {
+                    List<int> ids = user.Friendships.Select(x => x.FriendId).ToList();
+                    List<AppUser> friendsUsers = userManager.Users.Where(x => ids.Contains(x.Id)).ToList();
+                    friends = friendsUsers.Select(x => new Friend(x)).ToList();
+                }
+
                 List<Trip> trips = managerTrip.GetAll();
-                UserContext userContext = new UserContext(trips, new List<Guide>());
+                UserContext userContext = new UserContext(friends, trips, new List<Guide>());
                 return ServerResponse<UserContext>.ToJson(userContext);
             }
             catch (Exception e)

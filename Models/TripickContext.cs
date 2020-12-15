@@ -31,6 +31,9 @@ namespace TripickServer.Models
         //        clientCerts.Add(cert);
         //    }));
         //}
+        //protected override void OnModelCreating(ModelBuilder modelBuilder)
+        //{
+        //}
 
         // Commons
         public DbSet<Configuration> Configurations { get; set; }
