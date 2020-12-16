@@ -34,12 +34,21 @@ namespace TripickServer.Managers
 
         public List<Trip> GetAll(int pageIndex = 0, int pageSize = 10)
         {
-            return this.repoTrip.GetAll(pageIndex, pageSize).OrderByDescending(x => x.CreationDate).ToList();
+            List<Trip> trips = this.repoTrip.GetAll(pageIndex, pageSize).OrderByDescending(x => x.CreationDate).ToList();
+            
+            trips.ForEach(t =>
+            {
+                t.Travelers = t.Members == null ? new List<Traveler>() : t.Members.Select(f => new Traveler(f)).ToList();
+                t.Members = null;
+            });
+            return trips;
         }
 
         public Trip GetById(int id, bool full = false)
         {
             Trip trip = full ? this.repoTrip.GetFullById(id) : this.repoTrip.GetById(id);
+            trip.Travelers = trip.Members == null ? new List<Traveler>() : trip.Members.Select(f => new Traveler(f)).ToList();
+            trip.Members = null;
             return trip;
         }
 
@@ -48,7 +57,7 @@ namespace TripickServer.Managers
             int numberOfTrips = this.repoTrip.Count() % 5;
             Configuration configs = repoConfiguration.Get("TripCoverImage" + numberOfTrips);
             // Create
-            Trip tripToSave = new Trip()
+            Trip trip = new Trip()
             {
                 IdOwner = this.ConnectedUser().Id,
                 IsPublic = false,
@@ -57,11 +66,13 @@ namespace TripickServer.Managers
                 Description = string.Empty,
                 Note = string.Empty
             };
-            this.repoTrip.Add(tripToSave);
+            this.repoTrip.Add(trip);
 
             // Commit
             this.TripickContext.SaveChanges();
-            return tripToSave;
+            trip.Travelers = trip.Members == null ? new List<Traveler>() : trip.Members.Select(f => new Traveler(f)).ToList();
+            trip.Members = null;
+            return trip;
         }
 
         public Trip Update(Trip trip)
@@ -124,7 +135,9 @@ namespace TripickServer.Managers
             // Commit
             this.TripickContext.SaveChanges();
 
-            // Do not send the image again
+            // Do not send unuseful data
+            existing.Travelers = existing.Members == null ? new List<Traveler>() : existing.Members.Select(f => new Traveler(f)).ToList();
+            existing.Members = null;
             existing.CoverImage = null;
             existing.Tiles = null;
             return existing;

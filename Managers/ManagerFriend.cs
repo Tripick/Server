@@ -17,7 +17,6 @@ namespace TripickServer.Managers
         #region Properties
 
         private UserManager<AppUser> userManager;
-        private TripickContext tripickContext;
 
         #endregion
 
@@ -26,7 +25,6 @@ namespace TripickServer.Managers
         public ManagerFriend(ILogger<ServerLogger> logger, Func<AppUser> user, UserManager<AppUser> userManager, TripickContext tripickContext) : base(logger, user, tripickContext)
         {
             this.userManager = userManager;
-            this.tripickContext = tripickContext;
         }
 
         #endregion
@@ -35,31 +33,31 @@ namespace TripickServer.Managers
 
         public List<Friend> Add(int id)
         {
-            AppUser newFriend = this.tripickContext.Users.Where(x => x.Id == id)
-                .Include(t => t.Friendships)
-                .SingleOrDefault();
-            if (newFriend == null)
-                throw new NullReferenceException($"The user [Id={id}] does not exist");
-
-            AppUser user = this.tripickContext.Users.Where(x => x.Id == this.ConnectedUser().Id)
+            AppUser user = this.TripickContext.Users.Where(x => x.Id == this.ConnectedUser().Id)
                 .Include(t => t.Friendships)
                 .SingleOrDefault();
             if (user == null)
                 throw new NullReferenceException($"The user [Id={this.ConnectedUser().Id}] does not exist");
 
-            if(!user.Friendships.Any(x => x.IdFriend == newFriend.Id))
+            AppUser newFriend = this.TripickContext.Users.Where(x => x.Id == id)
+                .Include(t => t.Friendships)
+                .SingleOrDefault();
+            if (newFriend == null)
+                throw new NullReferenceException($"The user [Id={id}] does not exist");
+
+            if (!user.Friendships.Any(x => x.IdFriend == newFriend.Id))
                 user.Friendships.Add(new Friendship() { IdOwner = user.Id, IdFriend = newFriend.Id });
 
-            if (!newFriend.Friendships.Any(x => x.IdFriend == user.Id)) 
+            if (!newFriend.Friendships.Any(x => x.IdFriend == user.Id))
                 newFriend.Friendships.Add(new Friendship() { IdOwner = newFriend.Id, IdFriend = user.Id });
 
-            this.tripickContext.SaveChanges();
+            this.TripickContext.SaveChanges();
 
             List<Friend> friends = new List<Friend>();
             if (user != null && user.Friendships != null)
             {
                 List<int> ids = user.Friendships.Select(x => x.IdFriend).ToList();
-                List<AppUser> friendsUsers = this.userManager.Users.Where(x => ids.Contains(x.Id)).ToList();
+                List<AppUser> friendsUsers = this.userManager.Users.Where(x => ids.Contains(x.Id)).Include(t => t.Photo).ToList();
                 friends = friendsUsers.Select(x => new Friend(x)).ToList();
             }
             return friends;
@@ -67,13 +65,13 @@ namespace TripickServer.Managers
 
         public List<Friend> Delete(int id)
         {
-            AppUser newFriend = this.tripickContext.Users.Where(x => x.Id == id)
+            AppUser newFriend = this.TripickContext.Users.Where(x => x.Id == id)
                 .Include(t => t.Friendships)
                 .SingleOrDefault();
             if (newFriend == null)
                 throw new NullReferenceException($"The user [Id={id}] does not exist");
 
-            AppUser user = this.tripickContext.Users.Where(x => x.Id == this.ConnectedUser().Id)
+            AppUser user = this.TripickContext.Users.Where(x => x.Id == this.ConnectedUser().Id)
                 .Include(t => t.Friendships)
                 .SingleOrDefault();
             if (user == null)
@@ -85,13 +83,13 @@ namespace TripickServer.Managers
             if (newFriend.Friendships.Any(x => x.IdFriend == user.Id))
                 newFriend.Friendships.RemoveAt(newFriend.Friendships.IndexOf(newFriend.Friendships.First(x => x.IdFriend == user.Id)));
 
-            this.tripickContext.SaveChanges();
+            this.TripickContext.SaveChanges();
 
             List<Friend> friends = new List<Friend>();
             if (user != null && user.Friendships != null)
             {
                 List<int> ids = user.Friendships.Select(x => x.IdFriend).ToList();
-                List<AppUser> friendsUsers = this.userManager.Users.Where(x => ids.Contains(x.Id)).ToList();
+                List<AppUser> friendsUsers = this.userManager.Users.Where(x => ids.Contains(x.Id)).Include(t => t.Photo).ToList();
                 friends = friendsUsers.Select(x => new Friend(x)).ToList();
             }
             return friends;

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace TripickServer.Models
 {
-    public class Friend
+    public class Traveler
     {
         public int Id { get; set; }
         public string UserName { get; set; }
@@ -11,7 +11,7 @@ namespace TripickServer.Models
         public string LastName { get; set; }
         public string Photo { get; set; }
 
-        public Friend(AppUser user)
+        public Traveler(AppUser user)
         {
             this.Id = user.Id;
             this.UserName = user.UserName;

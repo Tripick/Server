@@ -8,6 +8,9 @@ namespace TripickServer.Models
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public ImageAppUser Photo { get; set; }
+        public virtual List<Trip> Trips { get; set; }
+        public virtual List<Trip> GuestTrips { get; set; }
+
         public virtual List<Friendship> Friendships { get; set; }
     }
 }

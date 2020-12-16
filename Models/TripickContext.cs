@@ -34,14 +34,18 @@ namespace TripickServer.Models
             }
             protected override void OnModelCreating(ModelBuilder modelBuilder)
             {
-                modelBuilder.Entity<Friendship>().HasKey(table => new { table.IdOwner, table.IdFriend });
-                modelBuilder.Entity<Friendship>()
-                    .HasOne(x => x.Owner)
-                    //.WithMany(c => c.Products)
-                    //.HasForeignKey(p => new { p.CategoryId1, p.CategoryId2 });
+                modelBuilder.Entity<Friendship>().HasKey(x => new { x.IdOwner, x.IdFriend });
 
-            modelBuilder.Entity<TripFriendship>().HasKey(table => new { table.IdTrip, table.IdOwner, table.IdFriend });
-            }
+                modelBuilder.Entity<Trip>()
+                    .HasOne(x => x.Owner)
+                    .WithMany(x => x.Trips);
+
+                modelBuilder.Entity<Trip>()
+                    .HasMany(x => x.Members)
+                    .WithMany(x => x.GuestTrips);
+            
+                base.OnModelCreating(modelBuilder);
+        }
         #endif
 
         // Commons

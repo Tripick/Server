@@ -8,6 +8,7 @@ using TripickServer.Utils;
 using TripickServer.Repos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.EntityFrameworkCore;
 
 namespace TripickServer.Managers
 {
@@ -36,10 +37,16 @@ namespace TripickServer.Managers
         {
             Trip trip = repoTrip.GetById(idTrip);
 
-            if (!trip.Friendships.Any(x => x.Friendship.IdOwner == trip.IdOwner && x.Friendship.IdFriend == idFriend))
-                trip.Friendships.Add(new TripFriendship() { IdTrip = idTrip, IdOwner = trip.IdOwner, IdFriend = idFriend });
+            AppUser user = this.TripickContext.Users.Include(x => x.Friendships).Where(x => x.Id == this.ConnectedUser().Id).SingleOrDefault();
+            if (!user.Friendships.Any(x => x.IdFriend == idFriend))
+                throw new NullReferenceException("Impossible to add the traveler to the trip if he is not your friend.");
 
+            AppUser friend = this.TripickContext.Users.Where(x => x.Id == idFriend).Include(x => x.Photo).SingleOrDefault();
+            trip.Members.Add(friend);
             this.TripickContext.SaveChanges();
+
+            trip.Travelers = trip.Members == null ? new List<Traveler>() : trip.Members.Select(f => new Traveler(f)).ToList();
+            trip.Members = null;
             return trip;
         }
 
@@ -47,10 +54,13 @@ namespace TripickServer.Managers
         {
             Trip trip = repoTrip.GetById(idTrip);
 
-            if (trip.Friendships.Any(x => x.Friendship.IdOwner == trip.IdOwner && x.Friendship.IdFriend == idFriend))
-                trip.Friendships.RemoveAt(trip.Friendships.IndexOf(trip.Friendships.First(x => x.Friendship.IdOwner == trip.IdOwner && x.Friendship.IdFriend == idFriend)));
+            if (trip.Members.Any(x => x.Id == idFriend))
+                trip.Members.RemoveAt(trip.Members.IndexOf(trip.Members.First(x => x.Id == idFriend)));
 
             this.TripickContext.SaveChanges();
+
+            trip.Travelers = trip.Members == null ? new List<Traveler>() : trip.Members.Select(f => new Traveler(f)).ToList();
+            trip.Members = null;
             return trip;
         }
 
