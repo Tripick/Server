@@ -11,6 +11,12 @@ namespace TripickServer.Models
         public string LastName { get; set; }
         public string Photo { get; set; }
 
+        public Friend(Friendship friendship)
+        {
+            this.Id = friendship.IdFriend;
+            this.UserName = null;
+        }
+
         public Friend(AppUser user)
         {
             this.Id = user.Id;

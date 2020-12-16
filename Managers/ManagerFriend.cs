@@ -31,22 +31,6 @@ namespace TripickServer.Managers
 
         #endregion
 
-        #region Public
-
-        public JsonResult SafeCall<T>(Func<T> method)
-        {
-            try
-            {
-                return ServerResponse<T>.ToJson(method());
-            }
-            catch (Exception e)
-            {
-                return ServerResponse<T>.ToJson(false, e.Message);
-            }
-        }
-
-        #endregion
-
         #region Private
 
         public List<Friend> Add(int id)
@@ -63,18 +47,18 @@ namespace TripickServer.Managers
             if (user == null)
                 throw new NullReferenceException($"The user [Id={this.ConnectedUser().Id}] does not exist");
 
-            if(!user.Friendships.Any(x => x.FriendId == newFriend.Id))
-                user.Friendships.Add(new Friendship() { OwnerId = user.Id, FriendId = newFriend.Id });
+            if(!user.Friendships.Any(x => x.IdFriend == newFriend.Id))
+                user.Friendships.Add(new Friendship() { IdOwner = user.Id, IdFriend = newFriend.Id });
 
-            if (!newFriend.Friendships.Any(x => x.FriendId == user.Id)) 
-                newFriend.Friendships.Add(new Friendship() { OwnerId = newFriend.Id, FriendId = user.Id });
+            if (!newFriend.Friendships.Any(x => x.IdFriend == user.Id)) 
+                newFriend.Friendships.Add(new Friendship() { IdOwner = newFriend.Id, IdFriend = user.Id });
 
             this.tripickContext.SaveChanges();
 
             List<Friend> friends = new List<Friend>();
             if (user != null && user.Friendships != null)
             {
-                List<int> ids = user.Friendships.Select(x => x.FriendId).ToList();
+                List<int> ids = user.Friendships.Select(x => x.IdFriend).ToList();
                 List<AppUser> friendsUsers = this.userManager.Users.Where(x => ids.Contains(x.Id)).ToList();
                 friends = friendsUsers.Select(x => new Friend(x)).ToList();
             }
@@ -95,18 +79,18 @@ namespace TripickServer.Managers
             if (user == null)
                 throw new NullReferenceException($"The user [Id={this.ConnectedUser().Id}] does not exist");
 
-            if (user.Friendships.Any(x => x.FriendId == newFriend.Id))
-                user.Friendships.RemoveAt(user.Friendships.IndexOf(user.Friendships.First(x => x.FriendId == newFriend.Id)));
+            if (user.Friendships.Any(x => x.IdFriend == newFriend.Id))
+                user.Friendships.RemoveAt(user.Friendships.IndexOf(user.Friendships.First(x => x.IdFriend == newFriend.Id)));
 
-            if (newFriend.Friendships.Any(x => x.FriendId == user.Id))
-                newFriend.Friendships.RemoveAt(newFriend.Friendships.IndexOf(newFriend.Friendships.First(x => x.FriendId == user.Id)));
+            if (newFriend.Friendships.Any(x => x.IdFriend == user.Id))
+                newFriend.Friendships.RemoveAt(newFriend.Friendships.IndexOf(newFriend.Friendships.First(x => x.IdFriend == user.Id)));
 
             this.tripickContext.SaveChanges();
 
             List<Friend> friends = new List<Friend>();
             if (user != null && user.Friendships != null)
             {
-                List<int> ids = user.Friendships.Select(x => x.FriendId).ToList();
+                List<int> ids = user.Friendships.Select(x => x.IdFriend).ToList();
                 List<AppUser> friendsUsers = this.userManager.Users.Where(x => ids.Contains(x.Id)).ToList();
                 friends = friendsUsers.Select(x => new Friend(x)).ToList();
             }

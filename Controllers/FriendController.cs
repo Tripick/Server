@@ -45,16 +45,20 @@ namespace TripickServer.Controllers
 
         [HttpPost]
         [Route("Add")]
-        public JsonResult Add([FromBody] RequestAdd request)
+        public JsonResult Add([FromBody] Request<RequestAdd> request)
         {
-            return managerFriend.SafeCall(() => managerFriend.Add(request.Id));
+            if (request.Data == null)
+                return Error("Friend - Add : Data required.");
+            return managerFriend.SafeCall(() => managerFriend.Add(request.Data.Id));
         }
 
         [HttpPost]
         [Route("Delete")]
-        public JsonResult Delete([FromBody] RequestAdd request)
+        public JsonResult Delete([FromBody] Request<RequestAdd> request)
         {
-            return managerFriend.SafeCall(() => managerFriend.Delete(request.Id));
+            if (request.Data == null)
+                return Error("Friend - Delete : Data required.");
+            return managerFriend.SafeCall(() => managerFriend.Delete(request.Data.Id));
         }
     }
 }

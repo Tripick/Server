@@ -30,22 +30,6 @@ namespace TripickServer.Managers
 
         #endregion
 
-        #region Public
-
-        public JsonResult SafeCall<T>(Func<T> method)
-        {
-            try
-            {
-                return ServerResponse<T>.ToJson(method());
-            }
-            catch (Exception e)
-            {
-                return ServerResponse<T>.ToJson(false, e.Message);
-            }
-        }
-
-        #endregion
-
         #region Private
 
         public List<Trip> GetAll(int pageIndex = 0, int pageSize = 10)
@@ -55,14 +39,8 @@ namespace TripickServer.Managers
 
         public Trip GetById(int id, bool full = false)
         {
-            // Get the entity
             Trip trip = full ? this.repoTrip.GetFullById(id) : this.repoTrip.GetById(id);
-
-            // Verify the entity is mine
-            if (trip.IdOwner != this.ConnectedUser().Id)
-                throw new NullReferenceException("The trip does not belong to you");
-            else
-                return trip;
+            return trip;
         }
 
         public Trip Create()

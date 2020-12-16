@@ -49,7 +49,7 @@ namespace TripickServer.Controllers
                 AppUser user = await userManager.Users.Include(x => x.Friendships).SingleAsync(x => x.Id == this.ConnectedUser.Id);
                 if (user != null && user.Friendships != null)
                 {
-                    List<int> ids = user.Friendships.Select(x => x.FriendId).ToList();
+                    List<int> ids = user.Friendships.Select(x => x.IdFriend).ToList();
                     List<AppUser> friendsUsers = userManager.Users.Include(x => x.Photo).Where(x => ids.Contains(x.Id)).ToList();
                     friends = friendsUsers.Select(x => new Friend(x)).ToList();
                 }

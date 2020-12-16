@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using TripickServer.Models;
 using TripickServer.Utils;
@@ -23,6 +24,22 @@ namespace TripickServer.Managers
             this.Logger = logger;
             this.ConnectedUser = user;
             this.TripickContext = tripickContext;
+        }
+
+        #endregion
+
+        #region Public
+
+        public JsonResult SafeCall<T>(Func<T> method)
+        {
+            try
+            {
+                return ServerResponse<T>.ToJson(method());
+            }
+            catch (Exception e)
+            {
+                return ServerResponse<T>.ToJson(false, e.Message);
+            }
         }
 
         #endregion

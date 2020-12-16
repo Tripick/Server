@@ -7,14 +7,10 @@ namespace TripickServer.Models
 {
     public class Friendship
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
-
         [ForeignKey("Owner")]
-        public int OwnerId { get; set; }
+        public int IdOwner { get; set; }
         public AppUser Owner { get; set; }
 
-        public int FriendId { get; set; }
+        public int IdFriend { get; set; }
     }
 }

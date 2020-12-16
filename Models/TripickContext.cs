@@ -17,23 +17,32 @@ namespace TripickServer.Models
 
         public TripickContext(DbContextOptions<TripickContext> options) : base(options) { }
 
-        // When doing a migration, uncomment this :
-        //public TripickContext(IConfiguration configuration, DbContextOptions<TripickContext> options) : base(options)
-        //{
-        //    this.configuration = configuration;
-        //}
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-        //    optionsBuilder.UseNpgsql(configuration.GetConnectionString("DefaultConnection"), b => b.ProvideClientCertificatesCallback(clientCerts =>
-        //    {
-        //        var databaseCertificate = configuration.GetValue<string>(WebHostDefaults.ContentRootKey) + "/Resources/databaseCert.pfx";
-        //        var cert = new X509Certificate2(databaseCertificate, configuration.GetValue<string>("Settings:databaseCertPassword"));
-        //        clientCerts.Add(cert);
-        //    }));
-        //}
-        //protected override void OnModelCreating(ModelBuilder modelBuilder)
-        //{
-        //}
+        #if DEBUG
+            //When doing a migration, uncomment this :
+            public TripickContext(IConfiguration configuration, DbContextOptions<TripickContext> options) : base(options)
+            {
+                this.configuration = configuration;
+            }
+            protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+            {
+                optionsBuilder.UseNpgsql(configuration.GetConnectionString("DefaultConnection"), b => b.ProvideClientCertificatesCallback(clientCerts =>
+                {
+                    var databaseCertificate = configuration.GetValue<string>(WebHostDefaults.ContentRootKey) + "/Resources/databaseCert.pfx";
+                    var cert = new X509Certificate2(databaseCertificate, configuration.GetValue<string>("Settings:databaseCertPassword"));
+                    clientCerts.Add(cert);
+                }));
+            }
+            protected override void OnModelCreating(ModelBuilder modelBuilder)
+            {
+                modelBuilder.Entity<Friendship>().HasKey(table => new { table.IdOwner, table.IdFriend });
+                modelBuilder.Entity<Friendship>()
+                    .HasOne(x => x.Owner)
+                    //.WithMany(c => c.Products)
+                    //.HasForeignKey(p => new { p.CategoryId1, p.CategoryId2 });
+
+            modelBuilder.Entity<TripFriendship>().HasKey(table => new { table.IdTrip, table.IdOwner, table.IdFriend });
+            }
+        #endif
 
         // Commons
         public DbSet<Configuration> Configurations { get; set; }
