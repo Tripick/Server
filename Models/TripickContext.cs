@@ -31,20 +31,21 @@ namespace TripickServer.Models
         //        clientCerts.Add(cert);
         //    }));
         //}
-        //protected override void OnModelCreating(ModelBuilder modelBuilder)
-        //{
-        //    modelBuilder.Entity<Friendship>().HasKey(x => new { x.IdOwner, x.IdFriend });
 
-        //    modelBuilder.Entity<Trip>()
-        //        .HasOne(x => x.Owner)
-        //        .WithMany(x => x.Trips);
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Friendship>().HasKey(x => new { x.IdOwner, x.IdFriend });
 
-        //    modelBuilder.Entity<Trip>()
-        //        .HasMany(x => x.Members)
-        //        .WithMany(x => x.GuestTrips);
-            
-        //    base.OnModelCreating(modelBuilder);
-        //}
+            modelBuilder.Entity<Trip>()
+                .HasOne(x => x.Owner)
+                .WithMany(x => x.Trips);
+
+            modelBuilder.Entity<Trip>()
+                .HasMany(x => x.Members)
+                .WithMany(x => x.GuestTrips);
+
+            base.OnModelCreating(modelBuilder);
+        }
 
         // Commons
         public DbSet<Configuration> Configurations { get; set; }
