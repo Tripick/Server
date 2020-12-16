@@ -17,36 +17,34 @@ namespace TripickServer.Models
 
         public TripickContext(DbContextOptions<TripickContext> options) : base(options) { }
 
-        #if DEBUG
-            //When doing a migration, uncomment this :
-            public TripickContext(IConfiguration configuration, DbContextOptions<TripickContext> options) : base(options)
-            {
-                this.configuration = configuration;
-            }
-            protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-            {
-                optionsBuilder.UseNpgsql(configuration.GetConnectionString("DefaultConnection"), b => b.ProvideClientCertificatesCallback(clientCerts =>
-                {
-                    var databaseCertificate = configuration.GetValue<string>(WebHostDefaults.ContentRootKey) + "/Resources/databaseCert.pfx";
-                    var cert = new X509Certificate2(databaseCertificate, configuration.GetValue<string>("Settings:databaseCertPassword"));
-                    clientCerts.Add(cert);
-                }));
-            }
-            protected override void OnModelCreating(ModelBuilder modelBuilder)
-            {
-                modelBuilder.Entity<Friendship>().HasKey(x => new { x.IdOwner, x.IdFriend });
+        //When doing a migration, uncomment this :
+        //public TripickContext(IConfiguration configuration, DbContextOptions<TripickContext> options) : base(options)
+        //{
+        //    this.configuration = configuration;
+        //}
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    optionsBuilder.UseNpgsql(configuration.GetConnectionString("DefaultConnection"), b => b.ProvideClientCertificatesCallback(clientCerts =>
+        //    {
+        //        var databaseCertificate = configuration.GetValue<string>(WebHostDefaults.ContentRootKey) + "/Resources/databaseCert.pfx";
+        //        var cert = new X509Certificate2(databaseCertificate, configuration.GetValue<string>("Settings:databaseCertPassword"));
+        //        clientCerts.Add(cert);
+        //    }));
+        //}
+        //protected override void OnModelCreating(ModelBuilder modelBuilder)
+        //{
+        //    modelBuilder.Entity<Friendship>().HasKey(x => new { x.IdOwner, x.IdFriend });
 
-                modelBuilder.Entity<Trip>()
-                    .HasOne(x => x.Owner)
-                    .WithMany(x => x.Trips);
+        //    modelBuilder.Entity<Trip>()
+        //        .HasOne(x => x.Owner)
+        //        .WithMany(x => x.Trips);
 
-                modelBuilder.Entity<Trip>()
-                    .HasMany(x => x.Members)
-                    .WithMany(x => x.GuestTrips);
+        //    modelBuilder.Entity<Trip>()
+        //        .HasMany(x => x.Members)
+        //        .WithMany(x => x.GuestTrips);
             
-                base.OnModelCreating(modelBuilder);
-        }
-        #endif
+        //    base.OnModelCreating(modelBuilder);
+        //}
 
         // Commons
         public DbSet<Configuration> Configurations { get; set; }
