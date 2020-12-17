@@ -48,9 +48,13 @@ namespace TripickServer.Models
 
         public virtual List<Destination> Destinations { get; set; }
         public virtual List<AppUser> Members { get; set; }
+        public virtual List<AppUser> Subscribers { get; set; }
         public virtual List<Pick> Picks { get; set; }
 
         [NotMapped]
         public List<Traveler> Travelers { get; set; }
+
+        [NotMapped]
+        public List<Follower> Followers { get; set; }
     }
 }

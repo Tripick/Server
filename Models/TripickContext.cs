@@ -44,6 +44,10 @@ namespace TripickServer.Models
                 .HasMany(x => x.Members)
                 .WithMany(x => x.GuestTrips);
 
+            modelBuilder.Entity<Trip>()
+                .HasMany(x => x.Subscribers)
+                .WithMany(x => x.WatchedTrips);
+
             base.OnModelCreating(modelBuilder);
         }
 

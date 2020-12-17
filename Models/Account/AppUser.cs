@@ -10,6 +10,7 @@ namespace TripickServer.Models
         public ImageAppUser Photo { get; set; }
         public virtual List<Trip> Trips { get; set; }
         public virtual List<Trip> GuestTrips { get; set; }
+        public virtual List<Trip> WatchedTrips { get; set; }
 
         public virtual List<Friendship> Friendships { get; set; }
     }
