@@ -16,7 +16,6 @@ namespace TripickServer.Managers
     {
         #region Properties
 
-        private RepoConfiguration repoConfiguration;
         private RepoTrip repoTrip;
 
         #endregion
@@ -25,7 +24,6 @@ namespace TripickServer.Managers
 
         public ManagerTraveler(ILogger<ServerLogger> logger, Func<AppUser> user, TripickContext tripickContext) : base(logger, user, tripickContext)
         {
-            this.repoConfiguration = new RepoConfiguration(this.ConnectedUser, tripickContext);
             this.repoTrip = new RepoTrip(this.ConnectedUser, tripickContext);
         }
 

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Threading.Tasks;
 using TripickServer.Models;
 using TripickServer.Utils;
 
@@ -35,6 +36,18 @@ namespace TripickServer.Managers
             try
             {
                 return ServerResponse<T>.ToJson(method());
+            }
+            catch (Exception e)
+            {
+                return ServerResponse<T>.ToJson(false, e.Message);
+            }
+        }
+
+        public async Task<JsonResult> SafeCallAsync<T>(Func<Task<T>> method)
+        {
+            try
+            {
+                return ServerResponse<T>.ToJson(await method());
             }
             catch (Exception e)
             {

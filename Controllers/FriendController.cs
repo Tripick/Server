@@ -38,7 +38,7 @@ namespace TripickServer.Controllers
             TripickContext tripickContext)
         : base(logger, userManager)
         {
-            this.managerFriend = new ManagerFriend(logger, () => this.ConnectedUser, userManager, tripickContext);
+            this.managerFriend = new ManagerFriend(logger, () => this.ConnectedUser, tripickContext);
         }
 
         #endregion

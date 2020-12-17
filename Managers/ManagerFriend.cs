@@ -16,16 +16,12 @@ namespace TripickServer.Managers
     {
         #region Properties
 
-        private UserManager<AppUser> userManager;
-
         #endregion
 
         #region Constructor
 
-        public ManagerFriend(ILogger<ServerLogger> logger, Func<AppUser> user, UserManager<AppUser> userManager, TripickContext tripickContext) : base(logger, user, tripickContext)
-        {
-            this.userManager = userManager;
-        }
+        public ManagerFriend(ILogger<ServerLogger> logger, Func<AppUser> user, TripickContext tripickContext) : base(logger, user, tripickContext)
+        {}
 
         #endregion
 
@@ -57,7 +53,7 @@ namespace TripickServer.Managers
             if (user != null && user.Friendships != null)
             {
                 List<int> ids = user.Friendships.Select(x => x.IdFriend).ToList();
-                List<AppUser> friendsUsers = this.userManager.Users.Where(x => ids.Contains(x.Id)).Include(t => t.Photo).ToList();
+                List<AppUser> friendsUsers = this.TripickContext.Users.Where(x => ids.Contains(x.Id)).Include(t => t.Photo).ToList();
                 friends = friendsUsers.Select(x => new Friend(x)).ToList();
             }
             return friends;
@@ -89,7 +85,7 @@ namespace TripickServer.Managers
             if (user != null && user.Friendships != null)
             {
                 List<int> ids = user.Friendships.Select(x => x.IdFriend).ToList();
-                List<AppUser> friendsUsers = this.userManager.Users.Where(x => ids.Contains(x.Id)).Include(t => t.Photo).ToList();
+                List<AppUser> friendsUsers = this.TripickContext.Users.Where(x => ids.Contains(x.Id)).Include(t => t.Photo).ToList();
                 friends = friendsUsers.Select(x => new Friend(x)).ToList();
             }
             return friends;
