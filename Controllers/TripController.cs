@@ -54,16 +54,7 @@ namespace TripickServer.Controllers
         {
             if (request.Data == null)
                 return Error("Trip - Get : Data required.");
-            return managerTrip.SafeCall(() => managerTrip.GetById(request.Data.Id, false));
-        }
-
-        [HttpPost]
-        [Route("GetFull")]
-        public JsonResult GetFull([FromBody] Request<RequestGet> request)
-        {
-            if (request.Data == null)
-                return Error("Trip - Get : Data required.");
-            return managerTrip.SafeCall(() => managerTrip.GetById(request.Data.Id, true));
+            return managerTrip.SafeCall(() => managerTrip.GetById(request.Data.Id));
         }
 
         [HttpPost]
