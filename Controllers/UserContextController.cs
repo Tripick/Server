@@ -55,12 +55,6 @@ namespace TripickServer.Controllers
                 }
 
                 List<Trip> trips = managerTrip.GetAll();
-                trips.ForEach(t =>
-                {
-                    t.Travelers = t.Members == null ? new List<Traveler>() : t.Members.Select(f => new Traveler(f)).ToList();
-                    t.Members = null;
-                });
-
                 UserContext userContext = new UserContext(friends, trips, new List<Guide>());
                 return ServerResponse<UserContext>.ToJson(userContext);
             }

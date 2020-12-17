@@ -14,6 +14,13 @@ namespace TripickServer.Repos
 
         #endregion
 
+        public int Count()
+        {
+            return this.TripickContext.Trips
+                .Where(t => !t.IsDeleted && t.IdOwner == this.ConnectedUser().Id)
+                .Count();
+        }
+
         public List<Trip> GetAll(int pageIndex = 0, int pageSize = 10)
         {
             List<Trip> trips = this.TripickContext.Trips
@@ -25,15 +32,15 @@ namespace TripickServer.Repos
                 .Include(t => t.Destinations)
                 .Include(t => t.Members).ThenInclude(tra => tra.Photo)
                 .ToList();
-            trips.ForEach(t => t.Polygon = t.Polygon.OrderBy(p => p.Index).ToList());
-            trips.ForEach(t => t.Travelers = t.Members.Select(f => new Traveler(f)).ToList());
+
+            trips.ForEach(trip =>
+            {
+                trip.Polygon = trip.Polygon.OrderBy(p => p.Index).ToList();
+                trip.Travelers = trip.Members == null ? new List<Traveler>() : trip.Members.Select(f => new Traveler(f)).ToList();
+                trip.Members = null;
+                trip.Owner = null;
+            });
             return trips;
-        }
-        public int Count()
-        {
-            return this.TripickContext.Trips
-                .Where(t => !t.IsDeleted && t.IdOwner == this.ConnectedUser().Id)
-                .Count();
         }
 
         public override Trip GetById(int id)
@@ -48,8 +55,11 @@ namespace TripickServer.Repos
                 .Include(t => t.Picks).ThenInclude(p => p.Place)
                 .Include(t => t.Members).ThenInclude(tra => tra.Photo)
                 .FirstOrDefault();
+
             trip.Polygon = trip.Polygon.OrderBy(p => p.Index).ToList();
-            trip.Travelers = trip.Members.Select(f => new Traveler(f)).ToList();
+            trip.Travelers = trip.Members == null ? new List<Traveler>() : trip.Members.Select(f => new Traveler(f)).ToList();
+            trip.Members = null;
+            trip.Owner = null;
             return trip;
         }
 
@@ -65,8 +75,11 @@ namespace TripickServer.Repos
                 .Include(t => t.Picks).ThenInclude(p => p.Place)
                 .Include(t => t.Members).ThenInclude(tra => tra.Photo)
                 .FirstOrDefault();
+
             trip.Polygon = trip.Polygon.OrderBy(p => p.Index).ToList();
-            trip.Travelers = trip.Members.Select(f => new Traveler(f)).ToList();
+            trip.Travelers = trip.Members == null ? new List<Traveler>() : trip.Members.Select(f => new Traveler(f)).ToList();
+            trip.Members = null;
+            trip.Owner = null;
 
             List<MapTile> tiles = new List<MapTile>();
             if(trip != null)
