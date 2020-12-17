@@ -31,7 +31,7 @@ namespace TripickServer.Managers
 
         #region Private
 
-        public Trip Add(int idTrip, int idFriend)
+        public Traveler Add(int idTrip, int idFriend)
         {
             Trip trip = repoTrip.GetById(idTrip);
 
@@ -43,12 +43,10 @@ namespace TripickServer.Managers
             trip.Members.Add(friend);
             this.TripickContext.SaveChanges();
 
-            trip.Travelers = trip.Members == null ? new List<Traveler>() : trip.Members.Select(f => new Traveler(f)).ToList();
-            trip.Members = null;
-            return trip;
+            return new Traveler(friend);
         }
 
-        public Trip Delete(int idTrip, int idFriend)
+        public bool Delete(int idTrip, int idFriend)
         {
             Trip trip = repoTrip.GetById(idTrip);
 
@@ -57,9 +55,7 @@ namespace TripickServer.Managers
 
             this.TripickContext.SaveChanges();
 
-            trip.Travelers = trip.Members == null ? new List<Traveler>() : trip.Members.Select(f => new Traveler(f)).ToList();
-            trip.Members = null;
-            return trip;
+            return true;
         }
 
         #endregion
