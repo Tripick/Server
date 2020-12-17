@@ -39,9 +39,9 @@ namespace TripickServer.Managers
             return trips;
         }
 
-        public Trip GetById(int id, bool full = false)
+        public Trip GetById(int id)
         {
-            Trip trip = full ? this.repoTrip.GetFullById(id) : this.repoTrip.GetById(id);
+            Trip trip = this.repoTrip.GetById(id);
             return trip;
         }
 
@@ -73,7 +73,7 @@ namespace TripickServer.Managers
                 throw new NullReferenceException("The trip to update cannot be null");
 
             // Verify the entity to update exists
-            Trip existing = this.repoTrip.GetFullById(trip.Id);
+            Trip existing = this.repoTrip.GetByIdWithTiles(trip.Id);
             if (existing == null)
                 throw new NullReferenceException($"The trip [Id={trip.Id}] does not exist");
             // Verify the entity is mine

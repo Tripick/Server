@@ -45,6 +45,16 @@ namespace TripickServer.Repos
 
         public override Trip GetById(int id)
         {
+            Trip trip = GetPlainById(id);
+            trip.Polygon = trip.Polygon.OrderBy(p => p.Index).ToList();
+            trip.Travelers = trip.Members == null ? new List<Traveler>() : trip.Members.Select(f => new Traveler(f)).ToList();
+            trip.Members = null;
+            trip.Owner = null;
+            return trip;
+        }
+
+        public Trip GetPlainById(int id)
+        {
             Trip trip = this.TripickContext.Trips
                 .Where(t => !t.IsDeleted && t.IdOwner == this.ConnectedUser().Id && t.Id == id)
                 .Include(t => t.Region)
@@ -55,15 +65,10 @@ namespace TripickServer.Repos
                 .Include(t => t.Picks).ThenInclude(p => p.Place)
                 .Include(t => t.Members).ThenInclude(tra => tra.Photo)
                 .FirstOrDefault();
-
-            trip.Polygon = trip.Polygon.OrderBy(p => p.Index).ToList();
-            trip.Travelers = trip.Members == null ? new List<Traveler>() : trip.Members.Select(f => new Traveler(f)).ToList();
-            trip.Members = null;
-            trip.Owner = null;
             return trip;
         }
 
-        public Trip GetFullById(int id)
+        public Trip GetByIdWithTiles(int id)
         {
             Trip trip = this.TripickContext.Trips
                 .Where(t => !t.IsDeleted && t.IdOwner == this.ConnectedUser().Id && t.Id == id)
