@@ -40,7 +40,7 @@ namespace TripickServer.Managers
                 throw new NullReferenceException("Impossible to add the follower to the trip if he is not your friend.");
 
             AppUser friend = this.TripickContext.Users.Where(x => x.Id == idFriend).Include(x => x.Photo).SingleOrDefault();
-            trip.Members.Add(friend);
+            trip.Subscribers.Add(friend);
             this.TripickContext.SaveChanges();
 
             return new Follower(friend);
@@ -50,8 +50,8 @@ namespace TripickServer.Managers
         {
             Trip trip = repoTrip.GetById(idTrip);
 
-            if (trip.Members.Any(x => x.Id == idFriend))
-                trip.Members.RemoveAt(trip.Members.IndexOf(trip.Members.First(x => x.Id == idFriend)));
+            if (trip.Subscribers.Any(x => x.Id == idFriend))
+                trip.Subscribers.RemoveAt(trip.Subscribers.IndexOf(trip.Subscribers.First(x => x.Id == idFriend)));
 
             this.TripickContext.SaveChanges();
 
