@@ -41,7 +41,6 @@ namespace TripickServer.Repos
                 trip.Members = null;
                 trip.Followers = trip.Subscribers == null ? new List<Follower>() : trip.Subscribers.Select(f => new Follower(f)).ToList();
                 trip.Subscribers = null;
-                trip.Owner = null;
             });
             return trips;
         }
@@ -54,7 +53,6 @@ namespace TripickServer.Repos
             trip.Members = null;
             trip.Followers = trip.Subscribers == null ? new List<Follower>() : trip.Subscribers.Select(f => new Follower(f)).ToList();
             trip.Subscribers = null;
-            trip.Owner = null;
             return trip;
         }
 
@@ -93,7 +91,6 @@ namespace TripickServer.Repos
             trip.Members = null;
             trip.Followers = trip.Subscribers == null ? new List<Follower>() : trip.Subscribers.Select(f => new Follower(f)).ToList();
             trip.Subscribers = null;
-            trip.Owner = null;
 
             List<MapTile> tiles = new List<MapTile>();
             if(trip != null)

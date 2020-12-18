@@ -63,6 +63,7 @@ namespace TripickServer.Managers
 
             // Commit
             this.TripickContext.SaveChanges();
+            trip.Owner = null;
             return trip;
         }
 
@@ -127,6 +128,7 @@ namespace TripickServer.Managers
             this.TripickContext.SaveChanges();
 
             // Do not send unuseful data
+            existing.Owner = null;
             existing.CoverImage = null;
             existing.Tiles = null;
             return existing;
