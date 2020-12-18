@@ -33,30 +33,10 @@ namespace TripickServer.Repos
                 .Include(t => t.Members).ThenInclude(m => m.Photo)
                 .Include(t => t.Subscribers).ThenInclude(s => s.Photo)
                 .ToList();
-
-            trips.ForEach(trip =>
-            {
-                trip.Polygon = trip.Polygon.OrderBy(p => p.Index).ToList();
-                trip.Travelers = trip.Members == null ? new List<Traveler>() : trip.Members.Select(f => new Traveler(f)).ToList();
-                trip.Members = null;
-                trip.Followers = trip.Subscribers == null ? new List<Follower>() : trip.Subscribers.Select(f => new Follower(f)).ToList();
-                trip.Subscribers = null;
-            });
             return trips;
         }
 
         public override Trip GetById(int id)
-        {
-            Trip trip = GetPlainById(id);
-            trip.Polygon = trip.Polygon.OrderBy(p => p.Index).ToList();
-            trip.Travelers = trip.Members == null ? new List<Traveler>() : trip.Members.Select(f => new Traveler(f)).ToList();
-            trip.Members = null;
-            trip.Followers = trip.Subscribers == null ? new List<Follower>() : trip.Subscribers.Select(f => new Follower(f)).ToList();
-            trip.Subscribers = null;
-            return trip;
-        }
-
-        public Trip GetPlainById(int id)
         {
             Trip trip = this.TripickContext.Trips
                 .Where(t => !t.IsDeleted && t.IdOwner == this.ConnectedUser().Id && t.Id == id)
@@ -69,6 +49,8 @@ namespace TripickServer.Repos
                 .Include(t => t.Members).ThenInclude(m => m.Photo)
                 .Include(t => t.Subscribers).ThenInclude(s => s.Photo)
                 .FirstOrDefault();
+
+            trip.Polygon = trip.Polygon.OrderBy(p => p.Index).ToList();
             return trip;
         }
 
@@ -87,10 +69,6 @@ namespace TripickServer.Repos
                 .FirstOrDefault();
 
             trip.Polygon = trip.Polygon.OrderBy(p => p.Index).ToList();
-            trip.Travelers = trip.Members == null ? new List<Traveler>() : trip.Members.Select(f => new Traveler(f)).ToList();
-            trip.Members = null;
-            trip.Followers = trip.Subscribers == null ? new List<Follower>() : trip.Subscribers.Select(f => new Follower(f)).ToList();
-            trip.Subscribers = null;
 
             List<MapTile> tiles = new List<MapTile>();
             if(trip != null)

@@ -35,13 +35,25 @@ namespace TripickServer.Managers
         public List<Trip> GetAll(int pageIndex = 0, int pageSize = 10)
         {
             List<Trip> trips = this.repoTrip.GetAll(pageIndex, pageSize).OrderByDescending(x => x.CreationDate).ToList();
-            
+            trips.ForEach(trip =>
+            {
+                trip.Polygon = trip.Polygon.OrderBy(p => p.Index).ToList();
+                trip.Travelers = trip.Members == null ? new List<Traveler>() : trip.Members.Select(f => new Traveler(f)).ToList();
+                trip.Members = null;
+                trip.Followers = trip.Subscribers == null ? new List<Follower>() : trip.Subscribers.Select(f => new Follower(f)).ToList();
+                trip.Subscribers = null;
+            });
             return trips;
         }
 
         public Trip GetById(int id)
         {
             Trip trip = this.repoTrip.GetById(id);
+            trip.Owner = null;
+            trip.Travelers = trip.Members == null ? new List<Traveler>() : trip.Members.Select(f => new Traveler(f)).ToList();
+            trip.Members = null;
+            trip.Followers = trip.Subscribers == null ? new List<Follower>() : trip.Subscribers.Select(f => new Follower(f)).ToList();
+            trip.Subscribers = null;
             return trip;
         }
 
@@ -63,7 +75,12 @@ namespace TripickServer.Managers
 
             // Commit
             this.TripickContext.SaveChanges();
+
             trip.Owner = null;
+            trip.Travelers = trip.Members == null ? new List<Traveler>() : trip.Members.Select(f => new Traveler(f)).ToList();
+            trip.Members = null;
+            trip.Followers = trip.Subscribers == null ? new List<Follower>() : trip.Subscribers.Select(f => new Follower(f)).ToList();
+            trip.Subscribers = null;
             return trip;
         }
 
@@ -131,6 +148,10 @@ namespace TripickServer.Managers
             existing.Owner = null;
             existing.CoverImage = null;
             existing.Tiles = null;
+            existing.Travelers = existing.Members == null ? new List<Traveler>() : existing.Members.Select(f => new Traveler(f)).ToList();
+            existing.Members = null;
+            existing.Followers = existing.Subscribers == null ? new List<Follower>() : existing.Subscribers.Select(f => new Follower(f)).ToList();
+            existing.Subscribers = null;
             return existing;
         }
 

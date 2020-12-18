@@ -33,7 +33,7 @@ namespace TripickServer.Managers
 
         public Follower Add(int idTrip, int idFriend)
         {
-            Trip trip = repoTrip.GetPlainById(idTrip);
+            Trip trip = repoTrip.GetById(idTrip);
 
             AppUser user = this.TripickContext.Users.Include(x => x.Friendships).Where(x => x.Id == this.ConnectedUser().Id).SingleOrDefault();
             if (!user.Friendships.Any(x => x.IdFriend == idFriend))
@@ -48,7 +48,7 @@ namespace TripickServer.Managers
 
         public bool Delete(int idTrip, int idFriend)
         {
-            Trip trip = repoTrip.GetPlainById(idTrip);
+            Trip trip = repoTrip.GetById(idTrip);
 
             if (trip.Members.Any(x => x.Id == idFriend))
                 trip.Members.RemoveAt(trip.Members.IndexOf(trip.Members.First(x => x.Id == idFriend)));
