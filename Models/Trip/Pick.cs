@@ -8,6 +8,7 @@ namespace TripickServer.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
+        public int Index { get; set; }
         public int Rating { get; set; }
 
         [ForeignKey("Place")]

@@ -33,6 +33,7 @@ namespace TripickServer.Models
         public List<MapTile> Tiles { get; set; }
 
         // Filters
+        public bool IsPicksGenerated { get; set; } = false;
         public int FilterIntense { get; set; } = 3;
         public int FilterSportive { get; set; } = 3;
         public int FilterCity { get; set; } = 3;
