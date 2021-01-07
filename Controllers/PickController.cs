@@ -34,12 +34,12 @@ namespace TripickServer.Controllers
         #endregion
 
         [HttpPost]
-        [Route("Generate")]
-        public JsonResult Generate([FromBody] Request<RequestGenerate> request)
+        [Route("GetNext")]
+        public JsonResult GetNext([FromBody] Request<RequestGetNext> request)
         {
             if (request.Data == null)
-                return Error("Pick - Generate : Data required.");
-            return managerPick.SafeCall(() => managerPick.Generate(request.Data.IdTrip));
+                return Error("Pick - GetNext : Data required.");
+            return managerPick.SafeCall(() => managerPick.GetNext(request.Data.IdTrip, request.Data.Quantity));
         }
     }
 }

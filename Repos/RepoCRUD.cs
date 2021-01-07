@@ -48,6 +48,11 @@ namespace TripickServer.Repos
             dbSet.Add(entity);
         }
 
+        public virtual void AddRange(List<TEntity> entities)
+        {
+            dbSet.AddRange(entities);
+        }
+
         public virtual void Update(TEntity entity)
         {
             dbSet.Attach(entity);

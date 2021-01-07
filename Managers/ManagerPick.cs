@@ -34,10 +34,9 @@ namespace TripickServer.Managers
 
         #region Private
 
-        public bool Generate(int idTrip)
+        public List<Pick> GetNext(int idTrip, int quantity)
         {
             Trip trip = this.repoTrip.GetByIdWithTiles(idTrip);
-
             List<BoundingBox> areas = trip.Tiles.Select(t => new BoundingBox()
             {
                 MinLat = t.Latitude,
@@ -49,8 +48,13 @@ namespace TripickServer.Managers
             // Get places respecting area
             List<Place> places = this.repoPlace.GetAllInAreas(areas);
 
+            // Get existing picks for this user and trip
+            List<Pick> existingPicks = this.repoPick.GetAllByTrip(idTrip);
+            List<string> existingPicksIds = existingPicks.Select(x => x.IdPlace.ToString()).ToList();
+            var query = places.Where(p => !existingPicksIds.Contains(p.PlaceId));
+
             // Ordering places by preferences
-            var query = places.Where(p => p.PriceLevel == null || (int.Parse(p.PriceLevel) + 1) < trip.FilterExpensive);
+            query = query.Where(p => p.PriceLevel == null || (int.Parse(p.PriceLevel) + 1) < trip.FilterExpensive);
 
             if (trip.FilterSportive == 1) query = query.Where(p =>
                 !p.Types.Contains("park") &&
@@ -79,22 +83,18 @@ namespace TripickServer.Managers
             else if (trip.FilterFamous == 4) query = query.Where(p => p.NbRating > 500).OrderBy(p => p.NbRating).ThenBy(p => p.Rating);
             else if (trip.FilterFamous == 5) query = query.OrderByDescending(p => p.NbRating).ThenBy(p => p.Rating);
 
-            places = query.ToList();
+            places = query.Take(Math.Min(20, quantity)).ToList();
 
             // Generate picks
             List<Pick> picks = new List<Pick>();
             for (int i = 0; i < places.Count; i++)
             {
-                picks.Add(new Pick() { Index = i, IdPlace = places[i].Id, IdTrip = idTrip, IdUser = this.ConnectedUser().Id, Rating = -1 });
+                picks.Add(new Pick() { Index = i, IdPlace = places[i].Id, IdTrip = idTrip, IdUser = this.ConnectedUser().Id, Rating = -1, Place = places[i] });
             }
-            //for (int i = 0; i < picks.Count; i++)
-            //{
-            //    this.repoPick.Add(picks[i]);
-            //}
 
-            // Commit
+            //this.repoPick.AddRange(picks);
             //this.TripickContext.SaveChanges();
-            return true;
+            return picks;
         }
 
         #endregion
