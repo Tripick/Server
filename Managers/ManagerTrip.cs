@@ -113,6 +113,7 @@ namespace TripickServer.Managers
             existing.EndLongitude = trip.EndLongitude;
             existing.EndLatitudeDelta = trip.EndLatitudeDelta;
             existing.EndLongitudeDelta = trip.EndLongitudeDelta;
+            existing.FiltersSet = trip.FiltersSet;
             existing.FilterIntense = trip.FilterIntense;
             existing.FilterSportive = trip.FilterSportive;
             existing.FilterCity = trip.FilterCity;
