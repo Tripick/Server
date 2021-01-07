@@ -72,7 +72,7 @@ namespace TripickServer.Repos
 
             List<MapTile> tiles = new List<MapTile>();
             if(trip != null)
-                this.TripickContext.MapTiles.Where(t => t.IdTrip == trip.Id).ToList();
+                tiles = this.TripickContext.MapTiles.Where(t => t.IdTrip == trip.Id).ToList();
             trip.Tiles = tiles;
 
             return trip;

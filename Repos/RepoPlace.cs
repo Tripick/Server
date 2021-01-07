@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using LinqKit;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,13 +17,16 @@ namespace TripickServer.Repos
 
         public List<Place> GetAllInAreas(List<BoundingBox> areas)
         {
-            List<Place> places = this.TripickContext.Places
-                .Where(p => areas.Any(a => 
-                    a.MinLat < p.Latitude &&
-                    a.MaxLat > p.Latitude &&
-                    a.MinLat < p.Longitude &&
-                    a.MaxLat > p.Longitude))
-                .ToList();
+            var query = PredicateBuilder.New<Place>();
+            foreach (BoundingBox area in areas)
+            {
+                query = query.Or(p =>
+                    area.MinLat < p.Latitude &&
+                    area.MaxLat > p.Latitude &&
+                    area.MinLon < p.Longitude &&
+                    area.MaxLon > p.Longitude);
+            }
+            List<Place> places = this.TripickContext.Places.AsExpandable().Where(query).ToList();
             return places;
         }
     }

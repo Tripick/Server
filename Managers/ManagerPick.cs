@@ -36,7 +36,7 @@ namespace TripickServer.Managers
 
         public bool Generate(int idTrip)
         {
-            Trip trip = this.repoTrip.GetById(idTrip);
+            Trip trip = this.repoTrip.GetByIdWithTiles(idTrip);
 
             List<BoundingBox> areas = trip.Tiles.Select(t => new BoundingBox()
             {
@@ -82,13 +82,18 @@ namespace TripickServer.Managers
             places = query.ToList();
 
             // Generate picks
+            List<Pick> picks = new List<Pick>();
             for (int i = 0; i < places.Count; i++)
             {
-                this.repoPick.Add(new Pick() { Index = i, IdPlace = places[i].Id, IdTrip = idTrip, IdUser = this.ConnectedUser().Id, Rating = -1 });
+                picks.Add(new Pick() { Index = i, IdPlace = places[i].Id, IdTrip = idTrip, IdUser = this.ConnectedUser().Id, Rating = -1 });
             }
+            //for (int i = 0; i < picks.Count; i++)
+            //{
+            //    this.repoPick.Add(picks[i]);
+            //}
 
             // Commit
-            this.TripickContext.SaveChanges();
+            //this.TripickContext.SaveChanges();
             return true;
         }
 

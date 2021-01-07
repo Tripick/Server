@@ -34,6 +34,7 @@ namespace TripickServer.Models
 
         // Filters
         public bool IsPicksGenerated { get; set; } = false;
+        public bool FiltersSet { get; set; } = false;
         public int FilterIntense { get; set; } = 3;
         public int FilterSportive { get; set; } = 3;
         public int FilterCity { get; set; } = 3;

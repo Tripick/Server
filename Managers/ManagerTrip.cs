@@ -136,7 +136,9 @@ namespace TripickServer.Managers
                 }
             }
             existing.Polygon = trip.Polygon;
-            existing.Tiles = trip.Tiles;
+
+            if(trip.Tiles != null && trip.Tiles.Any())
+                existing.Tiles = trip.Tiles;
 
             // Update
             //this.repoTrip.Update(existing);
