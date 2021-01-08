@@ -26,7 +26,7 @@ namespace TripickServer.Repos
                     area.MinLon < p.Longitude &&
                     area.MaxLon > p.Longitude);
             }
-            List<Place> places = this.TripickContext.Places.AsExpandable().Where(query).ToList();
+            List<Place> places = this.TripickContext.Places.AsExpandable().Include(p => p.Images).Where(query).ToList();
             return places;
         }
     }

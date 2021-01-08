@@ -77,11 +77,12 @@ namespace TripickServer.Managers
                 !p.Types.Contains("spa")
             );
 
-            if (trip.FilterFamous == 3) query = query.OrderBy(p => p.Rating);
-            else if (trip.FilterFamous == 1) query = query.OrderBy(p => p.NbRating).ThenBy(p => p.Rating);
-            else if (trip.FilterFamous == 2) query = query.Where(p => p.NbRating > 0 && p.NbRating < 500).OrderByDescending(p => p.NbRating).ThenBy(p => p.Rating);
-            else if (trip.FilterFamous == 4) query = query.Where(p => p.NbRating > 500).OrderBy(p => p.NbRating).ThenBy(p => p.Rating);
-            else if (trip.FilterFamous == 5) query = query.OrderByDescending(p => p.NbRating).ThenBy(p => p.Rating);
+            query = query.OrderByDescending(p => p.Rating);
+            //if (trip.FilterFamous == 3) query = query.OrderBy(p => p.Rating);
+            //else if (trip.FilterFamous == 1) query = query.OrderBy(p => p.NbRating).ThenBy(p => p.Rating);
+            //else if (trip.FilterFamous == 2) query = query.Where(p => p.NbRating > 0 && p.NbRating < 500).OrderByDescending(p => p.NbRating).ThenBy(p => p.Rating);
+            //else if (trip.FilterFamous == 4) query = query.Where(p => p.NbRating > 500).OrderBy(p => p.NbRating).ThenBy(p => p.Rating);
+            //else if (trip.FilterFamous == 5) query = query.OrderByDescending(p => p.NbRating).ThenBy(p => p.Rating);
 
             places = query.Take(Math.Min(20, quantity)).ToList();
 
