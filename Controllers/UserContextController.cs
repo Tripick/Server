@@ -50,11 +50,13 @@ namespace TripickServer.Controllers
                 if (user != null && user.Friendships != null)
                 {
                     List<int> ids = user.Friendships.Select(x => x.IdFriend).ToList();
-                    List<AppUser> friendsUsers = userManager.Users.Include(x => x.Photo).Where(x => ids.Contains(x.Id)).ToList();
+                    //List<AppUser> friendsUsers = userManager.Users.Include(x => x.Photo).Where(x => ids.Contains(x.Id)).ToList();
+                    List<AppUser> friendsUsers = userManager.Users.Where(x => ids.Contains(x.Id)).ToList();
                     friends = friendsUsers.Select(x => new Friend(x)).ToList();
                 }
 
                 List<Trip> trips = managerTrip.GetAll();
+                trips.ForEach(t => t.Owner = null);
                 UserContext userContext = new UserContext(friends, trips, new List<Guide>());
                 return ServerResponse<UserContext>.ToJson(userContext);
             }

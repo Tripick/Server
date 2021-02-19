@@ -14,6 +14,11 @@ namespace TripickServer.Models
         public string BusinessStatus { get; set; }
         public string Name { get; set; }
         public string NameTranslated { get; set; }
+
+        /// Refined
+        public string Description { get; set; }
+        /// Refined
+
         public string PriceLevel { get; set; }
         public string Address { get; set; }
         public string Country { get; set; }
