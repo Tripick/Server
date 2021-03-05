@@ -17,6 +17,11 @@ namespace TripickServer.Models
 
         /// Refined
         public string Description { get; set; }
+        public int Difficulty { get; set; }
+        public TimeSpan Duration { get; set; }
+        public double Price { get; set; }
+        public double Length { get; set; }
+        public int Touristy { get; set; }
         /// Refined
 
         public string PriceLevel { get; set; }
