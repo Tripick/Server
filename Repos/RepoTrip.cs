@@ -33,6 +33,12 @@ namespace TripickServer.Repos
                 .Include(t => t.Members).ThenInclude(m => m.Photo)
                 .Include(t => t.Subscribers).ThenInclude(s => s.Photo)
                 .ToList();
+
+            foreach (var trip in trips)
+            {
+                trip.Tiles = this.TripickContext.MapTiles.Where(t => t.IdTrip == trip.Id).ToList();
+            }
+
             return trips;
         }
 
