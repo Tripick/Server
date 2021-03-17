@@ -38,6 +38,7 @@ namespace TripickServer.Managers
             trips.ForEach(trip =>
             {
                 trip.Polygon = trip.Polygon.OrderBy(p => p.Index).ToList();
+                trip.Tiles = trip.Tiles;
                 trip.Travelers = trip.Members == null ? new List<Traveler>() : trip.Members.Select(f => new Traveler(f)).ToList();
                 trip.Members = null;
                 trip.Followers = trip.Subscribers == null ? new List<Follower>() : trip.Subscribers.Select(f => new Follower(f)).ToList();
