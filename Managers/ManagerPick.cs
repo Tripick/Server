@@ -41,8 +41,8 @@ namespace TripickServer.Managers
             {
                 MinLat = t.Latitude,
                 MinLon = t.Longitude,
-                MaxLat = t.Latitude + t.Width,
-                MaxLon = t.Longitude + t.Height
+                MaxLat = t.Latitude + t.Height,
+                MaxLon = t.Longitude + t.Width
             }).ToList();
 
             // Get places respecting area
