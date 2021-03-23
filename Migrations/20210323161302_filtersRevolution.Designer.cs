@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TripickServer.Models;
@@ -9,9 +10,10 @@ using TripickServer.Models;
 namespace TripickServer.Migrations
 {
     [DbContext(typeof(TripickContext))]
-    partial class TripickContextModelSnapshot : ModelSnapshot
+    [Migration("20210323161302_filtersRevolution")]
+    partial class filtersRevolution
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -690,8 +692,8 @@ namespace TripickServer.Migrations
                     b.Property<int?>("Difficulty")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("Duration")
-                        .HasColumnType("integer");
+                    b.Property<TimeSpan>("DurationOld")
+                        .HasColumnType("interval");
 
                     b.Property<double>("Latitude")
                         .HasColumnType("double precision");

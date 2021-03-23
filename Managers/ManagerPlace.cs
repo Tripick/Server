@@ -1,13 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using TripickServer.Models;
-using TripickServer.Utils;
 using TripickServer.Repos;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Internal;
+using TripickServer.Utils;
 
 namespace TripickServer.Managers
 {
@@ -30,9 +26,9 @@ namespace TripickServer.Managers
 
         #region Private
 
-        public List<Place> GetAllInAreas(List<BoundingBox> areas)
+        public List<Place> SearchAutocomplete(string text, int quantity)
         {
-            List<Place> places = this.repoPlace.GetAllInAreas(areas);
+            List<Place> places = this.repoPlace.SearchAutocomplete(text, Math.Min(10, quantity));
             return places;
         }
 

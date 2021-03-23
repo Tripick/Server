@@ -1,13 +1,8 @@
 ﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
 
 namespace TripickServer.Models
 {
@@ -17,7 +12,7 @@ namespace TripickServer.Models
 
         public TripickContext(DbContextOptions<TripickContext> options) : base(options) { }
 
-        //When doing a migration, uncomment this :
+        /////// When doing a migration, uncomment this :
         //public TripickContext(IConfiguration configuration, DbContextOptions<TripickContext> options) : base(options)
         //{
         //    this.configuration = configuration;
@@ -73,6 +68,9 @@ namespace TripickServer.Models
         public DbSet<TypeToBring> TypeToBrings { get; set; }
         public DbSet<TypeGroup> TypeGroups { get; set; }
         public DbSet<MapTile> MapTiles { get; set; }
+
+        // Filters
+        public DbSet<Filter> Filters { get; set; }
 
         // Guides
         public DbSet<Guide> Guides { get; set; }

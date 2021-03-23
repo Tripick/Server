@@ -4,42 +4,41 @@ using Microsoft.Extensions.Logging;
 using TripickServer.Managers;
 using TripickServer.Models;
 using TripickServer.Requests;
-using TripickServer.Requests.Pick;
-using TripickServer.Requests.Trip;
+using TripickServer.Requests.Place;
 using TripickServer.Utils;
 
 namespace TripickServer.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class PickController : BaseController
+    public class PlaceController : BaseController
     {
         #region Properties
 
-        private readonly ManagerPick managerPick;
+        private readonly ManagerPlace managerPlace;
 
         #endregion
 
         #region Constructor
 
-        public PickController(
+        public PlaceController(
             ILogger<ServerLogger> logger,
             UserManager<AppUser> userManager,
             TripickContext tripickContext)
         : base(logger, userManager)
         {
-            this.managerPick = new ManagerPick(logger, () => this.ConnectedUser, tripickContext);
+            this.managerPlace = new ManagerPlace(logger, () => this.ConnectedUser, tripickContext);
         }
 
         #endregion
 
         [HttpPost]
-        [Route("GetNexts")]
-        public JsonResult GetNexts([FromBody] Request<RequestGetNext> request)
+        [Route("SearchAutocomplete")]
+        public JsonResult SearchAutocomplete([FromBody] Request<RequestSearchAutocomplete> request)
         {
             if (request.Data == null)
-                return Error("Pick - GetNexts : Data required.");
-            return managerPick.SafeCall(() => managerPick.GetNexts(request.Data.IdTrip, request.Data.Quantity));
+                return Error("Place - GetNext : Data required.");
+            return managerPlace.SafeCall(() => managerPlace.SearchAutocomplete(request.Data.Text, request.Data.Quantity));
         }
     }
 }

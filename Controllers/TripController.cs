@@ -16,6 +16,7 @@ namespace TripickServer.Controllers
         #region Properties
 
         private readonly ManagerTrip managerTrip;
+        private readonly ManagerFilter managerFilter;
 
         #endregion
 
@@ -28,6 +29,7 @@ namespace TripickServer.Controllers
         : base(logger, userManager)
         {
             this.managerTrip = new ManagerTrip(logger, () => this.ConnectedUser, tripickContext);
+            this.managerFilter = new ManagerFilter(logger, () => this.ConnectedUser, tripickContext);
         }
 
         #endregion
@@ -73,6 +75,15 @@ namespace TripickServer.Controllers
             if (request.Data == null)
                 return Error("Trip - Get : Data required.");
             return managerTrip.SafeCall(() => managerTrip.Delete(request.Data.Id));
+        }
+
+        [HttpPost]
+        [Route("GetFilters")]
+        public JsonResult GetFilters([FromBody] Request<RequestGet> request)
+        {
+            if (request.Data == null)
+                return Error("Trip - GetFilters : Data required.");
+            return managerFilter.SafeCall(() => managerFilter.Get(request.Data.Id));
         }
     }
 }

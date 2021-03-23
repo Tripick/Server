@@ -45,8 +45,9 @@ namespace TripickServer.Controllers
         {
             try
             {
-                List<Friend> friends = new List<Friend>();
+                // Get user friends list
                 AppUser user = await userManager.Users.Include(x => x.Friendships).SingleAsync(x => x.Id == this.ConnectedUser.Id);
+                List<Friend> friends = new List<Friend>();
                 if (user != null && user.Friendships != null)
                 {
                     List<int> ids = user.Friendships.Select(x => x.IdFriend).ToList();
@@ -54,6 +55,7 @@ namespace TripickServer.Controllers
                     friends = friendsUsers.Select(x => new Friend(x)).ToList();
                 }
 
+                // Get all trips
                 List<Trip> trips = managerTrip.GetAll();
                 trips.ForEach(t => t.Owner = null);
                 UserContext userContext = new UserContext(friends, trips, new List<Guide>());

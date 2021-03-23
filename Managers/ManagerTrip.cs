@@ -103,23 +103,19 @@ namespace TripickServer.Managers
             existing.Name = trip.Name;
             existing.Description = trip.Description;
             existing.Note = trip.Note;
+
             existing.StartDate = trip.StartDate;
             existing.StartLatitude = trip.StartLatitude;
             existing.StartLongitude = trip.StartLongitude;
             existing.StartLatitudeDelta = trip.StartLatitudeDelta;
             existing.StartLongitudeDelta = trip.StartLongitudeDelta;
+
             existing.EndDate = trip.EndDate;
             existing.EndLatitude = trip.EndLatitude;
             existing.EndLongitude = trip.EndLongitude;
             existing.EndLatitudeDelta = trip.EndLatitudeDelta;
             existing.EndLongitudeDelta = trip.EndLongitudeDelta;
-            existing.FiltersSet = trip.FiltersSet;
-            existing.FilterIntense = trip.FilterIntense;
-            existing.FilterSportive = trip.FilterSportive;
-            existing.FilterCity = trip.FilterCity;
-            existing.FilterFamous = trip.FilterFamous;
-            existing.FilterFar = trip.FilterFar;
-            existing.FilterExpensive = trip.FilterExpensive;
+
             if (existing.Region != null)
             {
                 existing.Region.Latitude = trip.Region.Latitude;

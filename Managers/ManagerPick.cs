@@ -18,6 +18,7 @@ namespace TripickServer.Managers
         private RepoTrip repoTrip;
         private RepoPlace repoPlace;
         private RepoPick repoPick;
+        private RepoFilter repoFilter;
 
         #endregion
 
@@ -28,13 +29,14 @@ namespace TripickServer.Managers
             this.repoTrip = new RepoTrip(this.ConnectedUser, tripickContext);
             this.repoPlace = new RepoPlace(this.ConnectedUser, tripickContext);
             this.repoPick = new RepoPick(this.ConnectedUser, tripickContext);
+            this.repoFilter = new RepoFilter(this.ConnectedUser, tripickContext);
         }
 
         #endregion
 
         #region Private
 
-        public List<Pick> GetNext(int idTrip, int quantity)
+        public List<Pick> GetNexts(int idTrip, int quantity)
         {
             Trip trip = this.repoTrip.GetByIdWithTiles(idTrip);
             List<BoundingBox> areas = trip.Tiles.Select(t => new BoundingBox()
@@ -45,56 +47,25 @@ namespace TripickServer.Managers
                 MaxLon = t.Longitude + t.Width
             }).ToList();
 
-            // Get places respecting area
-            List<Place> places = this.repoPlace.GetAllInAreas(areas);
-
             // Get existing picks for this user and trip
             List<Pick> existingPicks = this.repoPick.GetAllByTrip(idTrip);
-            List<string> existingPicksIds = existingPicks.Select(x => x.IdPlace.ToString()).ToList();
-            var query = places.Where(p => !existingPicksIds.Contains(p.PlaceId));
+            List<int> alreadyShown = existingPicks.Select(x => x.IdPlace).ToList();
 
-            // Ordering places by preferences
-            query = query.Where(p => p.PriceLevel == null || (int.Parse(p.PriceLevel) + 1) < trip.FilterExpensive);
+            // Get filters of the connected user for the trip
+            List<Filter> filters = this.repoFilter.GetAllForTrip(idTrip);
 
-            if (trip.FilterSportive == 1) query = query.Where(p =>
-                !p.Types.Contains("park") &&
-                !p.NameTranslated.Contains("park") &&
-                !p.Types.Contains("place_of_worship")
-            );
-            else if (trip.FilterSportive == 2) query = query.Where(p =>
-                !p.Types.Contains("park") &&
-                !p.NameTranslated.Contains("park")
-            );
-            else if (trip.FilterSportive == 4) query = query.Where(p =>
-                !p.Types.Contains("museum") &&
-                !p.NameTranslated.Contains("museum") &&
-                !p.Types.Contains("spa")
-            );
-            else if (trip.FilterSportive == 5) query = query.Where(p =>
-                !p.Types.Contains("museum") &&
-                !p.NameTranslated.Contains("museum") &&
-                !p.Types.Contains("place_of_worship") &&
-                !p.Types.Contains("spa")
-            );
+            // Get places respecting area
+            List<Place> places = this.repoPlace.GetNextsToPick(alreadyShown, areas, filters, quantity);
+            // If the number of places fetched is lower than the quantity needed : include also the places who don't have filter information (Price, Length, ...)
+            if(places.Count < quantity)
+                places.AddRange(this.repoPlace.GetNextsToPick(alreadyShown, areas, null, quantity - places.Count));
 
-            query = query.OrderByDescending(p => p.Rating);
-            //if (trip.FilterFamous == 3) query = query.OrderBy(p => p.Rating);
-            //else if (trip.FilterFamous == 1) query = query.OrderBy(p => p.NbRating).ThenBy(p => p.Rating);
-            //else if (trip.FilterFamous == 2) query = query.Where(p => p.NbRating > 0 && p.NbRating < 500).OrderByDescending(p => p.NbRating).ThenBy(p => p.Rating);
-            //else if (trip.FilterFamous == 4) query = query.Where(p => p.NbRating > 500).OrderBy(p => p.NbRating).ThenBy(p => p.Rating);
-            //else if (trip.FilterFamous == 5) query = query.OrderByDescending(p => p.NbRating).ThenBy(p => p.Rating);
-
-            places = query.Take(Math.Min(20, quantity)).ToList();
-
-            // Generate picks
+            // Generate picks to be rated
             List<Pick> picks = new List<Pick>();
             for (int i = 0; i < places.Count; i++)
             {
                 picks.Add(new Pick() { Index = i, IdPlace = places[i].Id, IdTrip = idTrip, IdUser = this.ConnectedUser().Id, Rating = -1, Place = places[i] });
             }
-
-            //this.repoPick.AddRange(picks);
-            //this.TripickContext.SaveChanges();
             return picks;
         }
 

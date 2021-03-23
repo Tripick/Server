@@ -29,15 +29,14 @@ namespace TripickServer.Repos
                 .Take(pageSize)
                 .Include(t => t.Region)
                 .Include(t => t.Polygon)
-                .Include(t => t.Destinations)
-                .Include(t => t.Members).ThenInclude(m => m.Photo)
-                .Include(t => t.Subscribers).ThenInclude(s => s.Photo)
+                .Include(t => t.Members)
+                .Include(t => t.Subscribers)
                 .ToList();
 
-            foreach (var trip in trips)
-            {
-                trip.Tiles = this.TripickContext.MapTiles.Where(t => t.IdTrip == trip.Id).ToList();
-            }
+            //foreach (var trip in trips)
+            //{
+            //    trip.Tiles = this.TripickContext.MapTiles.Where(t => t.IdTrip == trip.Id).ToList();
+            //}
 
             return trips;
         }
@@ -48,10 +47,8 @@ namespace TripickServer.Repos
                 .Where(t => !t.IsDeleted && t.IdOwner == this.ConnectedUser().Id && t.Id == id)
                 .Include(t => t.Region)
                 .Include(t => t.Polygon)
-                .Include(t => t.Destinations)
                 .Include(t => t.Itinerary).ThenInclude(i => i.Days).ThenInclude(d => d.ToBrings)
                 .Include(t => t.Itinerary).ThenInclude(i => i.Days).ThenInclude(d => d.Steps)
-                .Include(t => t.Picks).ThenInclude(p => p.Place)
                 .Include(t => t.Members).ThenInclude(m => m.Photo)
                 .Include(t => t.Subscribers).ThenInclude(s => s.Photo)
                 .FirstOrDefault();
@@ -66,10 +63,8 @@ namespace TripickServer.Repos
                 .Where(t => !t.IsDeleted && t.IdOwner == this.ConnectedUser().Id && t.Id == id)
                 .Include(t => t.Region)
                 .Include(t => t.Polygon)
-                .Include(t => t.Destinations)
                 .Include(t => t.Itinerary).ThenInclude(i => i.Days).ThenInclude(d => d.ToBrings)
                 .Include(t => t.Itinerary).ThenInclude(i => i.Days).ThenInclude(d => d.Steps)
-                .Include(t => t.Picks).ThenInclude(p => p.Place)
                 .Include(t => t.Members).ThenInclude(m => m.Photo)
                 .Include(t => t.Subscribers).ThenInclude(s => s.Photo)
                 .FirstOrDefault();
