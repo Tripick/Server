@@ -67,6 +67,8 @@ namespace TripickServer.Models
         public DbSet<ToBring> ToBrings { get; set; }
         public DbSet<TypeToBring> TypeToBrings { get; set; }
         public DbSet<TypeGroup> TypeGroups { get; set; }
+        public DbSet<Location> Locations { get; set; }
+        public DbSet<MapPoint> MapPoint { get; set; }
         public DbSet<MapTile> MapTiles { get; set; }
 
         // Filters

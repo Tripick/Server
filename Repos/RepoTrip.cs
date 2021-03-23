@@ -27,16 +27,21 @@ namespace TripickServer.Repos
                 .Where(t => !t.IsDeleted && t.IdOwner == this.ConnectedUser().Id)
                 .Skip(pageIndex * pageSize)
                 .Take(pageSize)
-                .Include(t => t.Region)
-                .Include(t => t.Polygon)
                 .Include(t => t.Members)
                 .Include(t => t.Subscribers)
                 .ToList();
 
-            //foreach (var trip in trips)
-            //{
-            //    trip.Tiles = this.TripickContext.MapTiles.Where(t => t.IdTrip == trip.Id).ToList();
-            //}
+            foreach (Trip trip in trips)
+            {
+                trip.Region = this.TripickContext.Locations.FirstOrDefault(l => l.IdTrip == trip.Id);
+            }
+            foreach (Trip trip in trips)
+            {
+                List<MapPoint> polygon = new List<MapPoint>();
+                if (trip != null)
+                    polygon = this.TripickContext.MapPoint.Where(p => p.IdTrip == trip.Id).ToList();
+                trip.Polygon = polygon.OrderBy(p => p.Index).ToList();
+            }
 
             return trips;
         }
@@ -44,33 +49,29 @@ namespace TripickServer.Repos
         public override Trip GetById(int id)
         {
             Trip trip = this.TripickContext.Trips
-                .Where(t => !t.IsDeleted && t.IdOwner == this.ConnectedUser().Id && t.Id == id)
-                .Include(t => t.Region)
-                .Include(t => t.Polygon)
-                .Include(t => t.Itinerary).ThenInclude(i => i.Days).ThenInclude(d => d.ToBrings)
-                .Include(t => t.Itinerary).ThenInclude(i => i.Days).ThenInclude(d => d.Steps)
-                .Include(t => t.Members).ThenInclude(m => m.Photo)
-                .Include(t => t.Subscribers).ThenInclude(s => s.Photo)
+                .Where(t => t.Id == id)
+                .Include(t => t.Members)
+                .Include(t => t.Subscribers)
                 .FirstOrDefault();
+            if (trip.IsDeleted || trip.IdOwner != this.ConnectedUser().Id)
+                return null;
 
-            trip.Polygon = trip.Polygon.OrderBy(p => p.Index).ToList();
+            // Region
+            trip.Region = this.TripickContext.Locations.FirstOrDefault(l => l.IdTrip == trip.Id);
+
+            // Polygon
+            List<MapPoint> polygon = new List<MapPoint>();
+            if (trip != null)
+                polygon = this.TripickContext.MapPoint.Where(p => p.IdTrip == trip.Id).ToList();
+            trip.Polygon = polygon.OrderBy(p => p.Index).ToList();
             return trip;
         }
 
         public Trip GetByIdWithTiles(int id)
         {
-            Trip trip = this.TripickContext.Trips
-                .Where(t => !t.IsDeleted && t.IdOwner == this.ConnectedUser().Id && t.Id == id)
-                .Include(t => t.Region)
-                .Include(t => t.Polygon)
-                .Include(t => t.Itinerary).ThenInclude(i => i.Days).ThenInclude(d => d.ToBrings)
-                .Include(t => t.Itinerary).ThenInclude(i => i.Days).ThenInclude(d => d.Steps)
-                .Include(t => t.Members).ThenInclude(m => m.Photo)
-                .Include(t => t.Subscribers).ThenInclude(s => s.Photo)
-                .FirstOrDefault();
+            Trip trip = GetById(id);
 
-            trip.Polygon = trip.Polygon.OrderBy(p => p.Index).ToList();
-
+            // Tiles
             List<MapTile> tiles = new List<MapTile>();
             if(trip != null)
                 tiles = this.TripickContext.MapTiles.Where(t => t.IdTrip == trip.Id).ToList();

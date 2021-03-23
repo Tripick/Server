@@ -36,7 +36,7 @@ namespace TripickServer.Repos
             var query = PredicateBuilder.New<Place>();
             foreach (BoundingBox area in areas)
             {
-                query = query.And(p =>
+                query = query.Or(p =>
                     area.MinLat < p.Latitude &&
                     area.MaxLat > p.Latitude &&
                     area.MinLon < p.Longitude &&
@@ -81,12 +81,18 @@ namespace TripickServer.Repos
             query = query.And(p => !alreadyShown.Contains(p.Id));
 
             // Get places according to query
-            List <Place> places = this.TripickContext.Places.AsExpandable()
+            List<Place> places = this.TripickContext.Places.AsExpandable()
                 .Where(query)
                 .OrderByDescending(p => p.Rating)
                 .Take(quantity)
-                .Include(p => p.Images)
                 .ToList();
+
+            // Include images
+            foreach (Place place in places)
+            {
+                place.Images = this.TripickContext.ImagePlaces.Where(i => i.IdPlace == place.Id).ToList();
+            }
+
             return places;
         }
 
