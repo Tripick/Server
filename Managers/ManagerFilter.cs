@@ -32,7 +32,15 @@ namespace TripickServer.Managers
 
         #region Private
 
-        public bool SaveFilters(int idTrip, List<Filter> filters)
+        public List<Filter> Get(int idTrip)
+        {
+            List<Filter> filters = this.repoFilter.Get(f => f.IdTrip == idTrip && f.IdUser == this.ConnectedUser().Id).ToList();
+            filters.ForEach(f => f.User = null);
+            filters.ForEach(f => f.Trip = null);
+            return filters;
+        }
+
+        public bool Save(int idTrip, List<Filter> filters)
         {
             Trip trip = this.repoTrip.GetById(idTrip);
             if(trip == null)
@@ -51,20 +59,16 @@ namespace TripickServer.Managers
                     existing.Max = filter.Max;
                 }
                 else
+                {
+                    filter.IdUser = this.ConnectedUser().Id;
+                    filter.IdTrip = idTrip;
                     this.repoFilter.Add(filter);
+                }
             }
 
             // Commit
             this.TripickContext.SaveChanges();
             return true;
-        }
-
-        public List<Filter> Get(int idTrip)
-        {
-            List<Filter> filters = this.repoFilter.Get(f => f.IdTrip == idTrip && f.IdUser == this.ConnectedUser().Id).ToList();
-            filters.ForEach(f => f.User =  null);
-            filters.ForEach(f => f.Trip = null);
-            return filters;
         }
 
         #endregion

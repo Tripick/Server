@@ -85,5 +85,14 @@ namespace TripickServer.Controllers
                 return Error("Trip - GetFilters : Data required.");
             return managerFilter.SafeCall(() => managerFilter.Get(request.Data.Id));
         }
+
+        [HttpPost]
+        [Route("SaveFilters")]
+        public JsonResult SaveFilters([FromBody] Request<RequestSaveFilters> request)
+        {
+            if (request.Data == null)
+                return Error("Trip - SaveFilters : Data required.");
+            return managerFilter.SafeCall(() => managerFilter.Save(request.Data.IdTrip, request.Data.Filters));
+        }
     }
 }
