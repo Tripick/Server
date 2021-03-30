@@ -30,11 +30,11 @@ namespace TripickServer.Managers
 
         #endregion
 
-        #region Private
+        #region Public
 
         public List<Filter> Get(int idTrip)
         {
-            List<Filter> filters = this.repoFilter.Get(f => f.IdTrip == idTrip && f.IdUser == this.ConnectedUser().Id).ToList();
+            List<Filter> filters = get(idTrip);
             filters.ForEach(f => f.User = null);
             filters.ForEach(f => f.Trip = null);
             return filters;
@@ -47,7 +47,7 @@ namespace TripickServer.Managers
                 throw new NullReferenceException("The trip does not exist.");
 
             // Get potential existing filters
-            List<Filter> existings = Get(idTrip);
+            List<Filter> existings = get(idTrip);
 
             // Apply filters values
             foreach (Filter filter in filters)
@@ -69,6 +69,15 @@ namespace TripickServer.Managers
             // Commit
             this.TripickContext.SaveChanges();
             return true;
+        }
+
+        #endregion
+
+        #region Private
+
+        private List<Filter> get(int idTrip)
+        {
+            return this.repoFilter.Get(f => f.IdTrip == idTrip && f.IdUser == this.ConnectedUser().Id).ToList();
         }
 
         #endregion
