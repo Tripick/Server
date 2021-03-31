@@ -78,7 +78,12 @@ namespace TripickServer.Managers
         {
             // Save pick
             Pick pick = new Pick() { IdPlace = idPlace, IdUser = this.ConnectedUser().Id, IdTrip = idTrip, Rating = rating };
-            this.repoPick.Add(pick);
+
+            Pick existingPick = this.repoPick.Find(idTrip, idPlace);
+            if(existingPick != null)
+                existingPick.Rating = pick.Rating;
+            else
+                this.repoPick.Add(pick);
 
             // Commit
             this.TripickContext.SaveChanges();

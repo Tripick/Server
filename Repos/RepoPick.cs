@@ -19,5 +19,10 @@ namespace TripickServer.Repos
             List<Pick> picks = this.TripickContext.Picks.Where(p => p.IdUser == this.ConnectedUser().Id && p.IdTrip == idTrip).ToList();
             return picks;
         }
+
+        public Pick Find(int idTrip, int idPlace)
+        {
+            return this.TripickContext.Picks.Where(p => p.IdUser == this.ConnectedUser().Id && p.IdTrip == idTrip && p.IdPlace == idPlace).FirstOrDefault();
+        }
     }
 }
