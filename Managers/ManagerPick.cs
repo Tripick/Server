@@ -74,6 +74,19 @@ namespace TripickServer.Managers
             return new NextPicks() { Count=count, ExistingPicksCount=existingPicksIds.Count, Picks=picks };
         }
 
+        public NextPicks SavePick(int idTrip, int idPlace, int rating)
+        {
+            // Save pick
+            Pick pick = new Pick() { IdPlace = idPlace, IdUser = this.ConnectedUser().Id, IdTrip = idTrip, Rating = rating };
+            this.repoPick.Add(pick);
+
+            // Commit
+            this.TripickContext.SaveChanges();
+
+            // Send next pick
+            return GetNexts(idTrip, 1);
+        }
+
         #endregion
     }
 }

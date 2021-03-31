@@ -41,5 +41,14 @@ namespace TripickServer.Controllers
                 return Error("Pick - GetNexts : Data required.");
             return managerPick.SafeCall(() => managerPick.GetNexts(request.Data.IdTrip, request.Data.Quantity));
         }
+
+        [HttpPost]
+        [Route("SavePick")]
+        public JsonResult SavePick([FromBody] Request<RequestSavePick> request)
+        {
+            if (request.Data == null)
+                return Error("Pick - SavePick : Data required.");
+            return managerPick.SafeCall(() => managerPick.SavePick(request.Data.IdTrip, request.Data.IdPlace, request.Data.Rating));
+        }
     }
 }
