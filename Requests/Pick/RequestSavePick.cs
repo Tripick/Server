@@ -12,5 +12,7 @@ namespace TripickServer.Requests.Pick
         public int IdPlace { get; set; }
         [Required]
         public int Rating { get; set; }
+        [Required]
+        public List<int> AlreadyLoaded { get; set; }
     }
 }

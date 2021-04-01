@@ -36,7 +36,7 @@ namespace TripickServer.Managers
 
         #region Private
 
-        public NextPicks GetNexts(int idTrip, int quantity)
+        public NextPicks GetNexts(int idTrip, int quantity, List<int> idsToExclude = null)
         {
             Trip trip = this.repoTrip.GetByIdWithTiles(idTrip);
             List<BoundingBox> areas = trip.Tiles.Select(t => new BoundingBox()
@@ -50,6 +50,11 @@ namespace TripickServer.Managers
             // Get existing picks for this user and trip
             List<Pick> existingPicks = this.repoPick.GetAllByTrip(idTrip);
             List<int> existingPicksIds = existingPicks.Select(x => x.IdPlace).ToList();
+            int existingPicksCount = existingPicksIds.Count;
+
+            // Exclude ids to exclude
+            if(idsToExclude != null && idsToExclude.Any())
+                existingPicksIds.AddRange(idsToExclude);
 
             // Get filters of the connected user for the trip
             List<Filter> filters = this.repoFilter.GetAllForTrip(idTrip);
@@ -71,10 +76,10 @@ namespace TripickServer.Managers
                 picks.Add(new Pick() { Index = i, IdPlace = places[i].Id, IdTrip = idTrip, IdUser = this.ConnectedUser().Id, Rating = -1, Place = places[i] });
             }
 
-            return new NextPicks() { Count=count, ExistingPicksCount=existingPicksIds.Count, Picks=picks };
+            return new NextPicks() { Count=count, ExistingPicksCount=existingPicksCount, Picks=picks };
         }
 
-        public NextPicks SavePick(int idTrip, int idPlace, int rating)
+        public NextPicks SavePick(int idTrip, int idPlace, int rating, List<int> alreadyLoaded)
         {
             // Save pick
             Pick pick = new Pick() { IdPlace = idPlace, IdUser = this.ConnectedUser().Id, IdTrip = idTrip, Rating = rating };
@@ -89,7 +94,7 @@ namespace TripickServer.Managers
             this.TripickContext.SaveChanges();
 
             // Send next pick
-            return GetNexts(idTrip, 1);
+            return GetNexts(idTrip, 1, alreadyLoaded);
         }
 
         #endregion
