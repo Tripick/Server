@@ -38,6 +38,11 @@ namespace TripickServer.Utils
             return cleanString.Substring(0, Math.Min(cleanString.Length, 20));
         }
 
+        public static string ToCleanString(this string s)
+        {
+            return Regex.Replace(Regex.Replace(s.Trim(), "[ -]+|_+", "_"), "^_*|_*$|[^a-zA-ZÀ-ÿ0-9_]*", "");
+        }
+
         #endregion
     }
 }

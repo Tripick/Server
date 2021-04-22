@@ -87,10 +87,11 @@ namespace TripickServer.Repos
                 .Take(quantity)
                 .ToList();
 
-            // Include images
+            // Include images and reviews
             foreach (Place place in places)
             {
                 place.Images = this.TripickContext.ImagePlaces.Where(i => i.IdPlace == place.Id).ToList();
+                place.Reviews = this.TripickContext.ReviewPlace.Where(r => r.IdPlace == place.Id).ToList();
             }
 
             return places;

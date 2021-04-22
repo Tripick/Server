@@ -40,5 +40,14 @@ namespace TripickServer.Controllers
                 return Error("Place - GetNext : Data required.");
             return managerPlace.SafeCall(() => managerPlace.SearchAutocomplete(request.Data.Text, request.Data.Quantity));
         }
+
+        [HttpPost]
+        [Route("Review")]
+        public JsonResult Review([FromBody] Request<RequestReview> request)
+        {
+            if (request.Data == null)
+                return Error("Place - Review : Data required.");
+            return managerPlace.SafeCall(() => managerPlace.Review(request.Data.IdPlace, request.Data.Rating, request.Data.Message, request.Data.Title));
+        }
     }
 }
