@@ -92,6 +92,15 @@ namespace TripickServer.Repos
             {
                 place.Images = this.TripickContext.ImagePlaces.Where(i => i.IdPlace == place.Id).ToList();
                 place.Reviews = this.TripickContext.ReviewPlace.Where(r => r.IdPlace == place.Id).ToList();
+                place.Reviews.ForEach(r =>
+                {
+                    r.Place = null;
+                    r.Author = new AppUser()
+                    {
+                        UserName = r.Author.UserName,
+                        Photo = r.Author.Photo,
+                    };
+                });
             }
 
             return places;
