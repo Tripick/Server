@@ -91,16 +91,7 @@ namespace TripickServer.Repos
             foreach (Place place in places)
             {
                 place.Images = this.TripickContext.ImagePlaces.Where(i => i.IdPlace == place.Id).ToList();
-                place.Reviews = this.TripickContext.ReviewPlace.Where(r => r.IdPlace == place.Id).ToList();
-                place.Reviews.ForEach(r =>
-                {
-                    r.Place = null;
-                    r.Author = new AppUser()
-                    {
-                        UserName = r.Author.UserName,
-                        Photo = r.Author.Photo,
-                    };
-                });
+                place.Reviews = GetReviews(place.Id);
             }
 
             return places;
@@ -168,6 +159,21 @@ namespace TripickServer.Repos
                 .OrderByDescending(x => x.NbRating)
                 .ToList();
             return places;
+        }
+
+        public List<ReviewPlace> GetReviews(int idPlace)
+        {
+            List<ReviewPlace> reviews = this.TripickContext.ReviewPlace.Where(r => r.IdPlace == idPlace).Include(r => r.Author).ThenInclude(a => a.Photo).ToList();
+            reviews.ForEach(r =>
+            {
+                r.Place = null;
+                r.Author = new AppUser()
+                {
+                    UserName = r.Author.UserName,
+                    Photo = r.Author.Photo,
+                };
+            });
+            return reviews;
         }
     }
 }
