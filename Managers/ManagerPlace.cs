@@ -59,7 +59,9 @@ namespace TripickServer.Managers
 
             // Commit
             this.TripickContext.SaveChanges();
-            return this.repoPlace.GetById(idPlace).Reviews;
+            List<ReviewPlace> reviews = this.repoPlace.GetById(idPlace).Reviews;
+            reviews.ForEach(r => { r.Author = null; r.Place = null; });
+            return reviews;
         }
 
         #endregion
