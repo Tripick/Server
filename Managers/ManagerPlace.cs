@@ -49,6 +49,7 @@ namespace TripickServer.Managers
             {
                 // Create a new review
                 review = new ReviewPlace();
+                review.CreationDate = DateTime.Now;
                 review.IdPlace = idPlace;
                 review.IdAuthor = this.ConnectedUser().Id;
                 review.Rating = Math.Max(0, Math.Min(5, rating));
@@ -60,7 +61,15 @@ namespace TripickServer.Managers
             // Commit
             this.TripickContext.SaveChanges();
             List<ReviewPlace> reviews = this.repoPlace.GetById(idPlace).Reviews;
-            reviews.ForEach(r => { r.Author = null; r.Place = null; });
+            reviews.ForEach(r =>
+            {
+                r.Place = null;
+                r.Author = new AppUser()
+                {
+                    UserName = r.Author.UserName,
+                    Photo = r.Author.Photo,
+                };
+            });
             return reviews;
         }
 
