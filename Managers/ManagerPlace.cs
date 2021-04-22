@@ -38,7 +38,7 @@ namespace TripickServer.Managers
         {
             // Get existing if any
             ReviewPlace review = this.repoReviewPlace.Get(idPlace);
-            if(review == null)
+            if(review != null)
             {
                 // Update the existing review
                 review.Rating = Math.Max(0, Math.Min(5, rating));
@@ -53,7 +53,7 @@ namespace TripickServer.Managers
                 review.IdAuthor = this.ConnectedUser().Id;
                 review.Rating = Math.Max(0, Math.Min(5, rating));
                 review.Message = message.ToCleanString();
-                review.Title = title.ToCleanString();
+                review.Title = title?.ToCleanString();
                 this.repoReviewPlace.Add(review);
             }
 
