@@ -38,6 +38,8 @@ namespace TripickServer.Models
         [ForeignKey("Owner")]
         public int IdOwner { get; set; }
         public virtual AppUser Owner { get; set; }
+        [NotMapped]
+        public List<Filter> Filters { get; set; }
 
         public virtual List<AppUser> Members { get; set; }
         [NotMapped]

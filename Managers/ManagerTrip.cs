@@ -17,6 +17,7 @@ namespace TripickServer.Managers
 
         private RepoConfiguration repoConfiguration;
         private RepoTrip repoTrip;
+        private RepoFilter repoFilter;
 
         #endregion
 
@@ -26,6 +27,7 @@ namespace TripickServer.Managers
         {
             this.repoConfiguration = new RepoConfiguration(this.ConnectedUser, tripickContext);
             this.repoTrip = new RepoTrip(this.ConnectedUser, tripickContext);
+            this.repoFilter = new RepoFilter(this.ConnectedUser, tripickContext);
         }
 
         #endregion
@@ -42,6 +44,7 @@ namespace TripickServer.Managers
                 trip.Members = null;
                 trip.Followers = trip.Subscribers == null ? new List<Follower>() : trip.Subscribers.Select(f => new Follower(f)).ToList();
                 trip.Subscribers = null;
+                trip.Filters = this.repoFilter.Get(f => f.IdTrip == trip.Id && f.IdUser == this.ConnectedUser().Id).ToList();
             });
             return trips;
         }
@@ -151,6 +154,7 @@ namespace TripickServer.Managers
             existing.Members = null;
             existing.Followers = existing.Subscribers == null ? new List<Follower>() : existing.Subscribers.Select(f => new Follower(f)).ToList();
             existing.Subscribers = null;
+            existing.Filters = trip.Filters;
             return existing;
         }
 
