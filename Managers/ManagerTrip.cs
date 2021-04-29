@@ -45,6 +45,7 @@ namespace TripickServer.Managers
                 trip.Followers = trip.Subscribers == null ? new List<Follower>() : trip.Subscribers.Select(f => new Follower(f)).ToList();
                 trip.Subscribers = null;
                 trip.Filters = this.repoFilter.Get(f => f.IdTrip == trip.Id && f.IdUser == this.ConnectedUser().Id).ToList();
+                trip.Filters.ForEach(f => { f.Trip = null; f.User = null; });
             });
             return trips;
         }

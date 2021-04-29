@@ -18,6 +18,7 @@ namespace TripickServer.Repos
         public List<Filter> GetAllForTrip(int idTrip)
         {
             List<Filter> filters = this.TripickContext.Filters.Where(f => f.IdUser == this.ConnectedUser().Id && f.IdTrip == idTrip).ToList();
+            filters.ForEach(f => { f.Trip = null; f.User = null; });
             return filters;
         }
     }
