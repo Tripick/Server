@@ -43,6 +43,10 @@ namespace TripickServer.Managers
             flags = flags.Where(f => configFlags.Any(fConfig => fConfig.Id == f.IdReviewFlagConfig)).ToList();
             if (review != null)
             {
+                // Clear previous images and flags
+                this.TripickContext.ReviewFlags.RemoveRange(this.TripickContext.ReviewFlags.Where(f => f.IdReview == review.Id).ToList());
+                this.TripickContext.ReviewImages.RemoveRange(this.TripickContext.ReviewImages.Where(i => i.IdReview == review.Id).ToList());
+                this.TripickContext.SaveChanges();
                 // Update the existing review
                 review.Rating = Math.Max(0, Math.Min(5, rating));
                 review.Message = message.ToCleanString();
