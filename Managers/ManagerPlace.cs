@@ -40,14 +40,15 @@ namespace TripickServer.Managers
             // Get existing if any
             ReviewPlace review = this.repoReviewPlace.Get(idPlace);
             List<ConfigReviewFlag> configFlags = this.TripickContext.ConfigReviewFlags.ToList();
+            flags = flags.Where(f => configFlags.Any(fConfig => fConfig.Id == f.IdReviewFlagConfig)).ToList();
             if (review != null)
             {
                 // Update the existing review
                 review.Rating = Math.Max(0, Math.Min(5, rating));
                 review.Message = message.ToCleanString();
-                review.Flags = flags.Where(f => configFlags.Any(fConfig => fConfig.Id == f.IdReviewFlagConfig)).ToList();
-                review.Flags.ForEach(f => f.IdReviewFlagConfig = configFlags.First(fConfig => fConfig.Id == f.IdReviewFlagConfig).Id);
-                review.Pictures = pictures.Select(p => new ReviewImage() { Image = p }).ToList();
+                review.Flags = flags;
+                review.Flags.ForEach(f => f.IdReview = review.Id);
+                review.Pictures = pictures.Select(p => new ReviewImage() { IdReview = review.Id, Image = p }).ToList();
             }
             else
             {
@@ -58,8 +59,7 @@ namespace TripickServer.Managers
                 review.IdAuthor = this.ConnectedUser().Id;
                 review.Rating = Math.Max(0, Math.Min(5, rating));
                 review.Message = message.ToCleanString();
-                review.Flags = flags.Where(f => configFlags.Any(fConfig => fConfig.Id == f.IdReviewFlagConfig)).ToList();
-                review.Flags.ForEach(f => f.IdReviewFlagConfig = configFlags.First(fConfig => fConfig.Id == f.IdReviewFlagConfig).Id);
+                review.Flags = flags;
                 review.Pictures = pictures.Select(p => new ReviewImage() { Image = p }).ToList();
                 this.repoReviewPlace.Add(review);
             }
