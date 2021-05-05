@@ -14,6 +14,8 @@ namespace TripickServer.Models
         public string Title { get; set; }
         public string Message { get; set; }
         public DateTime CreationDate { get; set; }
+        public virtual List<ReviewFlag> Flags { get; set; }
+        public virtual List<ReviewImage> Pictures { get; set; }
         public virtual List<VoteReviewPlace> Votes { get; set; }
 
         [ForeignKey("Place")]

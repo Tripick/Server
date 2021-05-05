@@ -48,6 +48,7 @@ namespace TripickServer.Models
 
         // Commons
         public DbSet<Configuration> Configurations { get; set; }
+        public DbSet<ConfigReviewFlag> ConfigReviewFlags { get; set; }
         public DbSet<Hashtag> Hashtags { get; set; }
 
         // Places

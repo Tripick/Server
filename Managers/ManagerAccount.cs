@@ -115,7 +115,7 @@ namespace TripickServer.Managers
             // Send User and AuthenticationKeys
             AppUser fullUser = NotConnectedGet(user.Id);
             user.Photo = fullUser.Photo;
-            return new UserContext(user, newToken);
+            return new UserContext(user, newToken, LoadConfiguration());
         }
 
         public async Task<UserContext> LoginByToken(int id, string token)
@@ -133,7 +133,7 @@ namespace TripickServer.Managers
                 await signInManager.SignInAsync(user, isPersistent: true);
                 AppUser fullUser = NotConnectedGet(user.Id);
                 user.Photo = fullUser.Photo;
-                return new UserContext(user, token);
+                return new UserContext(user, token, LoadConfiguration());
             }
             else
                 throw new InvalidOperationException("Token invalid or expired.");

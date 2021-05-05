@@ -163,7 +163,13 @@ namespace TripickServer.Repos
 
         public List<ReviewPlace> GetReviews(int idPlace)
         {
-            List<ReviewPlace> reviews = this.TripickContext.ReviewPlace.Where(r => r.IdPlace == idPlace).Include(r => r.Author).ThenInclude(a => a.Photo).ToList();
+            List<ReviewPlace> reviews = this.TripickContext.ReviewPlace
+                .Where(r => r.IdPlace == idPlace)
+                .Include(r => r.Author)
+                .ThenInclude(a => a.Photo)
+                .Include(r => r.Flags)
+                .Include(r => r.Pictures)
+                .ToList();
             reviews.ForEach(r =>
             {
                 r.Place = null;
@@ -172,6 +178,8 @@ namespace TripickServer.Repos
                     UserName = r.Author.UserName,
                     Photo = r.Author.Photo,
                 };
+                r.Flags.ForEach(f => f.Review = null);
+                r.Pictures.ForEach(p => p.Review = null);
             });
             return reviews;
         }

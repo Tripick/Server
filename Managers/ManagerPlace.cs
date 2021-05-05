@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using TripickServer.Models;
 using TripickServer.Repos;
 using TripickServer.Utils;
@@ -34,16 +35,19 @@ namespace TripickServer.Managers
             return places;
         }
 
-        public List<ReviewPlace> Review(int idPlace, int rating, string message, string title)
+        public List<ReviewPlace> Review(int idPlace, int rating, string message, List<ReviewFlag> flags, List<string> pictures)
         {
             // Get existing if any
             ReviewPlace review = this.repoReviewPlace.Get(idPlace);
-            if(review != null)
+            List<ConfigReviewFlag> configFlags = this.TripickContext.ConfigReviewFlags.ToList();
+            if (review != null)
             {
                 // Update the existing review
                 review.Rating = Math.Max(0, Math.Min(5, rating));
                 review.Message = message.ToCleanString();
-                review.Title = title.ToCleanString();
+                review.Flags = flags.Where(f => configFlags.Any(fConfig => fConfig.Id == f.IdReviewFlagConfig)).ToList();
+                review.Flags.ForEach(f => f.IdReviewFlagConfig = configFlags.First(fConfig => fConfig.Id == f.IdReviewFlagConfig).Id);
+                review.Pictures = pictures.Select(p => new ReviewImage() { Image = p }).ToList();
             }
             else
             {
@@ -54,7 +58,9 @@ namespace TripickServer.Managers
                 review.IdAuthor = this.ConnectedUser().Id;
                 review.Rating = Math.Max(0, Math.Min(5, rating));
                 review.Message = message.ToCleanString();
-                review.Title = title?.ToCleanString();
+                review.Flags = flags.Where(f => configFlags.Any(fConfig => fConfig.Id == f.IdReviewFlagConfig)).ToList();
+                review.Flags.ForEach(f => f.IdReviewFlagConfig = configFlags.First(fConfig => fConfig.Id == f.IdReviewFlagConfig).Id);
+                review.Pictures = pictures.Select(p => new ReviewImage() { Image = p }).ToList();
                 this.repoReviewPlace.Add(review);
             }
 

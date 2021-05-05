@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using TripickServer.Models;
 using TripickServer.Utils;
@@ -53,6 +54,14 @@ namespace TripickServer.Managers
             {
                 return ServerResponse<T>.ToJson(false, e.Message);
             }
+        }
+
+        public AppConfiguration LoadConfiguration()
+        {
+            return new AppConfiguration()
+            {
+                Flags = this.TripickContext.ConfigReviewFlags.ToList()
+            };
         }
 
         #endregion

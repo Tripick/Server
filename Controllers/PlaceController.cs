@@ -47,7 +47,7 @@ namespace TripickServer.Controllers
         {
             if (request.Data == null)
                 return Error("Place - Review : Data required.");
-            return managerPlace.SafeCall(() => managerPlace.Review(request.Data.IdPlace, request.Data.Rating, request.Data.Message, request.Data.Title));
+            return managerPlace.SafeCall(() => managerPlace.Review(request.Data.IdPlace, request.Data.Rating, request.Data.Message, request.Data.Flags, request.Data.Pictures));
         }
     }
 }
