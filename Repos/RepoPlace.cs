@@ -168,6 +168,7 @@ namespace TripickServer.Repos
                 .Include(r => r.Author)
                 .ThenInclude(a => a.Photo)
                 .Include(r => r.Flags)
+                .ThenInclude(r => r.Config)
                 .Include(r => r.Pictures)
                 .ToList();
             reviews.ForEach(r =>
