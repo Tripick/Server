@@ -40,7 +40,7 @@ namespace TripickServer.Managers
             return filters;
         }
 
-        public bool Save(int idTrip, List<Filter> filters)
+        public List<Filter> Save(int idTrip, List<Filter> filters)
         {
             Trip trip = this.repoTrip.GetById(idTrip);
             if(trip == null)
@@ -68,7 +68,7 @@ namespace TripickServer.Managers
 
             // Commit
             this.TripickContext.SaveChanges();
-            return true;
+            return filters;
         }
 
         #endregion
