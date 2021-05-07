@@ -78,7 +78,6 @@ namespace TripickServer.Managers
         private List<Filter> get(int idTrip)
         {
             List<Filter> filters =  this.repoFilter.Get(f => f.IdTrip == idTrip && f.IdUser == this.ConnectedUser().Id).ToList();
-            filters.ForEach(f => { f.Trip = null; f.User = null; });
             return filters;
         }
 
