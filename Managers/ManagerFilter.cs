@@ -68,6 +68,7 @@ namespace TripickServer.Managers
 
             // Commit
             this.TripickContext.SaveChanges();
+            filters.ForEach(f => { f.User = null; f.Trip = null; });
             return filters;
         }
 
