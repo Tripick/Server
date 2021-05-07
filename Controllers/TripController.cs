@@ -64,7 +64,7 @@ namespace TripickServer.Controllers
         public JsonResult Update([FromBody] Request<RequestUpdate> request)
         {
             if (request.Data == null)
-                return Error("Trip - Get : Data required.");
+                return Error("Trip - Update : Data required.");
             return managerTrip.SafeCall(() => managerTrip.Update(request.Data.Trip));
         }
 
@@ -73,8 +73,17 @@ namespace TripickServer.Controllers
         public JsonResult Delete([FromBody] Request<RequestDelete> request)
         {
             if (request.Data == null)
-                return Error("Trip - Get : Data required.");
+                return Error("Trip - Delete : Data required.");
             return managerTrip.SafeCall(() => managerTrip.Delete(request.Data.Id));
+        }
+
+        [HttpPost]
+        [Route("SaveCover")]
+        public JsonResult SaveCover([FromBody] Request<RequestSaveCover> request)
+        {
+            if (request.Data == null)
+                return Error("Trip - SaveCover : Data required.");
+            return managerTrip.SafeCall(() => managerTrip.SaveCover(request.Data.IdTrip, request.Data.Cover));
         }
 
         [HttpPost]

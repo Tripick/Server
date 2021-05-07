@@ -177,6 +177,28 @@ namespace TripickServer.Managers
             return true;
         }
 
+        public string SaveCover(int idTrip, string cover)
+        {
+            // Verify the entity to update is not null
+            if (cover == null)
+                throw new NullReferenceException("Cover photo required");
+
+            // Verify the entity to update exists
+            Trip existing = this.repoTrip.GetById(idTrip);
+            if (existing == null)
+                throw new NullReferenceException($"The trip [Id={idTrip}] does not exist");
+            // Verify the entity is mine
+            if (existing.IdOwner != this.ConnectedUser().Id)
+                throw new NullReferenceException("The trip does not belong to you");
+
+            existing.CoverImage = cover;
+
+            // Commit
+            this.TripickContext.SaveChanges();
+
+            return existing.CoverImage;
+        }
+
         #endregion
     }
 }
