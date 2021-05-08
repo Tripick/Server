@@ -79,6 +79,17 @@ namespace TripickServer.Managers
         private List<Filter> get(int idTrip)
         {
             List<Filter> filters =  this.repoFilter.Get(f => f.IdTrip == idTrip && f.IdUser == this.ConnectedUser().Id).ToList();
+            if(!filters.Any())
+            {
+                filters = new List<Filter>()
+                {
+                    new Filter() { Name="Price", Min=0, Max=99 },
+                    new Filter() { Name = "Length", Min = 0, Max = 300 },
+                    new Filter() { Name = "Duration", Min = 0, Max = 999 },
+                    new Filter() { Name = "Difficulty", Min = 0, Max = 5 },
+                    new Filter() { Name = "Touristy", Min = 0, Max = 5 }
+                };
+            }
             return filters;
         }
 

@@ -45,7 +45,21 @@ namespace TripickServer.Managers
                 trip.Followers = trip.Subscribers == null ? new List<Follower>() : trip.Subscribers.Select(f => new Follower(f)).ToList();
                 trip.Subscribers = null;
                 trip.Filters = this.repoFilter.Get(f => f.IdTrip == trip.Id && f.IdUser == this.ConnectedUser().Id).ToList();
-                trip.Filters.ForEach(f => { f.Trip = null; f.User = null; });
+                if (!trip.Filters.Any())
+                {
+                    trip.Filters = new List<Filter>()
+                    {
+                        new Filter() { Name="Price", Min=0, Max=99 },
+                        new Filter() { Name = "Length", Min = 0, Max = 300 },
+                        new Filter() { Name = "Duration", Min = 0, Max = 999 },
+                        new Filter() { Name = "Difficulty", Min = 0, Max = 5 },
+                        new Filter() { Name = "Touristy", Min = 0, Max = 5 }
+                    };
+                }
+                else
+                {
+                    trip.Filters.ForEach(f => { f.Trip = null; f.User = null; });
+                }
             });
             return trips;
         }
