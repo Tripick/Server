@@ -30,6 +30,17 @@ namespace TripickServer.Repos
             return places;
         }
 
+        public Place GetComplete(int id)
+        {
+            Place place = this.TripickContext.Places.FirstOrDefault(p => p.Id == id);
+            if (place == null)
+                return null;
+            // Include images and reviews
+            place.Images = this.TripickContext.ImagePlaces.Where(i => i.IdPlace == id).ToList();
+            place.Reviews = GetReviews(id);
+            return place;
+        }
+
         public List<Place> GetNextsToPick(List<int> alreadyShown, List<BoundingBox> areas, List<Filter> filters, int quantity)
         {
             // Places in area of Trip
@@ -154,7 +165,7 @@ namespace TripickServer.Repos
         public List<Place> SearchAutocomplete(string text, int quantity)
         {
             List<Place> places = this.TripickContext.Places
-                .Where(p => p.Name.StartsWith(text) || p.NameTranslated.StartsWith(text))
+                .Where(p => p.Name.ToLower().StartsWith(text.ToLower()) || p.NameTranslated.ToLower().StartsWith(text.ToLower()))
                 .Take(quantity)
                 .OrderByDescending(x => x.NbRating)
                 .ToList();

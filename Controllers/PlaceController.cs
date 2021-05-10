@@ -42,6 +42,15 @@ namespace TripickServer.Controllers
         }
 
         [HttpPost]
+        [Route("GetPlace")]
+        public JsonResult GetPlace([FromBody] Request<RequestGetPlace> request)
+        {
+            if (request.Data == null)
+                return Error("Place - GetPlace : Data required.");
+            return managerPlace.SafeCall(() => managerPlace.GetPlace(request.Data.Id));
+        }
+
+        [HttpPost]
         [Route("Review")]
         public JsonResult Review([FromBody] Request<RequestReview> request)
         {

@@ -32,7 +32,14 @@ namespace TripickServer.Managers
         public List<Place> SearchAutocomplete(string text, int quantity)
         {
             List<Place> places = this.repoPlace.SearchAutocomplete(text, Math.Min(10, quantity));
+            places = places.Select(p => new Place() { Id=p.Id, Name=text.ToLower().StartsWith(p.Name.ToLower()) ? p.Name : p.NameTranslated }).ToList();
             return places;
+        }
+
+        public Place GetPlace(int id)
+        {
+            Place place = this.repoPlace.GetComplete(id);
+            return place;
         }
 
         public List<ReviewPlace> Review(int idPlace, int rating, string message, List<ReviewFlag> flags, List<string> pictures)
