@@ -37,6 +37,7 @@ namespace TripickServer.Repos
                 return null;
             // Include images and reviews
             place.Images = this.TripickContext.ImagePlaces.Where(i => i.IdPlace == id).ToList();
+            place.Images.ForEach(i => { i.Place = null; i.Uploader = null; });
             place.Reviews = GetReviews(id);
             return place;
         }
@@ -102,6 +103,7 @@ namespace TripickServer.Repos
             foreach (Place place in places)
             {
                 place.Images = this.TripickContext.ImagePlaces.Where(i => i.IdPlace == place.Id).ToList();
+                place.Images.ForEach(i => { i.Place = null; i.Uploader = null; });
                 place.Reviews = GetReviews(place.Id);
             }
 
