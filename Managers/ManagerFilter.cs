@@ -77,7 +77,7 @@ namespace TripickServer.Managers
 
             // Commit
             this.TripickContext.SaveChanges();
-            //filters = filters.Select(f => f.ToDTO()).ToList();
+            filters = filters.Select(f => f.ToDTO()).ToList();
             return filters;
         }
 
