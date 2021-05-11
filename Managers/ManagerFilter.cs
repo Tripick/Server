@@ -34,7 +34,18 @@ namespace TripickServer.Managers
 
         public List<Filter> Get(int idTrip)
         {
-            List<Filter> filters = get(idTrip);
+            List<Filter> filters = this.repoFilter.Get(f => f.IdTrip == idTrip && f.IdUser == this.ConnectedUser().Id).ToList();
+            if (!filters.Any())
+            {
+                filters = new List<Filter>()
+                {
+                    new Filter() { IdTrip = idTrip, IdUser = this.ConnectedUser().Id, Name = "Price", Min = 0, Max = 99 },
+                    new Filter() { IdTrip = idTrip, IdUser = this.ConnectedUser().Id, Name = "Length", Min = 0, Max = 300 },
+                    new Filter() { IdTrip = idTrip, IdUser = this.ConnectedUser().Id, Name = "Duration", Min = 0, Max = 999 },
+                    new Filter() { IdTrip = idTrip, IdUser = this.ConnectedUser().Id, Name = "Difficulty", Min = 0, Max = 5 },
+                    new Filter() { IdTrip = idTrip, IdUser = this.ConnectedUser().Id, Name = "Touristy", Min = 0, Max = 5 }
+                };
+            }
             return filters.Select(f => f.ToDTO()).ToList();
         }
 
@@ -45,7 +56,7 @@ namespace TripickServer.Managers
                 throw new NullReferenceException("The trip does not exist.");
 
             // Get potential existing filters
-            List<Filter> existings = get(idTrip);
+            List<Filter> existings = this.repoFilter.Get(f => f.IdTrip == idTrip && f.IdUser == this.ConnectedUser().Id).ToList();
 
             // Apply filters values
             foreach (Filter filter in filters)
@@ -66,28 +77,7 @@ namespace TripickServer.Managers
 
             // Commit
             this.TripickContext.SaveChanges();
-            filters = filters.Select(f => f.ToDTO()).ToList();
-            return filters;
-        }
-
-        #endregion
-
-        #region Private
-
-        private List<Filter> get(int idTrip)
-        {
-            List<Filter> filters =  this.repoFilter.Get(f => f.IdTrip == idTrip && f.IdUser == this.ConnectedUser().Id).ToList();
-            if(!filters.Any())
-            {
-                filters = new List<Filter>()
-                {
-                    new Filter() { Name="Price", Min=0, Max=99 },
-                    new Filter() { Name = "Length", Min = 0, Max = 300 },
-                    new Filter() { Name = "Duration", Min = 0, Max = 999 },
-                    new Filter() { Name = "Difficulty", Min = 0, Max = 5 },
-                    new Filter() { Name = "Touristy", Min = 0, Max = 5 }
-                };
-            }
+            //filters = filters.Select(f => f.ToDTO()).ToList();
             return filters;
         }
 
