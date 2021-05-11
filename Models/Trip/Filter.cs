@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TripickServer.Models
@@ -19,5 +20,18 @@ namespace TripickServer.Models
         [ForeignKey("Trip")]
         public int IdTrip { get; set; }
         public virtual Trip Trip { get; set; }
+
+        public Filter ToDTO()
+        {
+            return new Filter()
+            {
+                Id = this.Id,
+                IdUser = this.IdUser,
+                IdTrip = this.IdTrip,
+                Name = this.Name,
+                Min = this.Min,
+                Max = this.Max,
+            };
+        }
     }
 }

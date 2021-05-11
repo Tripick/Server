@@ -29,11 +29,7 @@ namespace TripickServer.Repos
                     new Filter() { Name = "Touristy", Min = 0, Max = 5 }
                 };
             }
-            else
-            {
-                filters.ForEach(f => { f.Trip = null; f.User = null; });
-            }
-            return filters;
+            return filters.Select(f => f.ToDTO()).ToList();
         }
     }
 }

@@ -49,16 +49,16 @@ namespace TripickServer.Managers
                 {
                     trip.Filters = new List<Filter>()
                     {
-                        new Filter() { Name="Price", Min=0, Max=99 },
-                        new Filter() { Name = "Length", Min = 0, Max = 300 },
-                        new Filter() { Name = "Duration", Min = 0, Max = 999 },
-                        new Filter() { Name = "Difficulty", Min = 0, Max = 5 },
-                        new Filter() { Name = "Touristy", Min = 0, Max = 5 }
+                        new Filter() { IdTrip = trip.Id, IdUser = this.ConnectedUser().Id, Name="Price", Min=0, Max=99 },
+                        new Filter() { IdTrip = trip.Id, IdUser = this.ConnectedUser().Id, Name = "Length", Min = 0, Max = 300 },
+                        new Filter() { IdTrip = trip.Id, IdUser = this.ConnectedUser().Id, Name = "Duration", Min = 0, Max = 999 },
+                        new Filter() { IdTrip = trip.Id, IdUser = this.ConnectedUser().Id, Name = "Difficulty", Min = 0, Max = 5 },
+                        new Filter() { IdTrip = trip.Id, IdUser = this.ConnectedUser().Id, Name = "Touristy", Min = 0, Max = 5 }
                     };
                 }
                 else
                 {
-                    trip.Filters.ForEach(f => { f.Trip = null; f.User = null; });
+                    trip.Filters = trip.Filters.Select(f => f.ToDTO()).ToList();
                 }
             });
             return trips;

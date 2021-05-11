@@ -35,9 +35,7 @@ namespace TripickServer.Managers
         public List<Filter> Get(int idTrip)
         {
             List<Filter> filters = get(idTrip);
-            filters.ForEach(f => f.User = null);
-            filters.ForEach(f => f.Trip = null);
-            return filters;
+            return filters.Select(f => f.ToDTO()).ToList();
         }
 
         public List<Filter> Save(int idTrip, List<Filter> filters)
@@ -68,7 +66,7 @@ namespace TripickServer.Managers
 
             // Commit
             this.TripickContext.SaveChanges();
-            filters.ForEach(f => { f.User = null; f.Trip = null; });
+            filters = filters.Select(f => f.ToDTO()).ToList();
             return filters;
         }
 
