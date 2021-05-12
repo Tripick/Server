@@ -58,5 +58,14 @@ namespace TripickServer.Controllers
                 return Error("Place - Review : Data required.");
             return managerPlace.SafeCall(() => managerPlace.Review(request.Data.IdPlace, request.Data.Rating, request.Data.Message, request.Data.Flags, request.Data.Pictures));
         }
+
+        [HttpPost]
+        [Route("Save")]
+        public JsonResult Save([FromBody] Request<RequestSave> request)
+        {
+            if (request.Data == null)
+                return Error("Place - Save : Data required.");
+            return managerPlace.SafeCall(() => managerPlace.Save(request.Data.Place));
+        }
     }
 }
