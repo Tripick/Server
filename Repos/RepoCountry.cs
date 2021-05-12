@@ -23,6 +23,12 @@ namespace TripickServer.Repos
                 return new Country() { Code = null, Name = "" };
             return new Country() { Id=country.Id, Code=country.Code, Name=country.Name };
         }
+
+        public List<Country> GetAll()
+        {
+            return this.TripickContext.Countries.Include(c => c.Polygons).ThenInclude(p => p.Points).ToList();
+        }
+
         private bool isPointInPolygon(List<CountryPoint> polygon, double latitude, double longitude)
         {
             bool result = false;

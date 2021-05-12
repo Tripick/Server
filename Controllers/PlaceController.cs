@@ -67,5 +67,12 @@ namespace TripickServer.Controllers
                 return Error("Place - Save : Data required.");
             return managerPlace.SafeCall(() => managerPlace.Save(request.Data.Place));
         }
+
+        [HttpPost]
+        [Route("GetCountries")]
+        public JsonResult GetCountries([FromBody] Request<RequestSave> request)
+        {
+            return managerPlace.SafeCall(() => managerPlace.GetCountries());
+        }
     }
 }

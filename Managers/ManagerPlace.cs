@@ -100,6 +100,11 @@ namespace TripickServer.Managers
             return noReturn ? null : this.repoPlace.GetReviews(idPlace);
         }
 
+        public List<Country> GetCountries()
+        {
+            return this.repoCountry.GetAll();
+        }
+
         #endregion
 
         #region Private
