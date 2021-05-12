@@ -14,6 +14,7 @@ namespace TripickServer.Managers
 
         private RepoPlace repoPlace;
         private RepoReviewPlace repoReviewPlace;
+        private RepoCountry repoCountry;
 
         #endregion
 
@@ -23,6 +24,7 @@ namespace TripickServer.Managers
         {
             this.repoPlace = new RepoPlace(this.ConnectedUser, tripickContext);
             this.repoReviewPlace = new RepoReviewPlace(this.ConnectedUser, tripickContext);
+            this.repoCountry = new RepoCountry(this.ConnectedUser, tripickContext);
         }
 
         #endregion
@@ -41,13 +43,26 @@ namespace TripickServer.Managers
             return places;
         }
 
+        public bool Save(Place place)
+        {
+            // Verify the entity to update is not null
+            if (place == null)
+                throw new NullReferenceException("The place to save cannot be null");
+
+            // Check if the entity to update exists or not
+            if (place.Id == -1)
+                return create(place);
+            else
+                return update(place);
+        }
+
         public Place GetPlace(int id)
         {
             Place place = this.repoPlace.GetComplete(id);
             return place;
         }
 
-        public List<ReviewPlace> Review(int idPlace, int rating, string message, List<ReviewFlag> flags, List<string> pictures)
+        public List<ReviewPlace> Review(int idPlace, int rating, string message, List<ReviewFlag> flags, List<string> pictures, bool noReturn = false)
         {
             // Get existing if any
             ReviewPlace review = this.repoReviewPlace.Get(idPlace);
@@ -82,7 +97,59 @@ namespace TripickServer.Managers
 
             // Commit
             this.TripickContext.SaveChanges();
-            return this.repoPlace.GetReviews(idPlace);
+            return noReturn ? null : this.repoPlace.GetReviews(idPlace);
+        }
+
+        #endregion
+
+        #region Private
+
+        private bool create(Place place)
+        {
+            Country country = this.repoCountry.GetCountryOfPosition(place.Latitude, place.Longitude);
+            Place newPlace = new Place()
+            {
+                Name = place.Name,
+                NameTranslated = place.Name,
+                Country = country.Name,
+                CreationDate = DateTime.Now,
+                Description = place.Description,
+                Latitude = place.Latitude,
+                Longitude = place.Longitude
+            };
+
+            this.repoPlace.Add(newPlace);
+
+            // Commit
+            this.TripickContext.SaveChanges();
+
+            ReviewPlace review = place.Reviews[0];
+            Review(newPlace.Id, review.Rating, review.Message, review.Flags, review.Pictures.Select(p => p.Image).ToList(), noReturn: true);
+            return true;
+        }
+
+        private bool update(Place place)
+        {
+            Place existingPlace = this.repoPlace.GetById(place.Id);
+            if(existingPlace == null)
+                throw new NullReferenceException("The place to update cannot be null");
+
+            existingPlace.Name = place.Name;
+            existingPlace.NameTranslated = place.Name;
+            existingPlace.Description = place.Description;
+            if(place.Latitude != existingPlace.Latitude || place.Longitude != existingPlace.Longitude)
+            {
+                existingPlace.Country = this.repoCountry.GetCountryOfPosition(place.Latitude, place.Longitude).Name;
+                existingPlace.Latitude = place.Latitude;
+                existingPlace.Longitude = place.Longitude;
+            }
+
+            // Commit
+            this.TripickContext.SaveChanges();
+
+            ReviewPlace review = place.Reviews[0];
+            Review(existingPlace.Id, review.Rating, review.Message, review.Flags, review.Pictures.Select(p => p.Image).ToList(), noReturn: true);
+            return true;
         }
 
         #endregion

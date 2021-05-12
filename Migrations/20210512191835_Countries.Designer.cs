@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TripickServer.Models;
@@ -9,9 +10,10 @@ using TripickServer.Models;
 namespace TripickServer.Migrations
 {
     [DbContext(typeof(TripickContext))]
-    partial class TripickContextModelSnapshot : ModelSnapshot
+    [Migration("20210512191835_Countries")]
+    partial class Countries
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -344,46 +346,6 @@ namespace TripickServer.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Countries");
-                });
-
-            modelBuilder.Entity("TripickServer.Models.CountryPoint", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .UseIdentityByDefaultColumn();
-
-                    b.Property<int>("PolygonId")
-                        .HasColumnType("integer");
-
-                    b.Property<double>("x")
-                        .HasColumnType("double precision");
-
-                    b.Property<double>("y")
-                        .HasColumnType("double precision");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PolygonId");
-
-                    b.ToTable("CountryPoint");
-                });
-
-            modelBuilder.Entity("TripickServer.Models.CountryPolygon", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .UseIdentityByDefaultColumn();
-
-                    b.Property<int>("CountryId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CountryId");
-
-                    b.ToTable("CountryPolygon");
                 });
 
             modelBuilder.Entity("TripickServer.Models.Day", b =>
@@ -829,6 +791,46 @@ namespace TripickServer.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Places");
+                });
+
+            modelBuilder.Entity("TripickServer.Models.Point", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<int>("PolygonId")
+                        .HasColumnType("integer");
+
+                    b.Property<double>("x")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("y")
+                        .HasColumnType("double precision");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PolygonId");
+
+                    b.ToTable("Point");
+                });
+
+            modelBuilder.Entity("TripickServer.Models.Polygon", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .UseIdentityByDefaultColumn();
+
+                    b.Property<int>("CountryId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CountryId");
+
+                    b.ToTable("Polygon");
                 });
 
             modelBuilder.Entity("TripickServer.Models.ReviewFlag", b =>
@@ -1321,28 +1323,6 @@ namespace TripickServer.Migrations
                         .HasForeignKey("DestinationId");
                 });
 
-            modelBuilder.Entity("TripickServer.Models.CountryPoint", b =>
-                {
-                    b.HasOne("TripickServer.Models.CountryPolygon", "Polygon")
-                        .WithMany("Points")
-                        .HasForeignKey("PolygonId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Polygon");
-                });
-
-            modelBuilder.Entity("TripickServer.Models.CountryPolygon", b =>
-                {
-                    b.HasOne("TripickServer.Models.Country", "Country")
-                        .WithMany("Polygons")
-                        .HasForeignKey("CountryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Country");
-                });
-
             modelBuilder.Entity("TripickServer.Models.Day", b =>
                 {
                     b.HasOne("TripickServer.Models.Itinerary", "Itinerary")
@@ -1537,6 +1517,28 @@ namespace TripickServer.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("TripickServer.Models.Point", b =>
+                {
+                    b.HasOne("TripickServer.Models.Polygon", "Polygon")
+                        .WithMany("Points")
+                        .HasForeignKey("PolygonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Polygon");
+                });
+
+            modelBuilder.Entity("TripickServer.Models.Polygon", b =>
+                {
+                    b.HasOne("TripickServer.Models.Country", "Country")
+                        .WithMany("Polygons")
+                        .HasForeignKey("CountryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Country");
+                });
+
             modelBuilder.Entity("TripickServer.Models.ReviewFlag", b =>
                 {
                     b.HasOne("TripickServer.Models.ReviewPlace", "Review")
@@ -1711,11 +1713,6 @@ namespace TripickServer.Migrations
                     b.Navigation("Polygons");
                 });
 
-            modelBuilder.Entity("TripickServer.Models.CountryPolygon", b =>
-                {
-                    b.Navigation("Points");
-                });
-
             modelBuilder.Entity("TripickServer.Models.Day", b =>
                 {
                     b.Navigation("Steps");
@@ -1749,6 +1746,11 @@ namespace TripickServer.Migrations
                     b.Navigation("Images");
 
                     b.Navigation("Reviews");
+                });
+
+            modelBuilder.Entity("TripickServer.Models.Polygon", b =>
+                {
+                    b.Navigation("Points");
                 });
 
             modelBuilder.Entity("TripickServer.Models.ReviewGuide", b =>
