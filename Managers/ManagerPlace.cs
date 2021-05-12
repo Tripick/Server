@@ -100,9 +100,9 @@ namespace TripickServer.Managers
             return noReturn ? null : this.repoPlace.GetReviews(idPlace);
         }
 
-        public List<Country> GetCountries()
+        public List<Country> GetCountries(int quantity)
         {
-            return this.repoCountry.GetAll();
+            return this.repoCountry.GetAll(quantity);
         }
 
         #endregion

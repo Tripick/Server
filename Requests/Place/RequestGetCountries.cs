@@ -8,6 +8,6 @@ namespace TripickServer.Requests.Place
     public class RequestGetCountries
     {
         [Required]
-        public bool All { get; set; }
+        public int Quantity { get; set; }
     }
 }

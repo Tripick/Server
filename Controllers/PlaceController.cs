@@ -70,9 +70,9 @@ namespace TripickServer.Controllers
 
         [HttpPost]
         [Route("GetCountries")]
-        public JsonResult GetCountries([FromBody] Request<RequestSave> request)
+        public JsonResult GetCountries([FromBody] Request<RequestGetCountries> request)
         {
-            return managerPlace.SafeCall(() => managerPlace.GetCountries());
+            return managerPlace.SafeCall(() => managerPlace.GetCountries(request.Data.Quantity));
         }
     }
 }
