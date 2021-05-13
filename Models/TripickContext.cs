@@ -53,6 +53,7 @@ namespace TripickServer.Models
 
         // Countries
         public DbSet<Country> Countries { get; set; }
+        public DbSet<CountryArea> CountryAreas { get; set; }
 
         // Places
         public DbSet<Place> Places { get; set; }

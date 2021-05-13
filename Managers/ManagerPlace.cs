@@ -100,23 +100,18 @@ namespace TripickServer.Managers
             return noReturn ? null : this.repoPlace.GetReviews(idPlace);
         }
 
-        public List<Country> GetCountries(int quantity)
-        {
-            return this.repoCountry.GetAll(quantity);
-        }
-
         #endregion
 
         #region Private
 
         private bool create(Place place)
         {
-            Country country = this.repoCountry.GetCountryOfPosition(place.Latitude, place.Longitude);
             Place newPlace = new Place()
             {
                 Name = place.Name,
                 NameTranslated = place.Name,
-                Country = country.Name,
+                CountryId = place.CountryId,
+                Country = place.Country,
                 CreationDate = DateTime.Now,
                 Description = place.Description,
                 Latitude = place.Latitude,
@@ -144,7 +139,8 @@ namespace TripickServer.Managers
             existingPlace.Description = place.Description;
             if(place.Latitude != existingPlace.Latitude || place.Longitude != existingPlace.Longitude)
             {
-                existingPlace.Country = this.repoCountry.GetCountryOfPosition(place.Latitude, place.Longitude).Name;
+                existingPlace.CountryId = place.CountryId;
+                existingPlace.Country = place.Country;
                 existingPlace.Latitude = place.Latitude;
                 existingPlace.Longitude = place.Longitude;
             }

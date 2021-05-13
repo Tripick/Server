@@ -12,6 +12,7 @@ namespace TripickServer.Models
         public int Id { get; set; }
         public string Name { get; set; }
         public string Code { get; set; }
-        public ICollection<CountryPolygon> Polygons { get; set; }
+        public List<CountryPolygon> Polygons { get; set; }
+        public List<CountryArea> Areas { get; set; }
     }
 }

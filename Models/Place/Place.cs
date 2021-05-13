@@ -27,6 +27,7 @@ namespace TripickServer.Models
 
         public string PriceLevel { get; set; }
         public string Address { get; set; }
+        public int CountryId { get; set; } = -1;
         public string Country { get; set; }
         public double Latitude { get; set; }
         public double Longitude { get; set; }

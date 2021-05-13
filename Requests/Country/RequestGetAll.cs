@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using TripickServer.Models;
 
-namespace TripickServer.Requests.Place
+namespace TripickServer.Requests.Country
 {
-    public class RequestGetCountries
+    public class RequestGetAll
     {
         [Required]
         public int Quantity { get; set; }
