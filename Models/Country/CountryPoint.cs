@@ -12,13 +12,15 @@ namespace TripickServer.Models
         public int Id { get; set; }
         public double x { get; set; }
         public double y { get; set; }
+        public double index { get; set; }
 
         public CountryPoint() { }
 
-        public CountryPoint(double x, double y)
+        public CountryPoint(double x, double y, double index)
         {
             this.x = x;
             this.y = y;
+            this.index = index;
         }
 
         [ForeignKey("Polygon")]
