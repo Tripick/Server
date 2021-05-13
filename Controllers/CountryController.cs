@@ -50,6 +50,8 @@ namespace TripickServer.Controllers
             return managerCountry.SafeCall(() => managerCountry.GetByLocation(request.Data.Latitude, request.Data.Longitude));
         }
 
+
+        // TODO Hugo : remove acess to this function after generating countries !!!
         [HttpPost]
         [Route("GetAll")]
         public JsonResult GetAll([FromBody] Request<RequestGetAll> request)
@@ -57,6 +59,7 @@ namespace TripickServer.Controllers
             return managerCountry.SafeCall(() => managerCountry.GetAll(request.Data.Quantity));
         }
 
+        // TODO Hugo : remove acess to this function after generating countries !!!
         [HttpPost]
         [Route("SaveAll")]
         public JsonResult SaveAll([FromBody] Request<RequestSaveAll> request)

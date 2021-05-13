@@ -25,7 +25,8 @@ namespace TripickServer.Repos
 
         public List<Country> GetAll(int quantity)
         {
-            return this.TripickContext.Countries.Take(quantity).Include(c => c.Polygons).ThenInclude(p => p.Points.OrderBy(po => po.index)).ToList();
+            // TODO Hugo : remove the WHERE clause here !!!!!!!!!
+            return this.TripickContext.Countries.Where(c => !c.Areas.Any()).Take(quantity).Include(c => c.Polygons).ThenInclude(p => p.Points.OrderBy(po => po.index)).ToList();
         }
 
         public List<Country> GetAllLight()
