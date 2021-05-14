@@ -5,9 +5,9 @@ using TripickServer.Models;
 
 namespace TripickServer.Requests.Country
 {
-    public class RequestSaveAll
+    public class RequestSave
     {
         [Required]
-        public List<TripickServer.Models.Country> Countries { get; set; }
+        public TripickServer.Models.Country Country { get; set; }
     }
 }

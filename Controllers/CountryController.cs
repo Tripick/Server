@@ -70,10 +70,10 @@ namespace TripickServer.Controllers
 
         // TODO Hugo : remove acess to this function after generating countries !!!
         [HttpPost]
-        [Route("SaveAll")]
-        public JsonResult SaveAll([FromBody] Request<RequestSaveAll> request)
+        [Route("Save")]
+        public JsonResult Save([FromBody] Request<RequestSave> request)
         {
-            return managerCountry.SafeCall(() => managerCountry.SaveAll(request.Data.Countries));
+            return managerCountry.SafeCall(() => managerCountry.Save(request.Data.Country));
         }
     }
 }

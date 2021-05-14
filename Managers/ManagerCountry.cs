@@ -54,29 +54,22 @@ namespace TripickServer.Managers
             return this.repoCountry.GetAll(quantity);
         }
 
-        public bool SaveAll(List<Country> countries)
+        public bool Save(Country country)
         {
-            List<Country> existingCountries = this.repoCountry.GetAll(300);
-            foreach (Country country in countries)
+            Country existingCountry = this.repoCountry.GetComplete(country.Id);
+            if (existingCountry != null)
             {
-                Country existingCountry = existingCountries.FirstOrDefault(c => c.Id == country.Id);
-                if(existingCountry != null)
+                existingCountry.Areas.AddRange(country.Areas.Select(area => new CountryArea()
                 {
-                    foreach (CountryArea area in country.Areas)
-                    {
-                        this.repoCountryAreas.Add(new CountryArea()
-                        {
-                            CountryId = existingCountry.Id,
-                            MinLat = area.MinLat,
-                            MinLon = area.MinLon,
-                            MaxLat = area.MaxLat,
-                            MaxLon = area.MaxLon
-                        });
-                    }
-                }
+                    MinLat = area.MinLat,
+                    MinLon = area.MinLon,
+                    MaxLat = area.MaxLat,
+                    MaxLon = area.MaxLon
+                }).ToList());
+
+                // Commit
+                this.TripickContext.SaveChanges();
             }
-            // Commit
-            this.TripickContext.SaveChanges();
             return true;
         }
 
