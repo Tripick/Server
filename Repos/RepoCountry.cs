@@ -36,7 +36,7 @@ namespace TripickServer.Repos
 
         public List<Country> GetAll()
         {
-            return this.TripickContext.Countries.ToList();
+            return this.TripickContext.Countries.OrderBy(c => c.Name).ToList();
         }
     }
 }
