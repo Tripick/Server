@@ -44,17 +44,17 @@ namespace TripickServer.Managers
             return this.repoCountry.GetByLocation(latitude, longitude);
         }
 
-        public List<Country> GetAllLight()
+        public List<Country> GetAll()
         {
-            return this.repoCountry.GetAllLight();
+            return this.repoCountry.GetAll();
         }
 
-        public List<Country> GetAll(int quantity)
+        public List<Country> GenerationGetAll(int quantity)
         {
-            return this.repoCountry.GetAll(quantity);
+            return this.repoCountry.GenerationGetAll(quantity);
         }
 
-        public bool Save(Country country)
+        public bool GenerationSave(Country country)
         {
             Country existingCountry = this.repoCountry.GetComplete(country.Id);
             if (existingCountry != null)
