@@ -42,6 +42,15 @@ namespace TripickServer.Controllers
         }
 
         [HttpPost]
+        [Route("GetComplete")]
+        public JsonResult GetComplete([FromBody] Request<RequestGet> request)
+        {
+            if (request.Data == null || !request.Data.Id.HasValue)
+                return Error("Country - GetComplete : Data required.");
+            return managerCountry.SafeCall(() => managerCountry.GetComplete(request.Data.Id.Value));
+        }
+
+        [HttpPost]
         [Route("GetByLocation")]
         public JsonResult GetByLocation([FromBody] Request<RequestGetByLocation> request)
         {

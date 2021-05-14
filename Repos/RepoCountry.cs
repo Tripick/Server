@@ -23,6 +23,11 @@ namespace TripickServer.Repos
             return areas.Select(area => { return new Country() { Id = area.Country.Id, Code = area.Country.Code, Name = area.Country.Name }; }).ToList();
         }
 
+        public Country GetComplete(int id)
+        {
+            return this.TripickContext.Countries.Where(c => c.Id == id).Include(a => a.Areas).FirstOrDefault();
+        }
+
         public List<Country> GetAll(int quantity)
         {
             // TODO Hugo : remove the WHERE clause here !!!!!!!!!

@@ -34,6 +34,11 @@ namespace TripickServer.Managers
             return id.HasValue ? getById(id.Value) : getByName(name);
         }
 
+        public Country GetComplete(int id)
+        {
+            return this.repoCountry.GetComplete(id);
+        }
+
         public List<Country> GetByLocation(double latitude, double longitude)
         {
             return this.repoCountry.GetByLocation(latitude, longitude);
