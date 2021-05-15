@@ -28,15 +28,14 @@ namespace TripickServer.Repos
             return this.TripickContext.Countries.Where(c => c.Id == id).Include(a => a.Areas).FirstOrDefault();
         }
 
-        public List<Country> GenerationGetAll(int quantity)
-        {
-            // TODO Hugo : remove the WHERE clause here !!!!!!!!!
-            return this.TripickContext.Countries.Where(c => !c.Areas.Any()).Take(quantity).Include(c => c.Polygons).ThenInclude(p => p.Points.OrderBy(po => po.index)).ToList();
-        }
-
         public List<Country> GetAll()
         {
             return this.TripickContext.Countries.OrderBy(c => c.Name).ToList();
+        }
+
+        public List<Country> GenerationGetAll(int quantity)
+        {
+            return this.TripickContext.Countries.Where(c => !c.Areas.Any()).Take(quantity).Include(c => c.Polygons).ThenInclude(p => p.Points.OrderBy(po => po.index)).ToList();
         }
     }
 }
