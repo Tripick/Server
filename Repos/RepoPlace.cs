@@ -176,7 +176,7 @@ namespace TripickServer.Repos
 
         public List<PlaceFlag> GetFlags(int idPlace)
         {
-            return this.TripickContext.FlagPlace.Where(f => f.IdPlace == idPlace).Include(f => f.Config).ToList();
+            return this.TripickContext.PlaceFlags.Where(f => f.IdPlace == idPlace).Include(f => f.Config).ToList();
         }
 
         public List<ReviewPlace> GetReviews(int idPlace, bool withImages = true)

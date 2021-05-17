@@ -58,7 +58,7 @@ namespace TripickServer.Models
         // Places
         public DbSet<Place> Places { get; set; }
         public DbSet<ImagePlace> ImagePlaces { get; set; }
-        public DbSet<PlaceFlag> FlagPlace { get; set; }
+        public DbSet<PlaceFlag> PlaceFlags { get; set; }
         public DbSet<ReviewPlace> ReviewPlace { get; set; }
         public DbSet<ReviewImage> ReviewImages { get; set; }
         public DbSet<ReviewFlag> ReviewFlags { get; set; }
