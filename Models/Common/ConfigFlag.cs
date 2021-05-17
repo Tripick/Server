@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TripickServer.Models
 {
-    public class ConfigReviewFlag
+    public class ConfigFlag
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

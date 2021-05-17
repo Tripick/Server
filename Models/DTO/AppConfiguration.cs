@@ -5,6 +5,6 @@ namespace TripickServer.Models
 {
     public class AppConfiguration
     {
-        public List<ConfigReviewFlag> Flags { get; set; }
+        public List<ConfigFlag> Flags { get; set; }
     }
 }

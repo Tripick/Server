@@ -174,16 +174,30 @@ namespace TripickServer.Repos
             return places;
         }
 
-        public List<ReviewPlace> GetReviews(int idPlace)
+        public List<ReviewPlace> GetReviews(int idPlace, bool withImages = true)
         {
-            List<ReviewPlace> reviews = this.TripickContext.ReviewPlace
-                .Where(r => r.IdPlace == idPlace)
-                .Include(r => r.Author)
-                .ThenInclude(a => a.Photo)
-                .Include(r => r.Flags)
-                .ThenInclude(r => r.Config)
-                .Include(r => r.Pictures)
-                .ToList();
+            List<ReviewPlace> reviews = null;
+
+            if(withImages)
+            {
+                reviews = this.TripickContext.ReviewPlace
+                    .Where(r => r.IdPlace == idPlace)
+                    .Include(r => r.Author)
+                    .ThenInclude(a => a.Photo)
+                    .Include(r => r.Flags)
+                    .ThenInclude(r => r.Config)
+                    .Include(r => r.Pictures)
+                    .ToList();
+            }
+            else
+            {
+                reviews = this.TripickContext.ReviewPlace
+                    .Where(r => r.IdPlace == idPlace)
+                    .Include(r => r.Author)
+                    .Include(r => r.Flags)
+                    .ThenInclude(r => r.Config)
+                    .ToList();
+            }
             reviews.ForEach(r =>
             {
                 r.Place = null;

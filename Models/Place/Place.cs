@@ -37,6 +37,7 @@ namespace TripickServer.Models
         public string Reference { get; set; }
         public DateTime CreationDate { get; set; }
         public virtual List<ImagePlace> Images { get; set; }
+        public virtual List<PlaceFlag> Flags { get; set; }
         public virtual List<ReviewPlace> Reviews { get; set; }
     }
 }

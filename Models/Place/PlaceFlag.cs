@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TripickServer.Models
 {
-    public class ReviewFlag
+    public class PlaceFlag
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -16,8 +16,8 @@ namespace TripickServer.Models
         public int IdConfig { get; set; }
         public virtual ConfigFlag Config { get; set; }
 
-        [ForeignKey("Review")]
-        public int IdReview { get; set; }
-        public virtual ReviewPlace Review { get; set; }
+        [ForeignKey("Place")]
+        public int IdPlace { get; set; }
+        public virtual Place Place { get; set; }
     }
 }
