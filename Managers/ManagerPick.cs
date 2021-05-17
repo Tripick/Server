@@ -73,10 +73,19 @@ namespace TripickServer.Managers
             List<Pick> picks = new List<Pick>();
             for (int i = 0; i < places.Count; i++)
             {
+                places[i].Images.ForEach(i => { i.Place = null; i.Uploader = null; });
+                places[i].Flags.ForEach(f => f.Place = null);
+                places[i].Reviews.ForEach(r =>
+                {
+                    r.Place = null;
+                    r.Author = new AppUser() { UserName = r.Author.UserName, Photo = r.Author.Photo };
+                    r.Flags.ForEach(f => f.Review = null);
+                    r.Pictures.ForEach(p => p.Review = null);
+                });
                 picks.Add(new Pick() { Index = i, IdPlace = places[i].Id, IdTrip = idTrip, IdUser = this.ConnectedUser().Id, Rating = -1, Place = places[i] });
             }
 
-            return new NextPicks() { Count=count, ExistingPicksCount=existingPicksCount, Picks=picks };
+            return new NextPicks() { Count = count, ExistingPicksCount = existingPicksCount, Picks = picks };
         }
 
         public NextPicks SavePick(int idTrip, int idPlace, int rating, List<int> alreadyLoaded)

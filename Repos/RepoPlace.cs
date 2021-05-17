@@ -37,7 +37,6 @@ namespace TripickServer.Repos
                 return null;
             // Include images and reviews
             place.Images = this.TripickContext.ImagePlaces.Where(i => i.IdPlace == id).ToList();
-            place.Images.ForEach(i => { i.Place = null; i.Uploader = null; });
             place.Flags = GetFlags(id);
             place.Reviews = GetReviews(id);
             return place;
@@ -104,7 +103,6 @@ namespace TripickServer.Repos
             foreach (Place place in places)
             {
                 place.Images = this.TripickContext.ImagePlaces.Where(i => i.IdPlace == place.Id).ToList();
-                place.Images.ForEach(i => { i.Place = null; i.Uploader = null; });
                 place.Flags = GetFlags(place.Id);
                 place.Reviews = GetReviews(place.Id);
             }
@@ -178,12 +176,7 @@ namespace TripickServer.Repos
 
         public List<PlaceFlag> GetFlags(int idPlace)
         {
-            List<PlaceFlag> flags = this.TripickContext.FlagPlace
-                    .Where(f => f.IdPlace == idPlace)
-                    .Include(f => f.Config)
-                    .ToList();
-            flags.ForEach(r => { r.Place = null; });
-            return flags;
+            return this.TripickContext.FlagPlace.Where(f => f.IdPlace == idPlace).Include(f => f.Config).ToList();
         }
 
         public List<ReviewPlace> GetReviews(int idPlace, bool withImages = true)
@@ -210,17 +203,6 @@ namespace TripickServer.Repos
                     .ThenInclude(r => r.Config)
                     .ToList();
             }
-            reviews.ForEach(r =>
-            {
-                r.Place = null;
-                r.Author = new AppUser()
-                {
-                    UserName = r.Author.UserName,
-                    Photo = r.Author.Photo,
-                };
-                r.Flags.ForEach(f => f.Review = null);
-                r.Pictures.ForEach(p => p.Review = null);
-            });
             return reviews;
         }
     }

@@ -59,6 +59,15 @@ namespace TripickServer.Managers
         public Place GetPlace(int id)
         {
             Place place = this.repoPlace.GetComplete(id);
+            place.Images.ForEach(i => { i.Place = null; i.Uploader = null; });
+            place.Flags.ForEach(r => { r.Place = null; });
+            place.Reviews.ForEach(r =>
+            {
+                r.Place = null;
+                r.Author = new AppUser() { UserName = r.Author.UserName, Photo = r.Author.Photo };
+                r.Flags.ForEach(f => f.Review = null);
+                r.Pictures.ForEach(p => p.Review = null);
+            });
             return place;
         }
 
@@ -99,11 +108,20 @@ namespace TripickServer.Managers
 
             // Commit
             this.TripickContext.SaveChanges();
+            this.updateRatingAndFlags(idPlace);
 
-            this.updateRating(idPlace);
-            this.updateFlags(idPlace);
+            if (noReturn)
+               return null;
 
-            return noReturn ? null : this.repoPlace.GetReviews(idPlace);
+            List<ReviewPlace> reviews = this.repoPlace.GetReviews(idPlace);
+            reviews.ForEach(r =>
+            {
+                r.Place = null;
+                r.Author = new AppUser() { UserName = r.Author.UserName, Photo = r.Author.Photo };
+                r.Flags.ForEach(f => f.Review = null);
+                r.Pictures.ForEach(p => p.Review = null);
+            });
+            return reviews;
         }
 
         #endregion
@@ -159,9 +177,9 @@ namespace TripickServer.Managers
             return true;
         }
 
-        private bool updateRating(int idPlace)
+        private bool updateRatingAndFlags(int idPlace)
         {
-            Place existingPlace = this.repoPlace.GetById(idPlace);
+            Place existingPlace = this.repoPlace.GetComplete(idPlace);
             if (existingPlace == null)
                 throw new NullReferenceException("The place to update flags does not exist.");
 
@@ -169,18 +187,6 @@ namespace TripickServer.Managers
             existingPlace.Rating = reviews.Average(r => r.Rating);
             existingPlace.NbRating = reviews.Count;
 
-            // Commit
-            this.TripickContext.SaveChanges();
-            return true;
-        }
-
-        private bool updateFlags(int idPlace)
-        {
-            Place existingPlace = this.repoPlace.GetById(idPlace);
-            if (existingPlace == null)
-                throw new NullReferenceException("The place to update flags does not exist.");
-
-            List<ReviewPlace> reviews = this.repoPlace.GetReviews(idPlace, withImages:false);
             Dictionary<int, List<ReviewFlag>> reviewFlags = reviews.SelectMany(r => r.Flags).GroupBy(f => f.Config.Id).ToDictionary(x => x.Key, x => x.ToList());
             List<PlaceFlag> placeFlags = reviewFlags.Keys.Select(k =>
             {
