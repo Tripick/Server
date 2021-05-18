@@ -179,13 +179,13 @@ namespace TripickServer.Repos
             return this.TripickContext.PlaceFlags.Where(f => f.IdPlace == idPlace).Include(f => f.Config).ToList();
         }
 
-        public List<ReviewPlace> GetReviews(int idPlace, bool withImages = true)
+        public List<PlaceReview> GetReviews(int idPlace, bool withImages = true)
         {
-            List<ReviewPlace> reviews = null;
+            List<PlaceReview> reviews = null;
 
             if(withImages)
             {
-                reviews = this.TripickContext.ReviewPlace
+                reviews = this.TripickContext.PlaceReviews
                     .Where(r => r.IdPlace == idPlace)
                     .Include(r => r.Author)
                     .ThenInclude(a => a.Photo)
@@ -196,7 +196,7 @@ namespace TripickServer.Repos
             }
             else
             {
-                reviews = this.TripickContext.ReviewPlace
+                reviews = this.TripickContext.PlaceReviews
                     .Where(r => r.IdPlace == idPlace)
                     .Include(r => r.Author)
                     .Include(r => r.Flags)

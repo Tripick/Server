@@ -38,6 +38,6 @@ namespace TripickServer.Models
         public DateTime CreationDate { get; set; }
         public virtual List<ImagePlace> Images { get; set; }
         public virtual List<PlaceFlag> Flags { get; set; }
-        public virtual List<ReviewPlace> Reviews { get; set; }
+        public virtual List<PlaceReview> Reviews { get; set; }
     }
 }

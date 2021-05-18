@@ -71,10 +71,27 @@ namespace TripickServer.Managers
             return place;
         }
 
-        public List<ReviewPlace> Review(int idPlace, int rating, string message, List<ReviewFlag> flags, List<string> pictures, bool noReturn = false)
+        public List<PlaceReview> Review(int idPlace, double rating, string message, List<ReviewFlag> flags, List<string> pictures, bool noReturn = false)
         {
+            // Add a "system review" if there is no review on that place yet (in order to keep the current rating of a place)
+            List<PlaceReview> allExistingReviews = this.repoPlace.GetReviews(idPlace, withImages:false);
+            if(!allExistingReviews.Any())
+            {
+                Place place = this.repoPlace.GetById(idPlace);
+                PlaceReview systemReview = new PlaceReview();
+                systemReview.CreationDate = DateTime.Now;
+                systemReview.IdPlace = idPlace;
+                systemReview.IdAuthor = 2;
+                systemReview.Rating = Math.Max(0, Math.Min(5, place.Rating));
+                systemReview.Message = " ";
+                systemReview.Flags = new List<ReviewFlag>();
+                systemReview.Pictures = new List<ReviewImage>();
+                this.repoReviewPlace.Add(systemReview);
+                this.TripickContext.SaveChanges();
+            }
+
             // Get existing if any
-            ReviewPlace review = this.repoReviewPlace.Get(idPlace);
+            PlaceReview review = allExistingReviews.FirstOrDefault(r => r.IdAuthor == this.ConnectedUser().Id);
             List<ConfigFlag> configFlags = this.TripickContext.ConfigReviewFlags.ToList();
             flags = flags.Where(f => configFlags.Any(fConfig => fConfig.Id == f.IdConfig)).ToList();
             // Update
@@ -95,7 +112,7 @@ namespace TripickServer.Managers
             else
             {
                 // Create a new review
-                review = new ReviewPlace();
+                review = new PlaceReview();
                 review.CreationDate = DateTime.Now;
                 review.IdPlace = idPlace;
                 review.IdAuthor = this.ConnectedUser().Id;
@@ -113,7 +130,7 @@ namespace TripickServer.Managers
             if (noReturn)
                return null;
 
-            List<ReviewPlace> reviews = this.repoPlace.GetReviews(idPlace);
+            List<PlaceReview> reviews = this.repoPlace.GetReviews(idPlace);
             reviews.ForEach(r =>
             {
                 r.Place = null;
@@ -147,7 +164,7 @@ namespace TripickServer.Managers
             // Commit
             this.TripickContext.SaveChanges();
 
-            ReviewPlace review = place.Reviews[0];
+            PlaceReview review = place.Reviews[0];
             Review(newPlace.Id, review.Rating, review.Message, review.Flags, review.Pictures.Select(p => p.Image).ToList(), noReturn: true);
             return true;
         }
@@ -172,7 +189,7 @@ namespace TripickServer.Managers
             // Commit
             this.TripickContext.SaveChanges();
 
-            ReviewPlace review = place.Reviews[0];
+            PlaceReview review = place.Reviews[0];
             Review(existingPlace.Id, review.Rating, review.Message, review.Flags, review.Pictures.Select(p => p.Image).ToList(), noReturn: true);
             return true;
         }
@@ -183,7 +200,7 @@ namespace TripickServer.Managers
             if (existingPlace == null)
                 throw new NullReferenceException("The place to update flags does not exist.");
 
-            List<ReviewPlace> reviews = this.repoPlace.GetReviews(idPlace, withImages: false);
+            List<PlaceReview> reviews = this.repoPlace.GetReviews(idPlace, withImages: false);
             existingPlace.Rating = reviews.Average(r => r.Rating);
             existingPlace.NbRating = reviews.Count;
 

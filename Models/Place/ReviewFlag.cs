@@ -18,6 +18,6 @@ namespace TripickServer.Models
 
         [ForeignKey("Review")]
         public int IdReview { get; set; }
-        public virtual ReviewPlace Review { get; set; }
+        public virtual PlaceReview Review { get; set; }
     }
 }

@@ -12,7 +12,7 @@ namespace TripickServer.Models
 
         [ForeignKey("ReviewPlace")]
         public int IdReviewPlace { get; set; }
-        public virtual ReviewPlace ReviewPlace { get; set; }
+        public virtual PlaceReview ReviewPlace { get; set; }
 
         [ForeignKey("Author")]
         public int IdAuthor { get; set; }

@@ -5,12 +5,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TripickServer.Models
 {
-    public class ReviewPlace
+    public class PlaceReview
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        public int Rating { get; set; }
+        public double Rating { get; set; }
         public string Title { get; set; }
         public string Message { get; set; }
         public DateTime CreationDate { get; set; }

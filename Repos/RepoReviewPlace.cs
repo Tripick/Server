@@ -7,7 +7,7 @@ using TripickServer.Models;
 
 namespace TripickServer.Repos
 {
-    public class RepoReviewPlace : RepoCRUD<ReviewPlace>
+    public class RepoReviewPlace : RepoCRUD<PlaceReview>
     {
         #region Constructor
 
@@ -15,9 +15,9 @@ namespace TripickServer.Repos
 
         #endregion
 
-        public ReviewPlace Get(int idPlace)
+        public PlaceReview Get(int idPlace)
         {
-            return this.TripickContext.ReviewPlace.Where(t => t.IdAuthor == this.ConnectedUser().Id && t.IdPlace == idPlace).FirstOrDefault();
+            return this.TripickContext.PlaceReviews.Where(t => t.IdAuthor == this.ConnectedUser().Id && t.IdPlace == idPlace).FirstOrDefault();
         }
     }
 }
