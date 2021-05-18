@@ -73,7 +73,7 @@ namespace TripickServer.Managers
             }
 
             if (!userCreationResult.Succeeded)
-                throw new InvalidOperationException($"- {string.Join($"{Environment.NewLine}- ", userCreationResult.Errors.Select(x => x.Description).ToList())}");
+                throw new InvalidOperationException(!userCreationResult.Errors.Any() ? "" : userCreationResult.Errors.First().Description);
 
             // If a confirmation is required
             if (Constants.AuthenticationConfirmEmail)
@@ -105,7 +105,7 @@ namespace TripickServer.Managers
 
             Microsoft.AspNetCore.Identity.SignInResult passwordSignInResult = await signInManager.PasswordSignInAsync(user, password, isPersistent: true, lockoutOnFailure: false);
             if (!passwordSignInResult.Succeeded)
-                throw new InvalidOperationException("Wrong login or password.");
+                throw new InvalidOperationException("Incorrect login or password.");
 
             // Generate new token
             await userManager.RemoveAuthenticationTokenAsync(user, Constants.AppName, Constants.AuthenticationTokenName);

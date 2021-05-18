@@ -24,20 +24,23 @@ namespace TripickServer
         public void ConfigureServices(IServiceCollection services)
         {
             services
-                .AddIdentity<AppUser, AppRole>(options => { options.User.RequireUniqueEmail = true; })
+                .AddIdentity<AppUser, AppRole>(options =>
+                {
+                    options.User.RequireUniqueEmail = true;
+                    options.Password.RequireNonAlphanumeric = false;
+                    options.Password.RequiredLength = 8;
+                })
                 .AddEntityFrameworkStores<TripickContext>()
                 .AddTokenProvider(Constants.AppName, typeof(DataProtectorTokenProvider<AppUser>));
 
-            services
-                .AddDbContextPool<TripickContext>(options => options.UseNpgsql( // Remove "Pool" from "AddDbContextPool" when doing a migration
+            services.AddDbContextPool<TripickContext>(options => options.UseNpgsql( // Remove "Pool" from "AddDbContextPool" when doing a migration
                     Configuration.GetConnectionString("DefaultConnection"),
                     b => b.ProvideClientCertificatesCallback(clientCerts =>
                     {
                         var databaseCertificate = Configuration.GetValue<string>(WebHostDefaults.ContentRootKey) + "/Resources/databaseCert.pfx";
                         var cert = new X509Certificate2(databaseCertificate, Configuration.GetValue<string>("Settings:databaseCertPassword"));
                         clientCerts.Add(cert);
-                    }
-            )));
+                    })));
 
             services.AddControllers(options => {
                 //options.Filters.Add(new CheckAuthKeysAndConnect()); // To apply the attribute on all controllers
