@@ -28,6 +28,7 @@ namespace TripickServer
                 {
                     options.User.RequireUniqueEmail = true;
                     options.Password.RequireNonAlphanumeric = false;
+                    options.Password.RequireUppercase = false;
                     options.Password.RequiredLength = 8;
                 })
                 .AddEntityFrameworkStores<TripickContext>()
