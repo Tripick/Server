@@ -55,7 +55,7 @@ namespace TripickServer.Managers
                 UserName = username,
                 FirstName = string.Empty,
                 LastName = string.Empty,
-                Photo = new ImageAppUser() { CreationDate = DateTime.Now, Image = Images.ImageToBase64("./Resources/Account.jpg") }
+                Photo = new ImageAppUser() { CreationDate = DateTime.Now, Image = "data:image/jpeg;base64," + Images.ImageToBase64("./Resources/Account.jpg") }
             };
 
             IdentityResult userCreationResult = null;
