@@ -38,10 +38,15 @@ namespace TripickServer.Managers
 
         public AllPicks GetAll(int idTrip, int quantity, int skip)
         {
+            List<Pick> picks = this.repoPick.GetAll(idTrip, quantity, skip);
+            picks.ForEach(p =>
+            {
+                p.User = null;
+            });
             return new AllPicks()
             {
                 ExistingPicksCount = this.repoPick.CountAllByTrip(idTrip),
-                Picks = this.repoPick.GetAll(idTrip, quantity, skip)
+                Picks = picks
             };
         }
 
