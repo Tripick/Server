@@ -171,6 +171,12 @@ namespace TripickServer.Repos
                 .Take(quantity)
                 .OrderByDescending(x => x.NbRating)
                 .ToList();
+            if(places.Count < quantity)
+                places.AddRange(this.TripickContext.Places
+                .Where(p => p.Name.ToLower().Contains(text.ToLower()) || p.NameTranslated.ToLower().Contains(text.ToLower()))
+                .Take(quantity)
+                .OrderByDescending(x => x.NbRating)
+                .ToList());
             return places;
         }
 
