@@ -34,7 +34,16 @@ namespace TripickServer.Managers
 
         #endregion
 
-        #region Private
+        #region Public
+
+        public AllPicks GetAll(int idTrip, int quantity, int skip)
+        {
+            return new AllPicks()
+            {
+                ExistingPicksCount = this.repoPick.CountAllByTrip(idTrip),
+                Picks = this.repoPick.GetAll(idTrip, quantity, skip)
+            };
+        }
 
         public NextPicks GetNexts(int idTrip, int quantity, List<int> idsToExclude = null)
         {

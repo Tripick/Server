@@ -34,6 +34,15 @@ namespace TripickServer.Controllers
         #endregion
 
         [HttpPost]
+        [Route("GetAll")]
+        public JsonResult GetAll([FromBody] Request<RequestGetAllPicks> request)
+        {
+            if (request.Data == null)
+                return Error("Pick - GetAll : Data required.");
+            return managerPick.SafeCall(() => managerPick.GetAll(request.Data.IdTrip, request.Data.Quantity, request.Data.Skip));
+        }
+
+        [HttpPost]
         [Route("GetNexts")]
         public JsonResult GetNexts([FromBody] Request<RequestGetNext> request)
         {
