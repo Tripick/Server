@@ -48,7 +48,7 @@ namespace TripickServer.Controllers
         {
             if (request.Data == null)
                 return Error("Pick - GetNexts : Data required.");
-            return managerPick.SafeCall(() => managerPick.GetNexts(request.Data.IdTrip, request.Data.Quantity));
+            return managerPick.SafeCall(() => managerPick.GetNexts(request.Data.IdTrip, request.Data.Quantity, request.Data.AlreadyLoaded));
         }
 
         [HttpPost]

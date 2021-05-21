@@ -10,5 +10,7 @@ namespace TripickServer.Requests.Pick
         public int IdTrip { get; set; }
         [Required]
         public int Quantity { get; set; }
+        [Required]
+        public List<int> AlreadyLoaded { get; set; }
     }
 }

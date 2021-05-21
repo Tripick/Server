@@ -50,7 +50,7 @@ namespace TripickServer.Managers
             };
         }
 
-        public NextPicks GetNexts(int idTrip, int quantity, List<int> idsToExclude = null)
+        public NextPicks GetNexts(int idTrip, int quantity, List<int> alreadyLoaded = null)
         {
             Trip trip = this.repoTrip.GetByIdWithTiles(idTrip);
             List<BoundingBox> areas = trip.Tiles.Select(t => new BoundingBox()
@@ -67,8 +67,8 @@ namespace TripickServer.Managers
             int existingPicksCount = existingPicksIds.Count;
 
             // Exclude ids to exclude
-            if(idsToExclude != null && idsToExclude.Any())
-                existingPicksIds.AddRange(idsToExclude);
+            if(alreadyLoaded != null && alreadyLoaded.Any())
+                existingPicksIds.AddRange(alreadyLoaded);
 
             // Get filters of the connected user for the trip
             List<Filter> filters = this.repoFilter.GetAllForTrip(idTrip);
