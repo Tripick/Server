@@ -175,7 +175,7 @@ namespace TripickServer.Repos
             {
                 List<int> excluded = places.Select(p => p.Id).ToList();
                 places.AddRange(this.TripickContext.Places
-                .Where(p => !excluded.Contains(p.Id) && p.Name.ToLower().Contains(text.ToLower()) || p.NameTranslated.ToLower().Contains(text.ToLower()))
+                .Where(p => !excluded.Contains(p.Id) && (p.Name.ToLower().Contains(text.ToLower()) || p.NameTranslated.ToLower().Contains(text.ToLower())))
                 .Take(quantity)
                 .OrderByDescending(x => x.NbRating)
                 .ToList());
