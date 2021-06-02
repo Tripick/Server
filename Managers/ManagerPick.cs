@@ -79,7 +79,10 @@ namespace TripickServer.Managers
             // If the number of places fetched is lower than the quantity needed : include also the places who don't have filter information (Price, Length, ...)
             if (places.Count < quantity)
             {
-                places.AddRange(this.repoPlace.GetNextsToPick(existingPicksIds, areas, null, quantity - places.Count));
+                List<int> notToPick = new List<int>();
+                notToPick.AddRange(existingPicksIds);
+                notToPick.AddRange(places.Select(p => p.Id).ToList());
+                places.AddRange(this.repoPlace.GetNextsToPick(notToPick, areas, null, quantity - places.Count));
                 count += this.repoPlace.CountNextsToPick(existingPicksIds, areas, null);
             }
 
