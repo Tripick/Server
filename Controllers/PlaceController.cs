@@ -67,5 +67,14 @@ namespace TripickServer.Controllers
                 return Error("Place - Save : Data required.");
             return managerPlace.SafeCall(() => managerPlace.Save(request.Data.Place));
         }
+
+        [HttpPost]
+        [Route("GenerationSaveimages")]
+        public JsonResult GenerationSaveimages([FromBody] Request<RequestGenerationSaveImages> request)
+        {
+            if (request.Data == null)
+                return Error("Place - GenerationSaveimages : Data required.");
+            return managerPlace.SafeCall(() => managerPlace.GenerationSaveimages(request.Data.Id, request.Data.Urls));
+        }
     }
 }

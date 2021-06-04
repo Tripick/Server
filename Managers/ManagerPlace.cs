@@ -143,6 +143,46 @@ namespace TripickServer.Managers
 
         #endregion
 
+        #region Generation
+
+        public Place GenerationSaveimages(int id, List<string> urls)
+        {
+            if(id == -1)
+            {
+                return generationGetNextPlace();
+            }
+            else
+            {
+                generationSaveImages(id, urls);
+                return generationGetNextPlace();
+            }
+        }
+
+        private void generationSaveImages(int id, List<string> urls)
+        {
+            List<ImagePlace> images = urls.Select(u => new ImagePlace()
+            {
+                IdPlace = id,
+                IdUploader = 2,
+                IsCover = true,
+                IsVerified = true,
+                Url = u,
+                CreationDate = DateTime.Now,
+            }).ToList();
+            this.TripickContext.ImagePlaces.AddRange(images);
+            this.TripickContext.SaveChanges();
+        }
+
+        private Place generationGetNextPlace()
+        {
+            Place place = this.TripickContext.Places.Where(p => !string.IsNullOrWhiteSpace(p.PlaceId) && !p.Images.Any()).FirstOrDefault();
+            if (place == null)
+                return new Place() { Id = -1 };
+            return new Place() { Id = place.Id, PlaceId = place.PlaceId };
+        }
+
+        #endregion
+
         #region Private
 
         private bool create(Place place)

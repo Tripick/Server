@@ -9,7 +9,7 @@ namespace TripickServer.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        public string Image { get; set; }
+        public string Url { get; set; }
         public DateTime CreationDate { get; set; }
         public bool IsVerified { get; set; }
         public bool IsCover { get; set; }
