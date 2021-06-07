@@ -39,11 +39,6 @@ namespace TripickServer.Managers
             List<Trip> trips = this.repoTrip.GetAll(pageIndex, pageSize).OrderByDescending(x => x.CreationDate).ToList();
             trips.ForEach(trip =>
             {
-                trip.Polygon = trip.Polygon.OrderBy(p => p.Index).ToList();
-                trip.Travelers = trip.Members == null ? new List<Traveler>() : trip.Members.Select(f => new Traveler(f)).ToList();
-                trip.Members = null;
-                trip.Followers = trip.Subscribers == null ? new List<Follower>() : trip.Subscribers.Select(f => new Follower(f)).ToList();
-                trip.Subscribers = null;
                 trip.Filters = this.repoFilter.Get(f => f.IdTrip == trip.Id && f.IdUser == this.ConnectedUser().Id).ToList();
                 if (!trip.Filters.Any())
                 {
@@ -55,10 +50,6 @@ namespace TripickServer.Managers
                         new Filter() { IdTrip = trip.Id, IdUser = this.ConnectedUser().Id, Name = "Difficulty", Min = 0, Max = 5 },
                         new Filter() { IdTrip = trip.Id, IdUser = this.ConnectedUser().Id, Name = "Touristy", Min = 0, Max = 5 }
                     };
-                }
-                else
-                {
-                    trip.Filters = trip.Filters.Select(f => f?.ToDTO()).ToList();
                 }
             });
             return trips;
