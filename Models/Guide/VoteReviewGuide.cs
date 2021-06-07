@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using TripickServer.Models.Common;
 
 namespace TripickServer.Models
 {
-    public class VoteReviewGuide
+    public class VoteReviewGuide : ModelBase<VoteReviewGuide>
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -17,5 +18,16 @@ namespace TripickServer.Models
         [ForeignKey("Author")]
         public int IdAuthor { get; set; }
         public virtual AppUser Author { get; set; }
+
+        public VoteReviewGuide ToDTO()
+        {
+            return new VoteReviewGuide()
+            {
+                Id = this.Id,
+                IsUp = this.IsUp,
+                IdReviewGuide = this.IdReviewGuide,
+                IdAuthor = this.IdAuthor
+            };
+        }
     }
 }

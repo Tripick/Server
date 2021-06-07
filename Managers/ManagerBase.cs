@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TripickServer.Models;
+using TripickServer.Models.Common;
 using TripickServer.Utils;
 
 namespace TripickServer.Managers
@@ -32,7 +34,31 @@ namespace TripickServer.Managers
 
         #region Public
 
-        public JsonResult SafeCall<T>(Func<T> method)
+        public JsonResult SafeCall<T>(Func<T> method) where T : ModelBase<T>, new()
+        {
+            try
+            {
+                return ServerResponse<T>.ToJson(method().ToDTO());
+            }
+            catch (Exception e)
+            {
+                return ServerResponse<T>.ToJson(false, e.Message);
+            }
+        }
+
+        public JsonResult SafeCall<T>(Func<List<T>> method) where T : ModelBase<T>, new()
+        {
+            try
+            {
+                return ServerResponse<List<T>>.ToJson(method().ToDTO());
+            }
+            catch (Exception e)
+            {
+                return ServerResponse<T>.ToJson(false, e.Message);
+            }
+        }
+
+        public JsonResult SafeCallValueType<T>(Func<T> method)
         {
             try
             {
@@ -44,7 +70,31 @@ namespace TripickServer.Managers
             }
         }
 
-        public async Task<JsonResult> SafeCallAsync<T>(Func<Task<T>> method)
+        public async Task<JsonResult> SafeCallAsync<T>(Func<Task<T>> method) where T : ModelBase<T>, new()
+        {
+            try
+            {
+                return ServerResponse<T>.ToJson((await method()).ToDTO());
+            }
+            catch (Exception e)
+            {
+                return ServerResponse<T>.ToJson(false, e.Message);
+            }
+        }
+
+        public async Task<JsonResult> SafeCallAsync<T>(Func<Task<List<T>>> method) where T : ModelBase<T>, new()
+        {
+            try
+            {
+                return ServerResponse<List<T>>.ToJson((await method()).ToDTO());
+            }
+            catch (Exception e)
+            {
+                return ServerResponse<T>.ToJson(false, e.Message);
+            }
+        }
+
+        public async Task<JsonResult> SafeCallValueTypeAsync<T>(Func<Task<T>> method)
         {
             try
             {

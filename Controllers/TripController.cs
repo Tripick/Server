@@ -74,7 +74,7 @@ namespace TripickServer.Controllers
         {
             if (request.Data == null)
                 return Error("Trip - Delete : Data required.");
-            return managerTrip.SafeCall(() => managerTrip.Delete(request.Data.Id));
+            return managerTrip.SafeCallValueType(() => managerTrip.Delete(request.Data.Id));
         }
 
         [HttpPost]
@@ -83,7 +83,7 @@ namespace TripickServer.Controllers
         {
             if (request.Data == null)
                 return Error("Trip - SaveCover : Data required.");
-            return managerTrip.SafeCall(() => managerTrip.SaveCover(request.Data.IdTrip, request.Data.Cover));
+            return managerTrip.SafeCallValueType(() => managerTrip.SaveCover(request.Data.IdTrip, request.Data.Cover));
         }
 
         [HttpPost]

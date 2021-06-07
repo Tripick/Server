@@ -49,7 +49,7 @@ namespace TripickServer.Managers
                 {
                     trip.Filters = new List<Filter>()
                     {
-                        new Filter() { IdTrip = trip.Id, IdUser = this.ConnectedUser().Id, Name="Price", Min=0, Max=99 },
+                        new Filter() { IdTrip = trip.Id, IdUser = this.ConnectedUser().Id, Name="Price", Min = 0, Max = 99 },
                         new Filter() { IdTrip = trip.Id, IdUser = this.ConnectedUser().Id, Name = "Length", Min = 0, Max = 300 },
                         new Filter() { IdTrip = trip.Id, IdUser = this.ConnectedUser().Id, Name = "Duration", Min = 0, Max = 999 },
                         new Filter() { IdTrip = trip.Id, IdUser = this.ConnectedUser().Id, Name = "Difficulty", Min = 0, Max = 5 },
@@ -66,13 +66,7 @@ namespace TripickServer.Managers
 
         public Trip GetById(int id)
         {
-            Trip trip = this.repoTrip.GetById(id);
-            trip.Owner = null;
-            trip.Travelers = trip.Members == null ? new List<Traveler>() : trip.Members.Select(f => new Traveler(f)).ToList();
-            trip.Members = null;
-            trip.Followers = trip.Subscribers == null ? new List<Follower>() : trip.Subscribers.Select(f => new Follower(f)).ToList();
-            trip.Subscribers = null;
-            return trip;
+            return this.repoTrip.GetById(id);
         }
 
         public Trip Create()
@@ -93,12 +87,6 @@ namespace TripickServer.Managers
 
             // Commit
             this.TripickContext.SaveChanges();
-
-            trip.Owner = null;
-            trip.Travelers = trip.Members == null ? new List<Traveler>() : trip.Members.Select(f => new Traveler(f)).ToList();
-            trip.Members = null;
-            trip.Followers = trip.Subscribers == null ? new List<Follower>() : trip.Subscribers.Select(f => new Follower(f)).ToList();
-            trip.Subscribers = null;
             return trip;
         }
 
@@ -155,21 +143,8 @@ namespace TripickServer.Managers
             if(trip.Tiles != null && trip.Tiles.Any())
                 existing.Tiles = trip.Tiles;
 
-            // Update
-            //this.repoTrip.Update(existing);
-
             // Commit
             this.TripickContext.SaveChanges();
-
-            // Do not send unuseful data
-            existing.Owner = null;
-            existing.CoverImage = null;
-            existing.Tiles = null;
-            existing.Travelers = existing.Members == null ? new List<Traveler>() : existing.Members.Select(f => new Traveler(f)).ToList();
-            existing.Members = null;
-            existing.Followers = existing.Subscribers == null ? new List<Follower>() : existing.Subscribers.Select(f => new Follower(f)).ToList();
-            existing.Subscribers = null;
-            existing.Filters = trip.Filters;
             return existing;
         }
 
@@ -209,7 +184,6 @@ namespace TripickServer.Managers
 
             // Commit
             this.TripickContext.SaveChanges();
-
             return existing.CoverImage;
         }
 

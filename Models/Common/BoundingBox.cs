@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using TripickServer.Models.Common;
 
 namespace TripickServer.Models
 {
-    public class BoundingBox
+    public class BoundingBox : ModelBase<BoundingBox>
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -12,5 +13,7 @@ namespace TripickServer.Models
         public double MinLon { get; set; }
         public double MaxLat { get; set; }
         public double MaxLon { get; set; }
+
+        public BoundingBox ToDTO() { return this; }
     }
 }

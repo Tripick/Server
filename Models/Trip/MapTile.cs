@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using TripickServer.Models.Common;
 
 namespace TripickServer.Models
 {
-    public class MapTile
+    public class MapTile : ModelBase<MapTile>
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -17,5 +18,18 @@ namespace TripickServer.Models
         [ForeignKey("Trip")]
         public int IdTrip { get; set; }
         public virtual Trip Trip { get; set; }
+
+        public MapTile ToDTO()
+        {
+            return new MapTile()
+            {
+                Id = this.Id,
+                IdTrip = this.IdTrip,
+                Latitude = this.Latitude,
+                Longitude = this.Longitude,
+                Height = this.Height,
+                Width = this.Width,
+            };
+        }
     }
 }

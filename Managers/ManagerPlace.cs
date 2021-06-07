@@ -58,17 +58,7 @@ namespace TripickServer.Managers
 
         public Place GetPlace(int id)
         {
-            Place place = this.repoPlace.GetComplete(id);
-            place.Images.ForEach(i => { i.Place = null; i.Uploader = null; });
-            place.Flags.ForEach(r => { r.Place = null; });
-            place.Reviews.ForEach(r =>
-            {
-                r.Place = null;
-                r.Author = new AppUser() { UserName = r.Author.UserName, Photo = r.Author.Photo };
-                r.Flags.ForEach(f => f.Review = null);
-                r.Pictures.ForEach(p => p.Review = null);
-            });
-            return place;
+            return this.repoPlace.GetComplete(id);
         }
 
         public List<PlaceReview> Review(int idPlace, double rating, string message, List<ReviewFlag> flags, List<string> pictures, bool noReturn = false)
@@ -131,13 +121,6 @@ namespace TripickServer.Managers
                return null;
 
             List<PlaceReview> reviews = this.repoPlace.GetReviews(idPlace);
-            reviews.ForEach(r =>
-            {
-                r.Place = null;
-                r.Author = new AppUser() { UserName = r.Author.UserName, Photo = r.Author.Photo };
-                r.Flags.ForEach(f => f.Review = null);
-                r.Pictures.ForEach(p => p.Review = null);
-            });
             return reviews;
         }
 

@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using TripickServer.Models.Common;
+using TripickServer.Utils;
 
 namespace TripickServer.Models
 {
-    public class Place
+    public class Place : ModelBase<Place>
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -39,5 +41,25 @@ namespace TripickServer.Models
         public virtual List<ImagePlace> Images { get; set; }
         public virtual List<PlaceFlag> Flags { get; set; }
         public virtual List<PlaceReview> Reviews { get; set; }
+
+        public Place ToDTO()
+        {
+            return new Place()
+            {
+                Id = this.Id,
+                PlaceId = this.PlaceId,
+                Name = this.Name,
+                NameTranslated = this.NameTranslated,
+                CountryId = this.CountryId,
+                Country = this.Country,
+                Latitude = this.Latitude,
+                Longitude = this.Longitude,
+                Rating = this.Rating,
+                NbRating = this.NbRating,
+                Images = this.Images.ToDTO(),
+                Flags = this.Flags.ToDTO(),
+                Reviews = this.Reviews.ToDTO(),
+            };
+        }
     }
 }

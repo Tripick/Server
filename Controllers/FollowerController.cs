@@ -48,7 +48,7 @@ namespace TripickServer.Controllers
         {
             if (request.Data == null)
                 return Error("Follower - Delete : Data required.");
-            return managerFollower.SafeCall(() => managerFollower.Delete(request.Data.IdTrip, request.Data.IdFriend));
+            return managerFollower.SafeCallValueType(() => managerFollower.Delete(request.Data.IdTrip, request.Data.IdFriend));
         }
     }
 }

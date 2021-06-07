@@ -16,9 +16,7 @@ namespace TripickServer.Repos
 
         public int Count()
         {
-            return this.TripickContext.Trips
-                .Where(t => !t.IsDeleted && t.IdOwner == this.ConnectedUser().Id)
-                .Count();
+            return this.TripickContext.Trips.Where(t => !t.IsDeleted && t.IdOwner == this.ConnectedUser().Id).Count();
         }
 
         public List<Trip> GetAll(int pageIndex = 0, int pageSize = 10)
@@ -42,7 +40,6 @@ namespace TripickServer.Repos
                     polygon = this.TripickContext.MapPoint.Where(p => p.IdTrip == trip.Id).ToList();
                 trip.Polygon = polygon.OrderBy(p => p.Index).ToList();
             }
-
             return trips;
         }
 
@@ -76,7 +73,6 @@ namespace TripickServer.Repos
             if(trip != null)
                 tiles = this.TripickContext.MapTiles.Where(t => t.IdTrip == trip.Id).ToList();
             trip.Tiles = tiles;
-
             return trip;
         }
     }

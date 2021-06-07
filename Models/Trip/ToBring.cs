@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using TripickServer.Models.Common;
 
 namespace TripickServer.Models
 {
-    public class ToBring
+    public class ToBring : ModelBase<ToBring>
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -14,5 +15,17 @@ namespace TripickServer.Models
         [ForeignKey("Type")]
         public int? IdType { get; set; }
         public virtual TypeToBring Type { get; set; }
+
+        public ToBring ToDTO()
+        {
+            return new ToBring()
+            {
+                Id = this.Id,
+                Name = this.Name,
+                Checked = this.Checked,
+                IdType = this.IdType,
+                Type = this.Type.ToDTO()
+            };
+        }
     }
 }

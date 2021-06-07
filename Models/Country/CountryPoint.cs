@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using TripickServer.Models.Common;
 
 namespace TripickServer.Models
 {
-    public class CountryPoint
+    public class CountryPoint : ModelBase<CountryPoint>
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -26,5 +27,10 @@ namespace TripickServer.Models
         [ForeignKey("Polygon")]
         public int PolygonId { get; set; }
         public CountryPolygon Polygon { get; set; }
+
+        public CountryPoint ToDTO()
+        {
+            return this;
+        }
     }
 }

@@ -95,7 +95,7 @@ namespace TripickServer.Controllers
         {
             if (request == null || request.AuthenticationKeys == null)
                 return ServerResponse<UserContext>.ToJson(false, "Credentials required.");
-            return await accountManager.SafeCallAsync(async () => await accountManager.Logout(request.AuthenticationKeys.Id, request.AuthenticationKeys.AccessToken));
+            return await accountManager.SafeCallValueTypeAsync(async () => await accountManager.Logout(request.AuthenticationKeys.Id, request.AuthenticationKeys.AccessToken));
         }
 
         [HttpPost]
@@ -104,7 +104,7 @@ namespace TripickServer.Controllers
         {
             if (credentials == null)
                 return ServerResponse<UserContext>.ToJson(false, "Credentials required.");
-            return await accountManager.SafeCallAsync(async () => await accountManager.Delete(credentials.Email, credentials.Password, credentials.RememberMe));
+            return await accountManager.SafeCallValueTypeAsync(async () => await accountManager.Delete(credentials.Email, credentials.Password, credentials.RememberMe));
         }
     }
 }

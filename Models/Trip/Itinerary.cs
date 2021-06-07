@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using TripickServer.Models.Common;
 
 namespace TripickServer.Models
 {
-    public class Itinerary
+    public class Itinerary : ModelBase<Itinerary>
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -19,5 +20,14 @@ namespace TripickServer.Models
         public virtual Trip Trip { get; set; }
 
         public virtual List<Day> Days { get; set; }
+
+        public Itinerary ToDTO()
+        {
+            return new Itinerary()
+            {
+                Id = this.Id,
+                IdTrip = this.IdTrip,
+            };
+        }
     }
 }

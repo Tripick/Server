@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using TripickServer.Models.Common;
 
 namespace TripickServer.Models
 {
-    public class PlaceFlag
+    public class PlaceFlag : ModelBase<PlaceFlag>
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -19,5 +20,17 @@ namespace TripickServer.Models
         [ForeignKey("Place")]
         public int IdPlace { get; set; }
         public virtual Place Place { get; set; }
+
+        public PlaceFlag ToDTO()
+        {
+            return new PlaceFlag()
+            {
+                Id = this.Id,
+                IdPlace = this.IdPlace,
+                IdConfig = this.IdConfig,
+                Config = this.Config,
+                Value = this.Value,
+            };
+        }
     }
 }

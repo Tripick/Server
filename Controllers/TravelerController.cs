@@ -48,7 +48,7 @@ namespace TripickServer.Controllers
         {
             if (request.Data == null)
                 return Error("Traveler - Delete : Data required.");
-            return managerTraveler.SafeCall(() => managerTraveler.Delete(request.Data.IdTrip, request.Data.IdFriend));
+            return managerTraveler.SafeCallValueType(() => managerTraveler.Delete(request.Data.IdTrip, request.Data.IdFriend));
         }
     }
 }

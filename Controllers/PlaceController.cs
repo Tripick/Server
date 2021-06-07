@@ -65,7 +65,7 @@ namespace TripickServer.Controllers
         {
             if (request.Data == null)
                 return Error("Place - Save : Data required.");
-            return managerPlace.SafeCall(() => managerPlace.Save(request.Data.Place));
+            return managerPlace.SafeCallValueType(() => managerPlace.Save(request.Data.Place));
         }
 
         [HttpPost]

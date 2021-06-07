@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using TripickServer.Models.Common;
 
 namespace TripickServer.Models
 {
-    public class CountryArea
+    public class CountryArea : ModelBase<CountryArea>
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -19,5 +20,17 @@ namespace TripickServer.Models
         [ForeignKey("Country")]
         public int CountryId { get; set; }
         public Country Country { get; set; }
+
+        public CountryArea ToDTO()
+        {
+            return new CountryArea()
+            {
+                Id = this.Id,
+                MinLat = this.MinLat,
+                MinLon = this.MinLon,
+                MaxLat = this.MaxLat,
+                MaxLon = this.MaxLon,
+            };
+        }
     }
 }

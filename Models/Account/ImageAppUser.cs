@@ -1,10 +1,11 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using TripickServer.Models.Common;
 
 namespace TripickServer.Models
 {
-    public class ImageAppUser
+    public class ImageAppUser : ModelBase<ImageAppUser>
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -15,5 +16,16 @@ namespace TripickServer.Models
         [ForeignKey("Owner")]
         public int IdOwner { get; set; }
         public virtual AppUser Owner { get; set; }
+
+        public ImageAppUser ToDTO()
+        {
+            return new ImageAppUser()
+            {
+                Id = this.Id,
+                Image = this.Image,
+                CreationDate = this.CreationDate,
+                IdOwner = this.IdOwner
+            };
+        }
     }
 }

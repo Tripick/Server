@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using TripickServer.Models.Common;
+using TripickServer.Utils;
 
 namespace TripickServer.Models
 {
-    public class PlaceReview
+    public class PlaceReview : ModelBase<PlaceReview>
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -25,5 +27,29 @@ namespace TripickServer.Models
         [ForeignKey("Author")]
         public int IdAuthor { get; set; }
         public virtual AppUser Author { get; set; }
+
+        public PlaceReview ToDTO()
+        {
+            return new PlaceReview()
+            {
+                Id = this.Id,
+                IdPlace = this.IdPlace,
+                IdAuthor = this.IdAuthor,
+                Author = this.Author == null ? null : new AppUser()
+                {
+                    Id = this.Author.Id,
+                    FirstName = this.Author.FirstName,
+                    LastName = this.Author.LastName,
+                    UserName = this.Author.UserName,
+                    Photo = this.Author.Photo.ToDTO(),
+                },
+                Rating = this.Rating,
+                Title = this.Title,
+                Message = this.Message,
+                Flags = this.Flags.ToDTO(),
+                Pictures = this.Pictures.ToDTO(),
+                Votes = this.Votes.ToDTO(),
+            };
+        }
     }
 }

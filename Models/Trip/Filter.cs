@@ -1,10 +1,11 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using TripickServer.Models.Common;
 
 namespace TripickServer.Models
 {
-    public class Filter
+    public class Filter : ModelBase<Filter>
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

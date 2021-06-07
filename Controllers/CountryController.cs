@@ -80,7 +80,7 @@ namespace TripickServer.Controllers
         [Route("GenerationSave")]
         public JsonResult GenerationSave([FromBody] Request<RequestSave> request)
         {
-            return managerCountry.SafeCall(() => managerCountry.GenerationSave(request.Data.Country));
+            return managerCountry.SafeCallValueType(() => managerCountry.GenerationSave(request.Data.Country));
         }
     }
 }

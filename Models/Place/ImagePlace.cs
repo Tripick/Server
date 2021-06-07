@@ -1,10 +1,11 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using TripickServer.Models.Common;
 
 namespace TripickServer.Models
 {
-    public class ImagePlace
+    public class ImagePlace : ModelBase<ImagePlace>
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -21,5 +22,16 @@ namespace TripickServer.Models
         [ForeignKey("Uploader")]
         public int IdUploader { get; set; }
         public virtual AppUser Uploader { get; set; }
+
+        public ImagePlace ToDTO()
+        {
+            return new ImagePlace()
+            {
+                Id = this.Id,
+                Url = this.Url,
+                IdPlace = this.IdPlace,
+                IdUploader = this.IdUploader
+            };
+        }
     }
 }

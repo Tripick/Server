@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using TripickServer.Models.Common;
+using TripickServer.Utils;
 
 namespace TripickServer.Models
 {
-    public class Guide
+    public class Guide : ModelBase<Guide>
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -26,5 +28,23 @@ namespace TripickServer.Models
         [ForeignKey("Trip")]
         public int IdTrip { get; set; }
         public virtual Trip Trip { get; set; }
+
+        public Guide ToDTO()
+        {
+            return new Guide()
+            {
+                Id = this.Id,
+                IdAuthor = this.IdAuthor,
+                IdTrip = this.IdTrip,
+                Name = this.Name,
+                Description = this.Description,
+                Type = this.Type.ToDTO(),
+                RecommendedGroups = this.RecommendedGroups.ToDTO(),
+                Hashtags = this.Hashtags.ToDTO(),
+                Images = this.Images.ToDTO(),
+                Reviews = this.Reviews.ToDTO(),
+                Price = this.Price,
+            };
+        }
     }
 }

@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using TripickServer.Models.Common;
 
 namespace TripickServer.Models
 {
-    public class Pick
+    public class Pick : ModelBase<Pick>
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -22,5 +23,20 @@ namespace TripickServer.Models
         [ForeignKey("Trip")]
         public int IdTrip { get; set; }
         public virtual Trip Trip { get; set; }
+
+        public Pick ToDTO()
+        {
+            return new Pick()
+            {
+                Id = this.Id,
+                Index = this.Index,
+                Rating = this.Rating,
+                IdTrip = this.IdTrip,
+                IdPlace = this.IdPlace,
+                IdUser = this.IdUser,
+                Place = this.Place.ToDTO(),
+                Trip = this.Trip.ToDTO(),
+            };
+        }
     }
 }

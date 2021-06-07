@@ -39,10 +39,6 @@ namespace TripickServer.Managers
         public AllPicks GetAll(int idTrip, int quantity, int skip)
         {
             List<Pick> picks = this.repoPick.GetAll(idTrip, quantity, skip);
-            picks.ForEach(p =>
-            {
-                p.User = null;
-            });
             return new AllPicks()
             {
                 ExistingPicksCount = this.repoPick.CountAllByTrip(idTrip),
@@ -90,15 +86,6 @@ namespace TripickServer.Managers
             List<Pick> picks = new List<Pick>();
             for (int i = 0; i < places.Count; i++)
             {
-                places[i].Images.ForEach(i => { i.Place = null; i.Uploader = null; });
-                places[i].Flags.ForEach(f => f.Place = null);
-                places[i].Reviews.ForEach(r =>
-                {
-                    r.Place = null;
-                    r.Author = new AppUser() { UserName = r.Author.UserName, Photo = r.Author.Photo };
-                    r.Flags.ForEach(f => f.Review = null);
-                    r.Pictures.ForEach(p => p.Review = null);
-                });
                 picks.Add(new Pick() { Index = i, IdPlace = places[i].Id, IdTrip = idTrip, IdUser = this.ConnectedUser().Id, Rating = -1, Place = places[i] });
             }
 

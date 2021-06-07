@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using TripickServer.Models.Common;
 
 namespace TripickServer.Utils
 {
@@ -44,6 +45,11 @@ namespace TripickServer.Utils
             s = s.Replace("\n", " ");
             s = s.Replace("  ", " ");
             return Regex.Replace(s.Trim(), "[^a-zA-ZÀ-ÿ0-9 $*&^+-_.,;!?():\"\'\n\uE000-\uF8FF\uD83C\uD83D\uD83E\uDC00-\uDFFF\uDC00-\uDFFF\u2694-\u2697\uDD10-\uDD5D]*", "");
+        }
+
+        public static List<T> ToDTO<T>(this List<T> list) where T : ModelBase<T>, new()
+        {
+            return list.Select(x => x.ToDTO()).ToList();
         }
 
         #endregion

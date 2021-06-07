@@ -1,10 +1,11 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using TripickServer.Models.Common;
 
 namespace TripickServer.Models
 {
-    public class Step
+    public class Step : ModelBase<Step>
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -32,5 +33,29 @@ namespace TripickServer.Models
         [ForeignKey("Type")]
         public int? IdType { get; set; }
         public virtual TypeStep Type { get; set; }
+
+        public Step ToDTO()
+        {
+            return new Step()
+            {
+                Id = this.Id,
+                IdDay = this.IdDay,
+                IdPick = this.IdPick,
+                IdType = this.IdType,
+                Name = this.Name,
+                Description = this.Description,
+                Note = this.Note,
+                CoverImage = this.CoverImage,
+                DistanceFromPrevious = this.DistanceFromPrevious,
+                Start = this.Start,
+                End = this.End,
+                IsActive = this.IsActive,
+                IsCustom = this.IsCustom,
+                Latitude = this.Latitude,
+                Longitude = this.Longitude,
+                Pick = this.Pick.ToDTO(),
+                Type = this.Type.ToDTO()
+            };
+        }
     }
 }

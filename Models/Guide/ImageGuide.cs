@@ -1,10 +1,11 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using TripickServer.Models.Common;
 
 namespace TripickServer.Models
 {
-    public class ImageGuide
+    public class ImageGuide : ModelBase<ImageGuide>
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -16,5 +17,17 @@ namespace TripickServer.Models
         [ForeignKey("Guide")]
         public int IdGuide { get; set; }
         public virtual Guide Guide { get; set; }
+
+        public ImageGuide ToDTO()
+        {
+            return new ImageGuide()
+            {
+                Id = this.Id,
+                Image = this.Image,
+                CreationDate = this.CreationDate,
+                IsVerified = this.IsVerified,
+                IdGuide = this.IdGuide
+            };
+        }
     }
 }

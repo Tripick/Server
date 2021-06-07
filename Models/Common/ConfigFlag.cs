@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using TripickServer.Models.Common;
 
 namespace TripickServer.Models
 {
-    public class ConfigFlag
+    public class ConfigFlag : ModelBase<ConfigFlag>
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -18,5 +19,7 @@ namespace TripickServer.Models
         public int MinVal { get; set; } = 0;
         public int MaxVal { get; set; } = 0;
         public string Unit { get; set; } = "";
+
+        public ConfigFlag ToDTO() { return this; }
     }
 }
