@@ -25,7 +25,7 @@ namespace TripickServer.Models
                 Id = this.Id,
                 Value = this.Value,
                 IdCurrency = this.IdCurrency,
-                Currency = this.Currency.ToDTO()
+                Currency = this.Currency?.ToDTO()
             };
         }
     }

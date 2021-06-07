@@ -24,7 +24,7 @@ namespace TripickServer.Models
                 Name = this.Name,
                 Checked = this.Checked,
                 IdType = this.IdType,
-                Type = this.Type.ToDTO()
+                Type = this.Type?.ToDTO()
             };
         }
     }

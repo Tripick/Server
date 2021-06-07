@@ -13,7 +13,7 @@ namespace TripickServer.Models
         {
             return new AppConfiguration()
             {
-                Flags = this.Flags.ToDTO()
+                Flags = this.Flags?.ToDTO()
             };
         }
     }

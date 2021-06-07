@@ -46,7 +46,7 @@ namespace TripickServer.Managers
                     new Filter() { IdTrip = idTrip, IdUser = this.ConnectedUser().Id, Name = "Touristy", Min = 0, Max = 5 }
                 };
             }
-            return filters.Select(f => f.ToDTO()).ToList();
+            return filters.Select(f => f?.ToDTO()).ToList();
         }
 
         public List<Filter> Save(int idTrip, List<Filter> filters)

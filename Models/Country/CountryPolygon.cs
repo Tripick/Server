@@ -24,7 +24,7 @@ namespace TripickServer.Models
             {
                 Id = this.Id,
                 CountryId = this.CountryId,
-                Points = this.Points.ToDTO()
+                Points = this.Points?.ToDTO()
             };
         }
     }

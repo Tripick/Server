@@ -38,7 +38,8 @@ namespace TripickServer.Managers
         {
             try
             {
-                return ServerResponse<T>.ToJson(method().ToDTO());
+                T result = method();
+                return ServerResponse<T>.ToJson(result == null ? result : result.ToDTO());
             }
             catch (Exception e)
             {
@@ -50,7 +51,8 @@ namespace TripickServer.Managers
         {
             try
             {
-                return ServerResponse<List<T>>.ToJson(method().ToDTO());
+                List<T> result = method();
+                return ServerResponse<List<T>>.ToJson(result == null ? result : result.ToDTO());
             }
             catch (Exception e)
             {
@@ -74,7 +76,8 @@ namespace TripickServer.Managers
         {
             try
             {
-                return ServerResponse<T>.ToJson((await method()).ToDTO());
+                T result = await method();
+                return ServerResponse<T>.ToJson(result == null ? result : result.ToDTO());
             }
             catch (Exception e)
             {
@@ -86,7 +89,8 @@ namespace TripickServer.Managers
         {
             try
             {
-                return ServerResponse<List<T>>.ToJson((await method()).ToDTO());
+                List<T> result = await method();
+                return ServerResponse<List<T>>.ToJson(result == null ? result : result.ToDTO());
             }
             catch (Exception e)
             {

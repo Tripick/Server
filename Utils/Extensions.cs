@@ -49,7 +49,7 @@ namespace TripickServer.Utils
 
         public static List<T> ToDTO<T>(this List<T> list) where T : ModelBase<T>, new()
         {
-            return list.Select(x => x.ToDTO()).ToList();
+            return list.Select(x => (x == null ? x : x.ToDTO())).ToList();
         }
 
         #endregion

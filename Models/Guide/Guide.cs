@@ -38,11 +38,11 @@ namespace TripickServer.Models
                 IdTrip = this.IdTrip,
                 Name = this.Name,
                 Description = this.Description,
-                Type = this.Type.ToDTO(),
-                RecommendedGroups = this.RecommendedGroups.ToDTO(),
-                Hashtags = this.Hashtags.ToDTO(),
-                Images = this.Images.ToDTO(),
-                Reviews = this.Reviews.ToDTO(),
+                Type = this.Type?.ToDTO(),
+                RecommendedGroups = this.RecommendedGroups?.ToDTO(),
+                Hashtags = this.Hashtags?.ToDTO(),
+                Images = this.Images?.ToDTO(),
+                Reviews = this.Reviews?.ToDTO(),
                 Price = this.Price,
             };
         }

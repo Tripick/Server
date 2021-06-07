@@ -24,8 +24,8 @@ namespace TripickServer.Models
                 Id = this.Id,
                 Name = this.Name,
                 Code = this.Code,
-                Polygons = this.Polygons.ToDTO(),
-                Areas = this.Areas.ToDTO(),
+                Polygons = this.Polygons?.ToDTO(),
+                Areas = this.Areas?.ToDTO(),
             };
         }
     }

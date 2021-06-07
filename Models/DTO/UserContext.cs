@@ -38,12 +38,12 @@ namespace TripickServer.Models
         {
             return new UserContext()
             {
-                User = this.User.ToDTO(),
-                AuthenticationKeys = this.AuthenticationKeys.ToDTO(),
-                Configuration = this.Configuration.ToDTO(),
-                Friends = this.Friends.ToDTO(),
-                Trips = this.Trips.ToDTO(),
-                RecommendedGuides = this.RecommendedGuides.ToDTO(),
+                User = this.User?.ToDTO(),
+                AuthenticationKeys = this.AuthenticationKeys?.ToDTO(),
+                Configuration = this.Configuration?.ToDTO(),
+                Friends = this.Friends?.ToDTO(),
+                Trips = this.Trips?.ToDTO(),
+                RecommendedGuides = this.RecommendedGuides?.ToDTO(),
             };
         }
     }

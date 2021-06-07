@@ -17,7 +17,7 @@ namespace TripickServer.Models
             {
                 Count = this.Count,
                 ExistingPicksCount = this.ExistingPicksCount,
-                Picks = this.Picks.ToDTO(),
+                Picks = this.Picks?.ToDTO(),
             };
         }
     }

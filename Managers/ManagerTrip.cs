@@ -58,7 +58,7 @@ namespace TripickServer.Managers
                 }
                 else
                 {
-                    trip.Filters = trip.Filters.Select(f => f.ToDTO()).ToList();
+                    trip.Filters = trip.Filters.Select(f => f?.ToDTO()).ToList();
                 }
             });
             return trips;

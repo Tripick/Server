@@ -53,8 +53,8 @@ namespace TripickServer.Models
                 IsCustom = this.IsCustom,
                 Latitude = this.Latitude,
                 Longitude = this.Longitude,
-                Pick = this.Pick.ToDTO(),
-                Type = this.Type.ToDTO()
+                Pick = this.Pick?.ToDTO(),
+                Type = this.Type?.ToDTO()
             };
         }
     }

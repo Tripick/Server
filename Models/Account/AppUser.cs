@@ -22,11 +22,11 @@ namespace TripickServer.Models
                 Id = this.Id,
                 FirstName = this.FirstName,
                 LastName = this.LastName,
-                Photo = this.Photo.ToDTO(),
-                Trips = this.Trips.ToDTO(),
-                GuestTrips = this.GuestTrips.ToDTO(),
-                WatchedTrips = this.WatchedTrips.ToDTO(),
-                Friendships = this.Friendships.ToDTO(),
+                Photo = this.Photo?.ToDTO(),
+                Trips = this.Trips?.ToDTO(),
+                GuestTrips = this.GuestTrips?.ToDTO(),
+                WatchedTrips = this.WatchedTrips?.ToDTO(),
+                Friendships = this.Friendships?.ToDTO(),
             };
         }
     }

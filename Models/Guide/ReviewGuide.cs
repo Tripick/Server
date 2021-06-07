@@ -37,7 +37,7 @@ namespace TripickServer.Models
                 Title = this.Title,
                 Message = this.Message,
                 CreationDate = this.CreationDate,
-                Votes = this.Votes.ToDTO(),
+                Votes = this.Votes?.ToDTO(),
             };
         }
     }

@@ -26,9 +26,9 @@ namespace TripickServer.Models
                 Id = this.Id,
                 IsMapFrame = this.IsMapFrame,
                 Name = this.Name,
-                BoundingBoxes = this.BoundingBoxes.ToDTO(),
+                BoundingBoxes = this.BoundingBoxes?.ToDTO(),
                 IdTrip = this.IdTrip,
-                Trip = this.Trip.ToDTO()
+                Trip = this.Trip?.ToDTO()
             };
         }
     }

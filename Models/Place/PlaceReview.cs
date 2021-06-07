@@ -41,14 +41,14 @@ namespace TripickServer.Models
                     FirstName = this.Author.FirstName,
                     LastName = this.Author.LastName,
                     UserName = this.Author.UserName,
-                    Photo = this.Author.Photo.ToDTO(),
+                    Photo = this.Author.Photo?.ToDTO(),
                 },
                 Rating = this.Rating,
                 Title = this.Title,
                 Message = this.Message,
-                Flags = this.Flags.ToDTO(),
-                Pictures = this.Pictures.ToDTO(),
-                Votes = this.Votes.ToDTO(),
+                Flags = this.Flags?.ToDTO(),
+                Pictures = this.Pictures?.ToDTO(),
+                Votes = this.Votes?.ToDTO(),
             };
         }
     }

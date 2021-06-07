@@ -56,9 +56,9 @@ namespace TripickServer.Models
                 Longitude = this.Longitude,
                 Rating = this.Rating,
                 NbRating = this.NbRating,
-                Images = this.Images.ToDTO(),
-                Flags = this.Flags.ToDTO(),
-                Reviews = this.Reviews.ToDTO(),
+                Images = this.Images?.ToDTO(),
+                Flags = this.Flags?.ToDTO(),
+                Reviews = this.Reviews?.ToDTO(),
             };
         }
     }

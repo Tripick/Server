@@ -75,12 +75,12 @@ namespace TripickServer.Models
                 EndLatitudeDelta = this.EndLatitudeDelta,
                 EndLongitude = this.EndLongitude,
                 EndLongitudeDelta = this.EndLongitudeDelta,
-                Region = this.Region,
-                Polygon = this.Polygon.ToDTO(),
-                Tiles = this.Tiles.ToDTO(),
-                Travelers = this.Members == null ? new List<Traveler>() : this.Members.Select(m => new Traveler(m)).ToList().ToDTO(),
-                Followers = this.Subscribers == null ? new List<Follower>() : this.Subscribers.Select(f => new Follower(f)).ToList().ToDTO(),
-                Itinerary = this.Itinerary.ToDTO()
+                Region = this.Region?.ToDTO(),
+                Polygon = this.Polygon?.ToDTO(),
+                Tiles = this.Tiles?.ToDTO(),
+                Travelers = this.Members == null ? new List<Traveler>() : this.Members.Select(m => new Traveler(m)).ToList()?.ToDTO(),
+                Followers = this.Subscribers == null ? new List<Follower>() : this.Subscribers.Select(f => new Follower(f)).ToList()?.ToDTO(),
+                Itinerary = this.Itinerary?.ToDTO()
             };
         }
     }
