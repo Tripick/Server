@@ -20,7 +20,6 @@ namespace TripickServer
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services
@@ -59,7 +58,8 @@ namespace TripickServer
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHttpsRedirection();
+            // TODO Hugo : Uncomment this line in production to use HTTPS !!!!
+            //app.UseHttpsRedirection();
 
             app.UseRouting();
 
