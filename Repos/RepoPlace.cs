@@ -48,12 +48,9 @@ namespace TripickServer.Repos
             var query = PredicateBuilder.New<Place>();
             foreach (BoundingBox area in areas)
             {
-                query = query.Or(p =>
-                    area.MinLat < p.Latitude &&
-                    area.MaxLat > p.Latitude &&
-                    area.MinLon < p.Longitude &&
-                    area.MaxLon > p.Longitude);
+                query = query.Or(p => area.MinLat < p.Latitude && area.MaxLat > p.Latitude && area.MinLon < p.Longitude && area.MaxLon > p.Longitude);
             }
+            query = query.And(query);
 
             // Include places who don't have filter information yet
             if(filters == null)
@@ -63,49 +60,57 @@ namespace TripickServer.Repos
             // Apply filters
             else if(filters.Any())
             {
-                int? minPrice = filters.FirstOrDefault(f => f.Name == "Price")?.Min;
-                int? maxPrice = filters.FirstOrDefault(f => f.Name == "Price")?.Max;
-                if (minPrice.HasValue && maxPrice.HasValue)
-                    query = query.And(p => p.Price >= minPrice.Value && p.Price <= maxPrice.Value);
+                //int? minPrice = filters.FirstOrDefault(f => f.Name == "Price")?.Min;
+                //int? maxPrice = filters.FirstOrDefault(f => f.Name == "Price")?.Max;
+                //if (minPrice.HasValue && maxPrice.HasValue)
+                //    query = query.And(p => p.Price >= minPrice.Value && p.Price <= maxPrice.Value);
 
-                int? minDifficulty = filters.FirstOrDefault(f => f.Name == "Difficulty")?.Min;
-                int? maxDifficulty = filters.FirstOrDefault(f => f.Name == "Difficulty")?.Max;
-                if (minDifficulty.HasValue && maxDifficulty.HasValue)
-                    query = query.And(p => p.Difficulty >= minDifficulty.Value && p.Difficulty <= maxDifficulty.Value);
+                //int? minDifficulty = filters.FirstOrDefault(f => f.Name == "Difficulty")?.Min;
+                //int? maxDifficulty = filters.FirstOrDefault(f => f.Name == "Difficulty")?.Max;
+                //if (minDifficulty.HasValue && maxDifficulty.HasValue)
+                //    query = query.And(p => p.Difficulty >= minDifficulty.Value && p.Difficulty <= maxDifficulty.Value);
 
-                int? minLength = filters.FirstOrDefault(f => f.Name == "Length")?.Min;
-                int? maxLength = filters.FirstOrDefault(f => f.Name == "Length")?.Max;
-                if (minLength.HasValue && maxLength.HasValue)
-                    query = query.And(p => p.Length >= minLength.Value && p.Length <= maxLength.Value);
+                //int? minLength = filters.FirstOrDefault(f => f.Name == "Length")?.Min;
+                //int? maxLength = filters.FirstOrDefault(f => f.Name == "Length")?.Max;
+                //if (minLength.HasValue && maxLength.HasValue)
+                //    query = query.And(p => p.Length >= minLength.Value && p.Length <= maxLength.Value);
 
-                int? minDuration = filters.FirstOrDefault(f => f.Name == "Duration")?.Min;
-                int? maxDuration = filters.FirstOrDefault(f => f.Name == "Duration")?.Max;
-                if (minDuration.HasValue && maxDuration.HasValue)
-                    query = query.And(p => p.Duration >= minDuration.Value && p.Duration <= maxDuration.Value);
+                //int? minDuration = filters.FirstOrDefault(f => f.Name == "Duration")?.Min;
+                //int? maxDuration = filters.FirstOrDefault(f => f.Name == "Duration")?.Max;
+                //if (minDuration.HasValue && maxDuration.HasValue)
+                //    query = query.And(p => p.Duration >= minDuration.Value && p.Duration <= maxDuration.Value);
 
-                int? minTouristy = filters.FirstOrDefault(f => f.Name == "Touristy")?.Min;
-                int? maxTouristy = filters.FirstOrDefault(f => f.Name == "Touristy")?.Max;
-                if (minTouristy.HasValue && maxTouristy.HasValue)
-                    query = query.And(p => p.Touristy >= minTouristy.Value && p.Touristy <= maxTouristy.Value);
+                //int? minTouristy = filters.FirstOrDefault(f => f.Name == "Touristy")?.Min;
+                //int? maxTouristy = filters.FirstOrDefault(f => f.Name == "Touristy")?.Max;
+                //if (minTouristy.HasValue && maxTouristy.HasValue)
+                //    query = query.And(p => p.Touristy >= minTouristy.Value && p.Touristy <= maxTouristy.Value);
             }
 
             // Skip those who were already picked before
             query = query.And(p => !alreadyShown.Contains(p.Id));
 
+            // Skip those who have no photo yet
+            query = query.And(p => p.Images.Any(i => i.Url != "NO_IMAGE"));
+
             // Get places according to query
             List<Place> places = this.TripickContext.Places.AsExpandable()
                 .Where(query)
                 .OrderByDescending(p => p.Rating)
+                .ThenByDescending(p => p.NbRating)
+                .Include(p => p.Images)
+                .Include(p => p.Flags)
+                .Include(p => p.Reviews)
                 .Take(quantity)
                 .ToList();
 
             // Include images and reviews
             foreach (Place place in places)
             {
-                place.Images = this.TripickContext.ImagePlaces.Where(i => i.IdPlace == place.Id).ToList();
+                place.Images = this.TripickContext.ImagePlaces.Where(i => i.IdPlace == place.Id && i.Url != "NO_IMAGE").OrderBy(x => x.Id).ToList();
                 place.Flags = GetFlags(place.Id);
                 place.Reviews = GetReviews(place.Id);
             }
+            //places = places.Where(p => p.Images.Any() || p.Reviews.Any(r => r.Pictures.Any())).ToList();
 
             return places;
         }

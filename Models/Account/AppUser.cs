@@ -20,6 +20,7 @@ namespace TripickServer.Models
             return new AppUser()
             {
                 Id = this.Id,
+                UserName = this.UserName,
                 FirstName = this.FirstName,
                 LastName = this.LastName,
                 Photo = this.Photo?.ToDTO(),
