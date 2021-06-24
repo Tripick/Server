@@ -37,6 +37,8 @@ namespace TripickServer.Models
         public Location Region { get; set; }
         public List<MapPoint> Polygon { get; set; }
         public List<MapTile> Tiles { get; set; }
+        [NotMapped]
+        public int NbPicks { get; set; }
 
         [ForeignKey("Owner")]
         public int IdOwner { get; set; }
@@ -80,6 +82,7 @@ namespace TripickServer.Models
                 Tiles = this.Tiles?.ToDTO(),
                 Travelers = this.Travelers != null && this.Travelers.Any() ? this.Travelers.ToDTO() : this.Members == null ? new List<Traveler>() : this.Members.Select(m => new Traveler(m)).ToList()?.ToDTO(),
                 Followers = this.Followers != null && this.Followers.Any() ? this.Followers.ToDTO() : this.Subscribers == null ? new List<Follower>() : this.Subscribers.Select(f => new Follower(f)).ToList()?.ToDTO(),
+                NbPicks = this.NbPicks,
                 Itinerary = this.Itinerary?.ToDTO()
             };
         }

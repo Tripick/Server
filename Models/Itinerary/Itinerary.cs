@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using TripickServer.Models.Common;
+using TripickServer.Utils;
 
 namespace TripickServer.Models
 {
@@ -27,6 +28,7 @@ namespace TripickServer.Models
             {
                 Id = this.Id,
                 IdTrip = this.IdTrip,
+                Days = this.Days.ToDTO(),
             };
         }
     }

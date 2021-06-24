@@ -31,7 +31,6 @@ namespace TripickServer.Models
                 Description = this.Description,
                 Note = this.Note,
                 IdItinerary = this.IdItinerary,
-                Itinerary = this.Itinerary?.ToDTO(),
                 ToBrings = this.ToBrings?.ToDTO(),
                 Steps = this.Steps?.ToDTO(),
             };

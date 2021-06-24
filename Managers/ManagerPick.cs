@@ -92,7 +92,7 @@ namespace TripickServer.Managers
             return new NextPicks() { Count = count, ExistingPicksCount = existingPicksCount, Picks = picks };
         }
 
-        public NextPicks SavePick(int idTrip, int idPlace, int rating, List<int> alreadyLoaded)
+        public bool SavePick(int idTrip, int idPlace, int rating)
         {
             // Save pick
             Pick pick = new Pick() { IdPlace = idPlace, IdUser = this.ConnectedUser().Id, IdTrip = idTrip, Rating = rating };
@@ -107,7 +107,7 @@ namespace TripickServer.Managers
             this.TripickContext.SaveChanges();
 
             // Send next pick
-            return GetNexts(idTrip, 1, alreadyLoaded);
+            return true;
         }
 
         #endregion

@@ -103,5 +103,16 @@ namespace TripickServer.Controllers
                 return Error("Trip - SaveFilters : Data required.");
             return managerFilter.SafeCall(() => managerFilter.Save(request.Data.IdTrip, request.Data.Filters));
         }
+
+
+        [HttpPost]
+        [Route("GetItinerary")]
+        public JsonResult GetItinerary([FromBody] Request<RequestGetItinerary> request)
+        {
+            if (request.Data == null)
+                return Error("Trip - GetItinerary : Data required.");
+            return managerTrip.SafeCall(() => managerTrip.GetItinerary(request.Data.IdTrip, request.Data.Regenerate));
+        }
+
     }
 }

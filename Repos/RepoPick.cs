@@ -19,6 +19,11 @@ namespace TripickServer.Repos
             return this.TripickContext.Picks.Where(p => p.IdUser == this.ConnectedUser().Id && p.IdTrip == idTrip).Count();
         }
 
+        public int CountNotZeroByTrip(int idTrip)
+        {
+            return this.TripickContext.Picks.Where(p => p.IdUser == this.ConnectedUser().Id && p.IdTrip == idTrip && p.Rating > 0).Count();
+        }
+
         public List<Pick> GetAll(int idTrip, int quantity, int skip)
         {
             List<Pick> picks = this.TripickContext.Picks
@@ -32,9 +37,19 @@ namespace TripickServer.Repos
             return picks;
         }
 
-        public List<Pick> GetAllByTrip(int idTrip)
+        public List<Pick> GetAllByTrip(int idTrip, int? minRating = null)
         {
+            if(minRating.HasValue)
+                return this.TripickContext.Picks.Where(p => p.IdUser == this.ConnectedUser().Id && p.IdTrip == idTrip && p.Rating > minRating.Value).ToList();
             return this.TripickContext.Picks.Where(p => p.IdUser == this.ConnectedUser().Id && p.IdTrip == idTrip).ToList();
+        }
+
+        public List<Pick> GetPicked(int idTrip)
+        {
+            return this.TripickContext.Picks
+                .Where(p => p.IdUser == this.ConnectedUser().Id && p.IdTrip == idTrip && p.Rating > 0)
+                .Include(p => p.Place)
+                .ToList();
         }
 
         public Pick Find(int idTrip, int idPlace)

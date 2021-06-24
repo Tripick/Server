@@ -57,7 +57,7 @@ namespace TripickServer.Controllers
         {
             if (request.Data == null)
                 return Error("Pick - SavePick : Data required.");
-            return managerPick.SafeCall(() => managerPick.SavePick(request.Data.IdTrip, request.Data.IdPlace, request.Data.Rating, request.Data.AlreadyLoaded));
+            return managerPick.SafeCallValueType(() => managerPick.SavePick(request.Data.IdTrip, request.Data.IdPlace, request.Data.Rating));
         }
     }
 }
