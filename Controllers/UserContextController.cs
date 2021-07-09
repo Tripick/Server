@@ -56,7 +56,7 @@ namespace TripickServer.Controllers
                 }
 
                 // Get all trips
-                List<Trip> trips = managerTrip.GetAll();
+                List<Trip> trips = managerTrip.GetAll(0, 3);
                 UserContext userContext = new UserContext(managerTrip.LoadConfiguration(), friends, trips, new List<Guide>());
                 return ServerResponse<UserContext>.ToJson(userContext?.ToDTO());
             }

@@ -36,9 +36,9 @@ namespace TripickServer.Controllers
 
         [HttpPost]
         [Route("Create")]
-        public JsonResult Create([FromBody] Request<string> request)
+        public JsonResult Create([FromBody] Request<RequestCreate> request)
         {
-            return managerTrip.SafeCall(() => managerTrip.Create());
+            return managerTrip.SafeCall(() => managerTrip.Create(request.Data.Name, request.Data.Photo));
         }
 
         [HttpPost]
@@ -111,7 +111,7 @@ namespace TripickServer.Controllers
         {
             if (request.Data == null)
                 return Error("Trip - GetItinerary : Data required.");
-            return managerTrip.SafeCall(() => managerTrip.GetItinerary(request.Data.IdTrip, request.Data.Regenerate));
+            return managerTrip.SafeCall(() => managerTrip.GetItinerary(request.Data.IdTrip, request.Data.ForceRegeneration));
         }
 
     }

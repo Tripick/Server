@@ -92,6 +92,12 @@ namespace TripickServer.Managers
             return new NextPicks() { Count = count, ExistingPicksCount = existingPicksCount, Picks = picks };
         }
 
+        public Pick GetSingle(int id)
+        {
+            Place place = this.repoPlace.GetComplete(id);
+            return new Pick() { Index = 0, IdPlace = id, IdTrip = 0, IdUser = this.ConnectedUser().Id, Rating = -1, Place = place };
+        }
+
         public bool SavePick(int idTrip, int idPlace, int rating)
         {
             // Save pick

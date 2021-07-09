@@ -52,6 +52,15 @@ namespace TripickServer.Controllers
         }
 
         [HttpPost]
+        [Route("GetSingle")]
+        public JsonResult GetSingle([FromBody] Request<RequestGetSingle> request)
+        {
+            if (request.Data == null)
+                return Error("Pick - GetSingle : Data required.");
+            return managerPick.SafeCall(() => managerPick.GetSingle(request.Data.Id));
+        }
+
+        [HttpPost]
         [Route("SavePick")]
         public JsonResult SavePick([FromBody] Request<RequestSavePick> request)
         {

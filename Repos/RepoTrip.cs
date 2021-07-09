@@ -23,6 +23,7 @@ namespace TripickServer.Repos
         {
             List<Trip> trips = this.TripickContext.Trips
                 .Where(t => !t.IsDeleted && t.IdOwner == this.ConnectedUser().Id)
+                .OrderByDescending(x => x.CreationDate)
                 .Skip(pageIndex * pageSize)
                 .Take(pageSize)
                 .Include(t => t.Members)

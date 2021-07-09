@@ -66,17 +66,17 @@ namespace TripickServer.Managers
             return trip;
         }
 
-        public Trip Create()
+        public Trip Create(string name, string photo)
         {
-            int numberOfTrips = this.repoTrip.Count() % 5;
-            Configuration configs = repoConfiguration.Get("TripCoverImage" + numberOfTrips);
+            //int numberOfTrips = this.repoTrip.Count() % 5;
+            //Configuration configs = repoConfiguration.Get("TripCoverImage" + numberOfTrips);
             // Create
             Trip trip = new Trip()
             {
                 IdOwner = this.ConnectedUser().Id,
                 IsPublic = false,
-                CoverImage = configs?.Value,
-                Name = "My new trip",
+                CoverImage = photo,
+                Name = name,
                 Description = string.Empty,
                 Note = string.Empty
             };
@@ -119,27 +119,50 @@ namespace TripickServer.Managers
             existing.EndLatitudeDelta = trip.EndLatitudeDelta;
             existing.EndLongitudeDelta = trip.EndLongitudeDelta;
 
-            if (existing.Region != null)
+            existing.NbPicks = this.repoPick.CountNotZeroByTrip(trip.Id);
+
+            if(trip.Region != null)
             {
-                existing.Region.Latitude = trip.Region.Latitude;
-                existing.Region.Longitude = trip.Region.Longitude;
-                existing.Region.LatitudeDelta = trip.Region.LatitudeDelta;
-                existing.Region.LongitudeDelta = trip.Region.LongitudeDelta;
+                existing.Region = new Location()
+                {
+                    IdTrip = existing.Id,
+                    Latitude = trip.Region.Latitude,
+                    Longitude = trip.Region.Longitude,
+                    LatitudeDelta = trip.Region.LatitudeDelta,
+                    LongitudeDelta = trip.Region.LongitudeDelta
+                };
             }
-            else
-                existing.Region = trip.Region;
+
             if(trip.Polygon != null)
             {
                 for (int i = 0; i < trip.Polygon.Count; i++)
                 {
-                    trip.Polygon[i].Index = i;
+                    trip.Polygon[i] = new MapPoint()
+                    {
+                        Index = i,
+                        IdTrip = existing.Id,
+                        Latitude = trip.Polygon[i].Latitude,
+                        Longitude = trip.Polygon[i].Longitude
+                    };
                 }
             }
             existing.Polygon = trip.Polygon;
-            existing.NbPicks = this.repoPick.CountNotZeroByTrip(trip.Id);
 
-            if (trip.Tiles != null && trip.Tiles.Any())
-                existing.Tiles = trip.Tiles;
+            if (trip.Tiles != null)
+            {
+                for (int i = 0; i < trip.Tiles.Count; i++)
+                {
+                    trip.Tiles[i] = new MapTile()
+                    {
+                        IdTrip = existing.Id,
+                        Latitude = trip.Tiles[i].Latitude,
+                        Longitude = trip.Tiles[i].Longitude,
+                        Height = trip.Tiles[i].Height,
+                        Width = trip.Tiles[i].Width
+                    };
+                }
+            }
+            existing.Tiles = trip.Tiles;
 
             // Commit
             this.TripickContext.SaveChanges();
@@ -217,6 +240,7 @@ namespace TripickServer.Managers
                 steps.Add(new ItineraryDayStep()
                 {
                     Index = 0,
+                    Time = null,
                     IsPassage = true,
                     IsStart = passage.IsStart,
                     IsEnd = passage.IsEnd,
@@ -234,6 +258,7 @@ namespace TripickServer.Managers
                     steps.Add(new ItineraryDayStep()
                     {
                         Index = indexStep,
+                        Time = null,
                         IsPassage = false,
                         IsVisit = indexStep < 3,
                         IsSuggestion = indexStep >= 3,
@@ -252,20 +277,58 @@ namespace TripickServer.Managers
             // Changer de chemin lorsque la pondération des chemins est plus faible que le chemin courant
             // NOTE : if there is more golden than the number of days, some golden must be grouped (maybe the closest ones can be done at once)
             // Or remove those who are too far away and add them as visit suggestions
-            List<ItineraryDay> orderedDays = new List<ItineraryDay>();
-            orderedDays.Add(days.Where(d => d.Steps[0].IsStart).First());
-            orderedDays.AddRange(days.Where(d => !d.Steps[0].IsStart && !d.Steps[0].IsEnd).ToList());
-            orderedDays.Add(days.Where(d => d.Steps[0].IsEnd).First());
-            days = orderedDays;
 
-            List<ItineraryDay> bestOrderedDays = findBestOrder(days);
-
-            Itinerary iti = new Itinerary() { };
-            //iti.Days = bestOrderedDays;
+            int i = 1;
+            foreach (ItineraryDay d in days)
+            {
+                d.Id = i;
+                i++;
+            }
+            Itinerary iti = new Itinerary() { IdTrip = idTrip, CreationDate = DateTime.Now, Days = findBestOrder(days), IsActive = false };
             return iti;
         }
 
         private List<ItineraryDay> findBestOrder(List<ItineraryDay> days)
+        {
+            ItineraryDay start = days.Where(d => d.Steps[0].IsStart).FirstOrDefault();
+            start.Index = 0;
+            ItineraryDay end = days.Where(d => d.Steps[0].IsEnd).FirstOrDefault();
+            days = days.Where(d => !d.Steps[0].IsStart && !d.Steps[0].IsEnd).ToList();
+            List<ItineraryDay> order = new List<ItineraryDay>() { start };
+            List<ItineraryDay> uncharteds = days.ToList();
+            ItineraryDay currentDay = start;
+            int i = 1;
+            while (order.Count < days.Count || uncharteds.Count <= 0)
+            {
+                int closestId = -1;
+                double closestDistance = double.PositiveInfinity;
+                foreach (ItineraryDay uncharted in uncharteds)
+                {
+                    double distance = Functions.CoordinatesDistance(
+                        currentDay.Steps[0].IsStart || currentDay.Steps[0].IsEnd ? currentDay.Steps[0].Latitude : currentDay.Steps[0].Visit.Place.Latitude,
+                        currentDay.Steps[0].IsStart || currentDay.Steps[0].IsEnd ? currentDay.Steps[0].Longitude : currentDay.Steps[0].Visit.Place.Longitude,
+                        uncharted.Steps[0].Visit.Place.Latitude,
+                        uncharted.Steps[0].Visit.Place.Longitude);
+                    if (distance < closestDistance)
+                    {
+                        closestDistance = distance;
+                        closestId = uncharted.Id;
+                    }
+                }
+                ItineraryDay nextDay = uncharteds.FirstOrDefault(d => d.Id == closestId);
+                nextDay.Index = i;
+                uncharteds.Remove(nextDay);
+                order.Add(nextDay);
+                currentDay = nextDay;
+                i++;
+            }
+
+            end.Index = order.Count;
+            order.Add(end);
+            return order.OrderBy(d => d.Index).ToList();
+        }
+
+        private List<ItineraryDay> findBestOrderStartEnd(List<ItineraryDay> days)
         {
             ItineraryDay start = days.Where(d => d.Steps[0].IsStart).FirstOrDefault();
             ItineraryDay end = days.Where(d => d.Steps[0].IsEnd).FirstOrDefault();
@@ -279,6 +342,11 @@ namespace TripickServer.Managers
             days = days.OrderBy(d => d.DistanceToStart - d.DistanceToEnd).ToList();
             days.Add(end);
             days.Insert(0, start);
+            for (int i = 0; i < days.Count; i++)
+            {
+                days[i].Index = i;
+            }
+            days = days.OrderBy(d => d.Index).ToList();
             return days;
         }
 

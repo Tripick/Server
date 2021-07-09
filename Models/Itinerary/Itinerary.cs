@@ -20,7 +20,7 @@ namespace TripickServer.Models
         public int IdTrip { get; set; }
         public virtual Trip Trip { get; set; }
 
-        public virtual List<Day> Days { get; set; }
+        public virtual List<ItineraryDay> Days { get; set; }
 
         public Itinerary ToDTO()
         {

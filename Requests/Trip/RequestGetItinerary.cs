@@ -7,6 +7,6 @@ namespace TripickServer.Requests.Trip
         [Required]
         public int IdTrip { get; set; }
         [Required]
-        public bool Regenerate { get; set; }
+        public bool ForceRegeneration { get; set; }
     }
 }
