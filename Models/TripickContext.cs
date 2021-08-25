@@ -43,6 +43,9 @@ namespace TripickServer.Models
                 .HasMany(x => x.Subscribers)
                 .WithMany(x => x.WatchedTrips);
 
+            modelBuilder.Entity<Place>()
+                .HasIndex(p => new { p.NbRating, p.Rating });
+
             base.OnModelCreating(modelBuilder);
         }
 
@@ -69,6 +72,8 @@ namespace TripickServer.Models
         public DbSet<Destination> Destinations { get; set; }
         public DbSet<Pick> Picks { get; set; }
         public DbSet<Itinerary> Itineraries { get; set; }
+        public DbSet<ItineraryDay> ItineraryDays { get; set; }
+        public DbSet<ItineraryDayStep> ItineraryDaySteps { get; set; }
         public DbSet<Day> Days { get; set; }
         public DbSet<Step> Steps { get; set; }
         public DbSet<TypeStep> TypeSteps { get; set; }
@@ -78,9 +83,6 @@ namespace TripickServer.Models
         public DbSet<Location> Locations { get; set; }
         public DbSet<MapPoint> MapPoint { get; set; }
         public DbSet<MapTile> MapTiles { get; set; }
-
-        // Filters
-        public DbSet<Filter> Filters { get; set; }
 
         // Guides
         public DbSet<Guide> Guides { get; set; }

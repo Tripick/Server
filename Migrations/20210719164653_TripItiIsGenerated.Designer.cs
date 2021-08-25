@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TripickServer.Models;
@@ -9,9 +10,10 @@ using TripickServer.Models;
 namespace TripickServer.Migrations
 {
     [DbContext(typeof(TripickContext))]
-    partial class TripickContextModelSnapshot : ModelSnapshot
+    [Migration("20210719164653_TripItiIsGenerated")]
+    partial class TripItiIsGenerated
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -202,9 +204,6 @@ namespace TripickServer.Migrations
                     b.Property<string>("FirstName")
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("LastConnectionDate")
-                        .HasColumnType("timestamp without time zone");
-
                     b.Property<string>("LastName")
                         .HasColumnType("text");
 
@@ -213,9 +212,6 @@ namespace TripickServer.Migrations
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("NewConnectionDate")
-                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -670,9 +666,6 @@ namespace TripickServer.Migrations
                     b.Property<int>("Index")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Name")
-                        .HasColumnType("text");
-
                     b.HasKey("Id");
 
                     b.HasIndex("IdItinerary");
@@ -924,8 +917,6 @@ namespace TripickServer.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("NbRating", "Rating");
 
                     b.ToTable("Places");
                 });

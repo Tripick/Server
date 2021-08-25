@@ -21,13 +21,21 @@ namespace TripickServer.Models
         public double VisitLikely { get; set; }
         public double Latitude { get; set; }
         public double Longitude { get; set; }
-        public Pick Visit { get; set; }
+
+        [ForeignKey("Day")]
+        public int IdDay { get; set; }
+        public virtual ItineraryDay Day { get; set; }
+
+        [ForeignKey("Visit")]
+        public int? IdVisit { get; set; }
+        public virtual Pick Visit { get; set; }
 
         public ItineraryDayStep ToDTO()
         {
             return new ItineraryDayStep()
             {
                 Id = this.Id,
+                IdDay = this.IdDay,
                 Index = this.Index,
                 Time = this.Time,
                 IsPassage = this.IsPassage,
@@ -39,6 +47,7 @@ namespace TripickServer.Models
                 VisitLikely = this.VisitLikely,
                 Latitude = this.Latitude,
                 Longitude = this.Longitude,
+                IdVisit = this.IdVisit,
                 Visit = this.Visit?.ToDTO(),
             };
         }

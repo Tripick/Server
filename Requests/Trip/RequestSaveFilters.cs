@@ -6,6 +6,7 @@ namespace TripickServer.Requests.Trip
     public class RequestSaveFilters
     {
         public int IdTrip { get; set; }
-        public List<Filter> Filters { get; set; }
+        public List<PlaceFlag> Filters { get; set; }
+        public int QuantityToLoad { get; set; }
     }
 }

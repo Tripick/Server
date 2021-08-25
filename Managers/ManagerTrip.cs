@@ -19,7 +19,9 @@ namespace TripickServer.Managers
         private RepoConfiguration repoConfiguration;
         private RepoTrip repoTrip;
         private RepoPick repoPick;
-        private RepoFilter repoFilter;
+        private RepoPlaceFlag repoFilter;
+        private RepoItinerary repoItinerary;
+        private RepoItineraryDay repoItineraryDay;
 
         #endregion
 
@@ -30,7 +32,9 @@ namespace TripickServer.Managers
             this.repoConfiguration = new RepoConfiguration(this.ConnectedUser, tripickContext);
             this.repoTrip = new RepoTrip(this.ConnectedUser, tripickContext);
             this.repoPick = new RepoPick(this.ConnectedUser, tripickContext);
-            this.repoFilter = new RepoFilter(this.ConnectedUser, tripickContext);
+            this.repoFilter = new RepoPlaceFlag(this.ConnectedUser, tripickContext);
+            this.repoItinerary = new RepoItinerary(this.ConnectedUser, tripickContext);
+            this.repoItineraryDay = new RepoItineraryDay(this.ConnectedUser, tripickContext);
         }
 
         #endregion
@@ -43,18 +47,7 @@ namespace TripickServer.Managers
             trips.ForEach(trip =>
             {
                 trip.NbPicks = this.repoPick.CountNotZeroByTrip(trip.Id);
-                trip.Filters = this.repoFilter.Get(f => f.IdTrip == trip.Id && f.IdUser == this.ConnectedUser().Id).ToList();
-                if (!trip.Filters.Any())
-                {
-                    trip.Filters = new List<Filter>()
-                    {
-                        new Filter() { IdTrip = trip.Id, IdUser = this.ConnectedUser().Id, Name="Price", Min = 0, Max = 99 },
-                        new Filter() { IdTrip = trip.Id, IdUser = this.ConnectedUser().Id, Name = "Length", Min = 0, Max = 300 },
-                        new Filter() { IdTrip = trip.Id, IdUser = this.ConnectedUser().Id, Name = "Duration", Min = 0, Max = 999 },
-                        new Filter() { IdTrip = trip.Id, IdUser = this.ConnectedUser().Id, Name = "Difficulty", Min = 0, Max = 5 },
-                        new Filter() { IdTrip = trip.Id, IdUser = this.ConnectedUser().Id, Name = "Touristy", Min = 0, Max = 5 }
-                    };
-                }
+                trip.Filters = this.repoFilter.GetFilters(trip.Id);
             });
             return trips;
         }
@@ -169,8 +162,14 @@ namespace TripickServer.Managers
             return existing;
         }
 
+        #region Itinerary
+
         public Itinerary GetItinerary(int idTrip, bool regenerate)
         {
+            Itinerary iti = this.TripickContext.Itineraries.FirstOrDefault(x => x.IdTrip == idTrip);
+            if (iti != null)
+                return this.repoItinerary.GetByIdTrip(idTrip);
+
             // Get trip
             Trip trip = this.repoTrip.GetById(idTrip);
             int nbDays = Convert.ToInt32((trip.EndDate.Value - trip.StartDate.Value).TotalDays);
@@ -178,7 +177,7 @@ namespace TripickServer.Managers
             // Get all picks that weren't rated 0/5
             List<Pick> picks = this.repoPick.GetPicked(idTrip).OrderByDescending(p => p.Rating).ToList();
 
-            // PASSAGES : is list of all locations the user will go through => Start location + End location + Best picks
+            // PASSAGES : is the list of all locations the user will absolutely go to => Start location + End location + Best picks
             List<Passage> passages = new List<Passage>();
             passages.Add(new Passage() { IsStart = true, Latitude = trip.StartLatitude.Value, Longitude = trip.StartLongitude.Value });
             passages.AddRange(picks.Take(nbDays).Select(p => new Passage() { Pick = p, Latitude = p.Place.Latitude, Longitude = p.Place.Longitude }).ToList());
@@ -217,7 +216,7 @@ namespace TripickServer.Managers
             // Must be between 0.5 and 1.5 (result must be between 0.1 and 4.9, not to be eliminated or better than a passage)
             // The lower the distance, the higher the ponderation
             // The ponderation can be between -2.5 and +2.5 (but the rating must be 0 < rating < 5)
-            double avgDistance = closestPassages.Average(x => x.Distance);
+            double avgDistance = closestPassages.Any() ? closestPassages.Average(x => x.Distance) : 0;
             double ponderationFactor = 2.5;
             foreach (Passage passage in visits.Keys)
             {
@@ -277,50 +276,122 @@ namespace TripickServer.Managers
             // Changer de chemin lorsque la pondération des chemins est plus faible que le chemin courant
             // NOTE : if there is more golden than the number of days, some golden must be grouped (maybe the closest ones can be done at once)
             // Or remove those who are too far away and add them as visit suggestions
-
             int i = 1;
+            days.AddRange(Enumerable.Range(0, nbDays - days.Count).Select(n => new ItineraryDay() { Steps = new List<ItineraryDayStep>() }));
             foreach (ItineraryDay d in days)
             {
-                d.Id = i;
+                d.Index = i;
                 i++;
             }
-            Itinerary iti = new Itinerary() { IdTrip = idTrip, CreationDate = DateTime.Now, Days = findBestOrder(days), IsActive = false };
+            days = findBestOrder(days);
+            // Remove start and end points from activities
+            days.ForEach(d =>
+            {
+                d.Steps = d.Steps.Where(s => !s.IsStart && !s.IsEnd).OrderByDescending(s => s.Visit.Rating).ToList();
+                if(d.Steps.Any()) d.Steps.First().IsPassage = true;
+            });
+
+            i = 0;
+            foreach (ItineraryDay d in days)
+            {
+                d.Date = trip.StartDate.Value.Date.AddDays(i);
+                int j = 0;
+                foreach (ItineraryDayStep s in d.Steps.Where(s => s.IsPassage))
+                {
+                    s.Index = j;
+                    s.Time = d.Date;
+                    if (s.Visit != null)
+                    {
+                        s.IdVisit = s.Visit.Id;
+                        s.Visit = null;
+                    }
+                    j++;
+                }
+                foreach (ItineraryDayStep s in d.Steps.Where(s => !s.IsPassage && s.IsVisit))
+                {
+                   s.Index = j;
+                   s.Time = d.Date;
+                   if (s.Visit != null)
+                   {
+                       s.IdVisit = s.Visit.Id;
+                       s.Visit = null;
+                    }
+                   j++;
+                }
+                foreach (ItineraryDayStep s in d.Steps.Where(s => !s.IsPassage && !s.IsVisit && s.IsSuggestion))
+                {
+                    s.Index = j;
+                    s.Time = d.Date;
+                    if (s.Visit != null)
+                    {
+                        s.IdVisit = s.Visit.Id;
+                        s.Visit = null;
+                    }
+                    j++;
+                }
+                i++;
+            }
+
+            //if (iti != null)
+            //    this.TripickContext.ItineraryDays.RemoveRange(this.TripickContext.ItineraryDays.Where(x => x.IdItinerary == iti.Id).ToArray());
+            //else
+            iti = new Itinerary();
+            iti.IdTrip = idTrip;
+            iti.CreationDate = DateTime.Now;
+            iti.Days = days;
+            iti.IsActive = false;
+
+            this.TripickContext.Itineraries.Add(iti);
+            trip.IsItineraryGenerated = true;
+            this.TripickContext.SaveChanges();
+
             return iti;
         }
 
         private List<ItineraryDay> findBestOrder(List<ItineraryDay> days)
         {
-            ItineraryDay start = days.Where(d => d.Steps[0].IsStart).FirstOrDefault();
+            ItineraryDay start = days.Where(d => d.Steps.Any() && d.Steps[0].IsStart).FirstOrDefault();
             start.Index = 0;
-            ItineraryDay end = days.Where(d => d.Steps[0].IsEnd).FirstOrDefault();
-            days = days.Where(d => !d.Steps[0].IsStart && !d.Steps[0].IsEnd).ToList();
+            ItineraryDay end = days.Where(d => d.Steps.Any() && d.Steps[0].IsEnd).FirstOrDefault();
+            days = days.Where(d => !d.Steps.Any() || (!d.Steps[0].IsStart && !d.Steps[0].IsEnd)).ToList();
             List<ItineraryDay> order = new List<ItineraryDay>() { start };
-            List<ItineraryDay> uncharteds = days.ToList();
+            List<ItineraryDay> uncharteds = days.Where(d => d.Steps.Any()).ToList();
+            List<ItineraryDay> emptyDays = days.Where(d => !d.Steps.Any()).ToList();
             ItineraryDay currentDay = start;
             int i = 1;
             while (order.Count < days.Count || uncharteds.Count <= 0)
             {
                 int closestId = -1;
                 double closestDistance = double.PositiveInfinity;
-                foreach (ItineraryDay uncharted in uncharteds)
+                if(currentDay.Steps.Any() && uncharteds.Any())
                 {
-                    double distance = Functions.CoordinatesDistance(
-                        currentDay.Steps[0].IsStart || currentDay.Steps[0].IsEnd ? currentDay.Steps[0].Latitude : currentDay.Steps[0].Visit.Place.Latitude,
-                        currentDay.Steps[0].IsStart || currentDay.Steps[0].IsEnd ? currentDay.Steps[0].Longitude : currentDay.Steps[0].Visit.Place.Longitude,
-                        uncharted.Steps[0].Visit.Place.Latitude,
-                        uncharted.Steps[0].Visit.Place.Longitude);
-                    if (distance < closestDistance)
+                    foreach (ItineraryDay uncharted in uncharteds)
                     {
-                        closestDistance = distance;
-                        closestId = uncharted.Id;
+                        double distance = Functions.CoordinatesDistance(
+                            currentDay.Steps[0].IsStart || currentDay.Steps[0].IsEnd ? currentDay.Steps[0].Latitude : currentDay.Steps[0].Visit.Place.Latitude,
+                            currentDay.Steps[0].IsStart || currentDay.Steps[0].IsEnd ? currentDay.Steps[0].Longitude : currentDay.Steps[0].Visit.Place.Longitude,
+                            uncharted.Steps[0].Visit.Place.Latitude,
+                            uncharted.Steps[0].Visit.Place.Longitude);
+                        if (distance < closestDistance)
+                        {
+                            closestDistance = distance;
+                            closestId = uncharted.Index;
+                        }
                     }
+                    ItineraryDay nextDay = uncharteds.FirstOrDefault(d => d.Index == closestId);
+                    uncharteds.Remove(nextDay);
+                    nextDay.Index = i;
+                    order.Add(nextDay);
+                    currentDay = nextDay;
+                    i++;
                 }
-                ItineraryDay nextDay = uncharteds.FirstOrDefault(d => d.Id == closestId);
-                nextDay.Index = i;
-                uncharteds.Remove(nextDay);
-                order.Add(nextDay);
-                currentDay = nextDay;
-                i++;
+                else
+                {
+                    // Add the days that don't have any step at the end of the list
+                    order.AddRange(emptyDays);
+                    for (; i < order.Count; i++) { order[i].Index = i; }
+                    break;
+                }
             }
 
             end.Index = order.Count;
@@ -402,6 +473,159 @@ namespace TripickServer.Managers
             return distances;
         }
 
+        public bool SaveDays(int idTrip, List<ItineraryDay> days)
+        {
+            Trip trip = this.TripickContext.Trips.FirstOrDefault(x => x.Id == idTrip && x.IdOwner == this.ConnectedUser().Id);
+            if (trip == null)
+                throw new NullReferenceException("The trip to update is not yours.");
+
+            Itinerary existingItinerary = this.repoItinerary.GetByIdTrip(idTrip);
+            if (existingItinerary == null)
+                throw new NullReferenceException("The itinerary to update does not exist.");
+
+            // Delete those who are not in the new list of days
+            ItineraryDay[] daysToDelete = existingItinerary.Days.Where(d => !days.Any(x => x.Id == d.Id)).ToArray();
+            days = days.Where(d => !daysToDelete.Any((x => x.Id == d.Id))).OrderBy(d => d.Index).ToList();
+            ItineraryDay startDay = days.First(d => d.Index == days.Min(dd => dd.Index));
+            days.ForEach(d => d.Date = startDay.Date.AddDays(d.Index));
+            for (int i = 0; i < days.Count; i++) { days[i].Index = i; } // Refresh days indexes
+            if (daysToDelete.Any())
+            {
+                this.TripickContext.ItineraryDays.RemoveRange(daysToDelete);
+                this.TripickContext.SaveChanges();
+            }
+
+            // Add those who are new in the list
+            List<ItineraryDay> daysToAdd = days.Where(d => !existingItinerary.Days.Any(x => x.Id == d.Id)).Select(d => new ItineraryDay()
+            {
+                //DistanceToStart = 0,
+                //DistanceToEnd = 0,
+                Date = d.Date,
+                IdItinerary = existingItinerary.Id,
+                Index = d.Index,
+                Name = d.Name,
+                Steps = d.Steps == null ? new List<ItineraryDayStep>() : d.Steps.Select(s => new ItineraryDayStep()
+                {
+                    //IdDay = d.Id,
+                    //DistanceToPassage = 0,
+                    //Latitude = 0,
+                    //Longitude = 0,
+                    //VisitLikely = 0,
+                    //IsEnd = false,
+                    //IsStart = false,
+                    //IsPassage = false,
+                    //IsSuggestion = false,
+                    IdVisit = s.IdVisit, // IdVisit always arrives as the Id of the place selected (need to find/create the pick related to this place)
+                    Index = s.Index,
+                    IsVisit = true,
+                    Time = s.Time,
+                }).ToList()
+            }).ToList();
+
+            // Find/Create pick related to each IdVisit of each step of each day
+            daysToAdd.ForEach(dta =>
+            {
+                dta.Steps.ForEach(s =>
+                {
+                    int idPlace = s.IdVisit.Value; // Only start and end don't have an IdVisit (since there's no visit to do on start and end)
+                    // Find the (potentially) existing pick for the place
+                    Pick existingPick = this.repoPick.GetByIdPlace(idTrip, idPlace);
+                    if (existingPick != null)
+                        s.IdVisit = existingPick.Id;
+                    else
+                    {
+                        Pick pickToCreate = new Pick()
+                        {
+                            // Index = 0, This is only used to order the picks to be displayed to the user on the pick page, no need for index here
+                            IdTrip = idTrip,
+                            IdPlace = idPlace,
+                            IdUser = this.ConnectedUser().Id,
+                            Rating = 5 // The place has been selected especially by the user, we assume that he really wants to go there so gets the maximum rate
+                        };
+                        this.TripickContext.Picks.Add(pickToCreate);
+                        this.TripickContext.SaveChanges();
+                        s.IdVisit = pickToCreate.Id;
+                    }
+                });
+            });
+
+            // Apply changes
+            this.TripickContext.ItineraryDays.AddRange(daysToAdd.ToArray());
+            existingItinerary.Days
+                .Where(d => days.Any(dd => dd.Id == d.Id))
+                .ToList()
+                .ForEach(d => { d.Index = days.First(x => x.Id == d.Id).Index; d.Date = days.First(x => x.Id == d.Id).Date; });
+            this.TripickContext.SaveChanges();
+            return true;
+        }
+
+        public bool SaveDay(int idTrip, ItineraryDay day)
+        {
+            Trip trip = this.TripickContext.Trips.FirstOrDefault(x => x.Id == idTrip && x.IdOwner == this.ConnectedUser().Id);
+            if (trip == null)
+                throw new NullReferenceException("The trip to update is not yours.");
+
+            ItineraryDay existingDay = this.repoItineraryDay.GetById(day.Id);
+            if (existingDay == null)
+                throw new NullReferenceException("The day to update does not exist.");
+
+            existingDay.Name = day.Name;
+
+            this.TripickContext.SaveChanges();
+            return true;
+        }
+
+        public ItineraryDay SaveSteps(int idTrip, int idDay, List<ItineraryDayStep> steps)
+        {
+            Trip trip = this.TripickContext.Trips.FirstOrDefault(x => x.Id == idTrip && x.IdOwner == this.ConnectedUser().Id);
+            if (trip == null)
+                throw new NullReferenceException("The trip to update is not yours.");
+            bool doesDayExist = this.repoItineraryDay.GetById(idDay) != null;
+            if (!doesDayExist)
+                throw new NullReferenceException("The day to update does not exist.");
+            this.TripickContext.ItineraryDaySteps.RemoveRange(this.TripickContext.ItineraryDaySteps.Where(x => x.IdDay == idDay).ToArray());
+            this.TripickContext.SaveChanges();
+
+            ItineraryDay day = this.repoItineraryDay.GetWithSteps(idDay);
+            day.Steps = steps.Select(s => new ItineraryDayStep()
+            {
+                DistanceToPassage = s.DistanceToPassage,
+                IdDay = day.Id,
+                IdVisit = s.IdVisit,
+                Index = s.Index,
+                IsEnd = s.IsEnd,
+                IsStart = s.IsStart,
+                IsPassage = s.IsPassage,
+                IsSuggestion = s.IsSuggestion,
+                IsVisit = s.IsVisit,
+                Latitude = s.Latitude,
+                Longitude = s.Longitude,
+                Time = s.Time,
+                VisitLikely = s.VisitLikely
+            }).ToList();
+            this.TripickContext.SaveChanges();
+            return day;
+        }
+
+        public bool MoveStep(int idTrip, int idOldDay, int idNewDay, int idStep)
+        {
+            Trip trip = this.TripickContext.Trips.FirstOrDefault(x => x.Id == idTrip && x.IdOwner == this.ConnectedUser().Id);
+            if (trip == null)
+                throw new NullReferenceException("The trip to update is not yours.");
+            ItineraryDay oldDay = this.repoItineraryDay.GetById(idOldDay);
+            if (oldDay == null)
+                throw new NullReferenceException("The old day to update does not exist.");
+            ItineraryDay newDay = this.repoItineraryDay.GetById(idNewDay);
+            if (newDay == null)
+                throw new NullReferenceException("The new day to update does not exist.");
+            ItineraryDayStep step = this.TripickContext.ItineraryDaySteps.Where(x => x.Id == idStep).FirstOrDefault();
+            step.IdDay = newDay.Id;
+            this.TripickContext.SaveChanges();
+            return true;
+        }
+
+        #endregion
+
         public bool Delete(int id)
         {
             // Verify the entity to update exists
@@ -439,6 +663,21 @@ namespace TripickServer.Managers
             // Commit
             this.TripickContext.SaveChanges();
             return existing.CoverImage;
+        }
+
+        public bool SaveFilters(int idTrip, List<PlaceFlag> filters)
+        {
+            // Verify the entity to update exists
+            Trip existing = this.repoTrip.GetById(idTrip);
+            if (existing == null)
+                throw new NullReferenceException($"The trip [Id={idTrip}] does not exist");
+            // Verify the entity is mine
+            if (existing.IdOwner != this.ConnectedUser().Id)
+                throw new NullReferenceException("The trip does not belong to you");
+
+            this.repoFilter.Save(idTrip, filters);
+
+            return true;
         }
 
         #endregion

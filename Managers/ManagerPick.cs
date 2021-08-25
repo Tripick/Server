@@ -18,7 +18,7 @@ namespace TripickServer.Managers
         private RepoTrip repoTrip;
         private RepoPlace repoPlace;
         private RepoPick repoPick;
-        private RepoFilter repoFilter;
+        private RepoPlaceFlag repoFilter;
 
         #endregion
 
@@ -29,7 +29,7 @@ namespace TripickServer.Managers
             this.repoTrip = new RepoTrip(this.ConnectedUser, tripickContext);
             this.repoPlace = new RepoPlace(this.ConnectedUser, tripickContext);
             this.repoPick = new RepoPick(this.ConnectedUser, tripickContext);
-            this.repoFilter = new RepoFilter(this.ConnectedUser, tripickContext);
+            this.repoFilter = new RepoPlaceFlag(this.ConnectedUser, tripickContext);
         }
 
         #endregion
@@ -60,14 +60,14 @@ namespace TripickServer.Managers
             // Get existing picks for this user and trip
             List<Pick> existingPicks = this.repoPick.GetAllByTrip(idTrip);
             List<int> existingPicksIds = existingPicks.Select(x => x.IdPlace).ToList();
-            int existingPicksCount = existingPicksIds.Count;
+            int existingPicksCount = existingPicks.Count(p => p.Rating > 0);
 
             // Exclude ids to exclude
             if(alreadyLoaded != null && alreadyLoaded.Any())
                 existingPicksIds.AddRange(alreadyLoaded);
 
             // Get filters of the connected user for the trip
-            List<Filter> filters = this.repoFilter.GetAllForTrip(idTrip);
+            List<PlaceFlag> filters = this.repoFilter.GetFilters(idTrip);
 
             // Get places respecting area
             List<Place> places = this.repoPlace.GetNextsToPick(existingPicksIds, areas, filters, quantity);
@@ -98,7 +98,7 @@ namespace TripickServer.Managers
             return new Pick() { Index = 0, IdPlace = id, IdTrip = 0, IdUser = this.ConnectedUser().Id, Rating = -1, Place = place };
         }
 
-        public bool SavePick(int idTrip, int idPlace, int rating)
+        public int SavePick(int idTrip, int idPlace, int rating)
         {
             // Save pick
             Pick pick = new Pick() { IdPlace = idPlace, IdUser = this.ConnectedUser().Id, IdTrip = idTrip, Rating = rating };
@@ -112,8 +112,8 @@ namespace TripickServer.Managers
             // Commit
             this.TripickContext.SaveChanges();
 
-            // Send next pick
-            return true;
+            // Send pick count
+            return this.repoPick.CountNotZeroByTrip(idTrip);
         }
 
         #endregion

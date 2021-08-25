@@ -35,7 +35,7 @@ namespace TripickServer.Models
                 IdPlace = this.IdPlace,
                 IdUser = this.IdUser,
                 Place = this.Place?.ToDTO(),
-                Trip = this.Trip?.ToDTO(),
+                //Trip = this.Trip?.ToDTO(),
             };
         }
     }

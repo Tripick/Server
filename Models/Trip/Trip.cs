@@ -43,8 +43,8 @@ namespace TripickServer.Models
         [ForeignKey("Owner")]
         public int IdOwner { get; set; }
         public virtual AppUser Owner { get; set; }
-        [NotMapped]
-        public List<Filter> Filters { get; set; }
+
+        public List<PlaceFlag> Filters { get; set; }
 
         public virtual List<AppUser> Members { get; set; }
         [NotMapped]
@@ -53,6 +53,7 @@ namespace TripickServer.Models
         public virtual List<AppUser> Subscribers { get; set; }
         [NotMapped]
         public List<Follower> Followers { get; set; }
+        public bool IsItineraryGenerated { get; set; }
 
         public virtual Itinerary Itinerary { get; set; }
 
@@ -78,11 +79,13 @@ namespace TripickServer.Models
                 EndLongitude = this.EndLongitude,
                 EndLongitudeDelta = this.EndLongitudeDelta,
                 Region = this.Region?.ToDTO(),
+                Filters = this.Filters?.ToDTO(),
                 Polygon = this.Polygon?.ToDTO().OrderBy(p => p.Index).ToList(),
                 Tiles = this.Tiles?.ToDTO(),
                 Travelers = this.Travelers != null && this.Travelers.Any() ? this.Travelers.ToDTO() : this.Members == null ? new List<Traveler>() : this.Members.Select(m => new Traveler(m)).ToList()?.ToDTO(),
                 Followers = this.Followers != null && this.Followers.Any() ? this.Followers.ToDTO() : this.Subscribers == null ? new List<Follower>() : this.Subscribers.Select(f => new Follower(f)).ToList()?.ToDTO(),
                 NbPicks = this.NbPicks,
+                IsItineraryGenerated = this.IsItineraryGenerated,
                 Itinerary = this.Itinerary?.ToDTO()
             };
         }

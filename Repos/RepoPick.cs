@@ -56,5 +56,10 @@ namespace TripickServer.Repos
         {
             return this.TripickContext.Picks.Where(p => p.IdUser == this.ConnectedUser().Id && p.IdTrip == idTrip && p.IdPlace == idPlace).FirstOrDefault();
         }
+
+        public Pick GetByIdPlace(int idTrip, int idPlace)
+        {
+            return this.TripickContext.Picks.Where(p => p.IdUser == this.ConnectedUser().Id && p.IdTrip == idTrip && p.IdPlace == idPlace).FirstOrDefault();
+        }
     }
 }

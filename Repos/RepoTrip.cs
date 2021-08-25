@@ -28,6 +28,7 @@ namespace TripickServer.Repos
                 .Take(pageSize)
                 .Include(t => t.Members)
                 .Include(t => t.Subscribers)
+                //.Include(t => t.Itinerary).ThenInclude(i => i.Days).ThenInclude(d => d.Steps).ThenInclude(s => s.Visit).ThenInclude(v => v.Place)
                 .ToList();
 
             foreach (Trip trip in trips)

@@ -42,7 +42,7 @@ namespace TripickServer.Repos
             return place;
         }
 
-        public List<Place> GetNextsToPick(List<int> alreadyShown, List<BoundingBox> areas, List<Filter> filters, int quantity)
+        public List<Place> GetNextsToPick(List<int> alreadyShown, List<BoundingBox> areas, List<PlaceFlag> filters, int quantity)
         {
             // Places in area of Trip
             var query = PredicateBuilder.New<Place>();
@@ -95,8 +95,8 @@ namespace TripickServer.Repos
             // Get places according to query
             List<Place> places = this.TripickContext.Places.AsExpandable()
                 .Where(query)
-                .OrderByDescending(p => p.Rating)
-                .ThenByDescending(p => p.NbRating)
+                .OrderByDescending(p => p.NbRating)
+                .ThenByDescending(p => p.Rating)
                 .Include(p => p.Images)
                 .Include(p => p.Flags)
                 .Include(p => p.Reviews)
@@ -115,7 +115,7 @@ namespace TripickServer.Repos
             return places;
         }
 
-        public int CountNextsToPick(List<int> alreadyShown, List<BoundingBox> areas, List<Filter> filters)
+        public int CountNextsToPick(List<int> alreadyShown, List<BoundingBox> areas, List<PlaceFlag> filters)
         {
             // Places in area of Trip
             var query = PredicateBuilder.New<Place>();
@@ -136,30 +136,30 @@ namespace TripickServer.Repos
             // Apply filters
             else if (filters.Any())
             {
-                int? minPrice = filters.FirstOrDefault(f => f.Name == "Price")?.Min;
-                int? maxPrice = filters.FirstOrDefault(f => f.Name == "Price")?.Max;
-                if (minPrice.HasValue && maxPrice.HasValue)
-                    query = query.And(p => p.Price >= minPrice.Value && p.Price <= maxPrice.Value);
+                //int? minPrice = filters.FirstOrDefault(f => f.Name == "Price")?.Min;
+                //int? maxPrice = filters.FirstOrDefault(f => f.Name == "Price")?.Max;
+                //if (minPrice.HasValue && maxPrice.HasValue)
+                //    query = query.And(p => p.Price >= minPrice.Value && p.Price <= maxPrice.Value);
 
-                int? minDifficulty = filters.FirstOrDefault(f => f.Name == "Difficulty")?.Min;
-                int? maxDifficulty = filters.FirstOrDefault(f => f.Name == "Difficulty")?.Max;
-                if (minDifficulty.HasValue && maxDifficulty.HasValue)
-                    query = query.And(p => p.Difficulty >= minDifficulty.Value && p.Difficulty <= maxDifficulty.Value);
+                //int? minDifficulty = filters.FirstOrDefault(f => f.Name == "Difficulty")?.Min;
+                //int? maxDifficulty = filters.FirstOrDefault(f => f.Name == "Difficulty")?.Max;
+                //if (minDifficulty.HasValue && maxDifficulty.HasValue)
+                //    query = query.And(p => p.Difficulty >= minDifficulty.Value && p.Difficulty <= maxDifficulty.Value);
 
-                int? minLength = filters.FirstOrDefault(f => f.Name == "Length")?.Min;
-                int? maxLength = filters.FirstOrDefault(f => f.Name == "Length")?.Max;
-                if (minLength.HasValue && maxLength.HasValue)
-                    query = query.And(p => p.Length >= minLength.Value && p.Length <= maxLength.Value);
+                //int? minLength = filters.FirstOrDefault(f => f.Name == "Length")?.Min;
+                //int? maxLength = filters.FirstOrDefault(f => f.Name == "Length")?.Max;
+                //if (minLength.HasValue && maxLength.HasValue)
+                //    query = query.And(p => p.Length >= minLength.Value && p.Length <= maxLength.Value);
 
-                int? minDuration = filters.FirstOrDefault(f => f.Name == "Duration")?.Min;
-                int? maxDuration = filters.FirstOrDefault(f => f.Name == "Duration")?.Max;
-                if (minDuration.HasValue && maxDuration.HasValue)
-                    query = query.And(p => p.Duration >= minDuration.Value && p.Duration <= maxDuration.Value);
+                //int? minDuration = filters.FirstOrDefault(f => f.Name == "Duration")?.Min;
+                //int? maxDuration = filters.FirstOrDefault(f => f.Name == "Duration")?.Max;
+                //if (minDuration.HasValue && maxDuration.HasValue)
+                //    query = query.And(p => p.Duration >= minDuration.Value && p.Duration <= maxDuration.Value);
 
-                int? minTouristy = filters.FirstOrDefault(f => f.Name == "Touristy")?.Min;
-                int? maxTouristy = filters.FirstOrDefault(f => f.Name == "Touristy")?.Max;
-                if (minTouristy.HasValue && maxTouristy.HasValue)
-                    query = query.And(p => p.Touristy >= minTouristy.Value && p.Touristy <= maxTouristy.Value);
+                //int? minTouristy = filters.FirstOrDefault(f => f.Name == "Touristy")?.Min;
+                //int? maxTouristy = filters.FirstOrDefault(f => f.Name == "Touristy")?.Max;
+                //if (minTouristy.HasValue && maxTouristy.HasValue)
+                //    query = query.And(p => p.Touristy >= minTouristy.Value && p.Touristy <= maxTouristy.Value);
             }
 
             // Skip those who were already picked before

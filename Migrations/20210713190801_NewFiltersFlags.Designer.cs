@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TripickServer.Models;
@@ -9,9 +10,10 @@ using TripickServer.Models;
 namespace TripickServer.Migrations
 {
     [DbContext(typeof(TripickContext))]
-    partial class TripickContextModelSnapshot : ModelSnapshot
+    [Migration("20210713190801_NewFiltersFlags")]
+    partial class NewFiltersFlags
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -202,9 +204,6 @@ namespace TripickServer.Migrations
                     b.Property<string>("FirstName")
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("LastConnectionDate")
-                        .HasColumnType("timestamp without time zone");
-
                     b.Property<string>("LastName")
                         .HasColumnType("text");
 
@@ -213,9 +212,6 @@ namespace TripickServer.Migrations
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("NewConnectionDate")
-                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -655,29 +651,23 @@ namespace TripickServer.Migrations
                         .HasColumnType("integer")
                         .UseIdentityByDefaultColumn();
 
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("timestamp without time zone");
-
                     b.Property<double>("DistanceToEnd")
                         .HasColumnType("double precision");
 
                     b.Property<double>("DistanceToStart")
                         .HasColumnType("double precision");
 
-                    b.Property<int>("IdItinerary")
-                        .HasColumnType("integer");
-
                     b.Property<int>("Index")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Name")
-                        .HasColumnType("text");
+                    b.Property<int?>("ItineraryId")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IdItinerary");
+                    b.HasIndex("ItineraryId");
 
-                    b.ToTable("ItineraryDays");
+                    b.ToTable("ItineraryDay");
                 });
 
             modelBuilder.Entity("TripickServer.Models.ItineraryDayStep", b =>
@@ -689,12 +679,6 @@ namespace TripickServer.Migrations
 
                     b.Property<double>("DistanceToPassage")
                         .HasColumnType("double precision");
-
-                    b.Property<int>("IdDay")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("IdVisit")
-                        .HasColumnType("integer");
 
                     b.Property<int>("Index")
                         .HasColumnType("integer");
@@ -714,6 +698,9 @@ namespace TripickServer.Migrations
                     b.Property<bool>("IsVisit")
                         .HasColumnType("boolean");
 
+                    b.Property<int?>("ItineraryDayId")
+                        .HasColumnType("integer");
+
                     b.Property<double>("Latitude")
                         .HasColumnType("double precision");
 
@@ -723,16 +710,19 @@ namespace TripickServer.Migrations
                     b.Property<DateTime?>("Time")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<int?>("VisitId")
+                        .HasColumnType("integer");
+
                     b.Property<double>("VisitLikely")
                         .HasColumnType("double precision");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IdDay");
+                    b.HasIndex("ItineraryDayId");
 
-                    b.HasIndex("IdVisit");
+                    b.HasIndex("VisitId");
 
-                    b.ToTable("ItineraryDaySteps");
+                    b.ToTable("ItineraryDayStep");
                 });
 
             modelBuilder.Entity("TripickServer.Models.Location", b =>
@@ -924,8 +914,6 @@ namespace TripickServer.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("NbRating", "Rating");
 
                     b.ToTable("Places");
                 });
@@ -1202,9 +1190,6 @@ namespace TripickServer.Migrations
                         .HasColumnType("integer");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsItineraryGenerated")
                         .HasColumnType("boolean");
 
                     b.Property<bool>("IsPublic")
@@ -1608,28 +1593,20 @@ namespace TripickServer.Migrations
 
             modelBuilder.Entity("TripickServer.Models.ItineraryDay", b =>
                 {
-                    b.HasOne("TripickServer.Models.Itinerary", "Itinerary")
+                    b.HasOne("TripickServer.Models.Itinerary", null)
                         .WithMany("Days")
-                        .HasForeignKey("IdItinerary")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Itinerary");
+                        .HasForeignKey("ItineraryId");
                 });
 
             modelBuilder.Entity("TripickServer.Models.ItineraryDayStep", b =>
                 {
-                    b.HasOne("TripickServer.Models.ItineraryDay", "Day")
+                    b.HasOne("TripickServer.Models.ItineraryDay", null)
                         .WithMany("Steps")
-                        .HasForeignKey("IdDay")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ItineraryDayId");
 
                     b.HasOne("TripickServer.Models.Pick", "Visit")
                         .WithMany()
-                        .HasForeignKey("IdVisit");
-
-                    b.Navigation("Day");
+                        .HasForeignKey("VisitId");
 
                     b.Navigation("Visit");
                 });

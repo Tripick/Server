@@ -203,6 +203,10 @@ namespace TripickServer.Managers
             if (user == null)
                 throw new NullReferenceException($"Unable to fetch user[{id}].");
 
+            // Update last connection date
+            user.LastConnectionDate = user.NewConnectionDate;
+            user.NewConnectionDate = DateTime.Now;
+            this.TripickContext.SaveChanges();
             return user;
         }
 

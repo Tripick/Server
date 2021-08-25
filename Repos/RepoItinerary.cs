@@ -16,7 +16,14 @@ namespace TripickServer.Repos
 
         public Itinerary GetByIdTrip(int idTrip)
         {
-            Itinerary itinerary = this.TripickContext.Itineraries.Where(i => i.IdTrip == idTrip).FirstOrDefault();
+            Itinerary itinerary = this.TripickContext.Itineraries.Where(i => i.IdTrip == idTrip)
+                .Include(i => i.Days)
+                .ThenInclude(d => d.Steps)
+                .ThenInclude(s => s.Visit)
+                .ThenInclude(v => v.Place)
+                .FirstOrDefault();
+            itinerary.Days = itinerary.Days.OrderBy(d => d.Index).ToList();
+            itinerary.Days.ForEach(d => d.Steps = d.Steps.OrderBy(s => s.Index).ToList());
             return itinerary;
         }
     }

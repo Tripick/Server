@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
+using System;
 using TripickServer.Controllers;
 using TripickServer.Requests;
 
@@ -33,8 +34,17 @@ namespace TripickServer.Utils
                 await context.Result.ExecuteResultAsync(context);
                 return;
             }
-            bool authenticationKeysValid = controller.ConnectCurrentUser(parameters.AuthenticationKeys).Result;
-            if (!authenticationKeysValid)
+            try
+            {
+                bool authenticationKeysValid = controller.ConnectCurrentUser(parameters.AuthenticationKeys).Result;
+                if (!authenticationKeysValid)
+                {
+                    context.Result = new RedirectToRouteResult(pathToErrorAction("Authentication keys invalid or expired."));
+                    await context.Result.ExecuteResultAsync(context);
+                    return;
+                }
+            }
+            catch(Exception)
             {
                 context.Result = new RedirectToRouteResult(pathToErrorAction("Authentication keys invalid or expired."));
                 await context.Result.ExecuteResultAsync(context);
