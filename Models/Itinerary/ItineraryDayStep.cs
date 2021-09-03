@@ -11,6 +11,9 @@ namespace TripickServer.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public int Index { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public string Link { get; set; }
         public DateTime? Time { get; set; }
         public bool IsPassage { get; set; }
         public bool IsStart { get; set; }

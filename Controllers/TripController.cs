@@ -106,6 +106,15 @@ namespace TripickServer.Controllers
         }
 
         [HttpPost]
+        [Route("DeleteItinerary")]
+        public JsonResult DeleteItinerary([FromBody] Request<RequestDeleteItinerary> request)
+        {
+            if (request.Data == null)
+                return Error("Trip - DeleteItinerary : Data required.");
+            return managerTrip.SafeCallValueType(() => managerTrip.DeleteItinerary(request.Data.IdTrip));
+        }
+
+        [HttpPost]
         [Route("SaveDays")]
         public JsonResult SaveDays([FromBody] Request<RequestSaveDays> request)
         {

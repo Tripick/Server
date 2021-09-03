@@ -48,6 +48,7 @@ namespace TripickServer.Managers
             {
                 trip.NbPicks = this.repoPick.CountNotZeroByTrip(trip.Id);
                 trip.Filters = this.repoFilter.GetFilters(trip.Id);
+                //trip.Tiles = this.TripickContext.MapTiles.Where(t => t.IdTrip == trip.Id).ToList();
             });
             return trips;
         }
@@ -138,8 +139,8 @@ namespace TripickServer.Managers
                         Longitude = trip.Polygon[i].Longitude
                     };
                 }
+                existing.Polygon = trip.Polygon;
             }
-            existing.Polygon = trip.Polygon;
 
             if (trip.Tiles != null)
             {
@@ -154,8 +155,8 @@ namespace TripickServer.Managers
                         Width = trip.Tiles[i].Width
                     };
                 }
+                existing.Tiles = trip.Tiles;
             }
-            existing.Tiles = trip.Tiles;
 
             // Commit
             this.TripickContext.SaveChanges();
@@ -348,6 +349,25 @@ namespace TripickServer.Managers
             return iti;
         }
 
+        public bool DeleteItinerary(int idTrip)
+        {
+            // Verify the entity to update exists
+            Trip existing = this.repoTrip.GetById(idTrip);
+            if (existing == null)
+                throw new NullReferenceException($"The trip [Id={idTrip}] does not exist");
+            // Verify the entity is mine
+            if (existing.IdOwner != this.ConnectedUser().Id)
+                throw new NullReferenceException("The trip does not belong to you");
+
+            // Delete
+            this.repoItinerary.Delete(this.repoItinerary.GetByIdTrip(idTrip));
+            existing.IsItineraryGenerated = false;
+
+            // Commit
+            this.TripickContext.SaveChanges();
+            return true;
+        }
+
         private List<ItineraryDay> findBestOrder(List<ItineraryDay> days)
         {
             ItineraryDay start = days.Where(d => d.Steps.Any() && d.Steps[0].IsStart).FirstOrDefault();
@@ -397,28 +417,6 @@ namespace TripickServer.Managers
             end.Index = order.Count;
             order.Add(end);
             return order.OrderBy(d => d.Index).ToList();
-        }
-
-        private List<ItineraryDay> findBestOrderStartEnd(List<ItineraryDay> days)
-        {
-            ItineraryDay start = days.Where(d => d.Steps[0].IsStart).FirstOrDefault();
-            ItineraryDay end = days.Where(d => d.Steps[0].IsEnd).FirstOrDefault();
-            days = days.Where(d => !d.Steps[0].IsStart && !d.Steps[0].IsEnd).ToList();
-            foreach (ItineraryDay day in days)
-            {
-                day.DistanceToStart = Functions.CoordinatesDistance(start.Steps[0].Latitude, start.Steps[0].Longitude, day.Steps[0].Visit.Place.Latitude, day.Steps[0].Visit.Place.Longitude);
-                day.DistanceToEnd = Functions.CoordinatesDistance(end.Steps[0].Latitude, end.Steps[0].Longitude, day.Steps[0].Visit.Place.Latitude, day.Steps[0].Visit.Place.Longitude);
-            }
-
-            days = days.OrderBy(d => d.DistanceToStart - d.DistanceToEnd).ToList();
-            days.Add(end);
-            days.Insert(0, start);
-            for (int i = 0; i < days.Count; i++)
-            {
-                days[i].Index = i;
-            }
-            days = days.OrderBy(d => d.Index).ToList();
-            return days;
         }
 
         private ItineraryDaysOrder findBestOrder2(List<ItineraryDay> days, List<ItineraryDaysOrder> orders)
