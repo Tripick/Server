@@ -50,6 +50,7 @@ namespace TripickServer.Models
                 PlaceId = this.PlaceId,
                 Name = this.Name,
                 NameTranslated = this.NameTranslated,
+                Address = this.Address,
                 CountryId = this.CountryId,
                 Country = this.Country,
                 Latitude = this.Latitude,

@@ -138,7 +138,7 @@ namespace TripickServer.Controllers
         {
             if (request.Data == null)
                 return Error("Trip - SaveSteps : Data required.");
-            return managerTrip.SafeCall(() => managerTrip.SaveSteps(request.Data.IdTrip, request.Data.IdDay, request.Data.Steps));
+            return managerTrip.SafeCallValueType(() => managerTrip.SaveSteps(request.Data.IdTrip, request.Data.IdDay, request.Data.Steps));
         }
 
         [HttpPost]
