@@ -95,59 +95,5 @@ namespace TripickServer.Controllers
             managerTrip.SaveFilters(request.Data.IdTrip, request.Data.Filters);
             return managerPick.SafeCall(() => managerPick.GetNexts(request.Data.IdTrip, request.Data.QuantityToLoad));
         }
-
-        [HttpPost]
-        [Route("GetItinerary")]
-        public JsonResult GetItinerary([FromBody] Request<RequestGetItinerary> request)
-        {
-            if (request.Data == null)
-                return Error("Trip - GetItinerary : Data required.");
-            return managerTrip.SafeCall(() => managerTrip.GetItinerary(request.Data.IdTrip, request.Data.ForceRegeneration));
-        }
-
-        [HttpPost]
-        [Route("DeleteItinerary")]
-        public JsonResult DeleteItinerary([FromBody] Request<RequestDeleteItinerary> request)
-        {
-            if (request.Data == null)
-                return Error("Trip - DeleteItinerary : Data required.");
-            return managerTrip.SafeCallValueType(() => managerTrip.DeleteItinerary(request.Data.IdTrip));
-        }
-
-        [HttpPost]
-        [Route("SaveDays")]
-        public JsonResult SaveDays([FromBody] Request<RequestSaveDays> request)
-        {
-            if (request.Data == null)
-                return Error("Trip - SaveDays : Data required.");
-            return managerTrip.SafeCallValueType(() => managerTrip.SaveDays(request.Data.IdTrip, request.Data.Days));
-        }
-
-        [HttpPost]
-        [Route("SaveDay")]
-        public JsonResult SaveDay([FromBody] Request<RequestSaveDay> request)
-        {
-            if (request.Data == null)
-                return Error("Trip - SaveDay : Data required.");
-            return managerTrip.SafeCallValueType(() => managerTrip.SaveDay(request.Data.IdTrip, request.Data.Day));
-        }
-
-        [HttpPost]
-        [Route("SaveSteps")]
-        public JsonResult SaveSteps([FromBody] Request<RequestSaveSteps> request)
-        {
-            if (request.Data == null)
-                return Error("Trip - SaveSteps : Data required.");
-            return managerTrip.SafeCallValueType(() => managerTrip.SaveSteps(request.Data.IdTrip, request.Data.IdDay, request.Data.Steps));
-        }
-
-        [HttpPost]
-        [Route("MoveStep")]
-        public JsonResult MoveStep([FromBody] Request<RequestMoveStep> request)
-        {
-            if (request.Data == null)
-                return Error("Trip - MoveStep : Data required.");
-            return managerTrip.SafeCallValueType(() => managerTrip.MoveStep(request.Data.IdTrip, request.Data.IdOldDay, request.Data.IdNewDay, request.Data.IdStep));
-        }
     }
 }

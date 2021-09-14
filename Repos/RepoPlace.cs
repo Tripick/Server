@@ -89,9 +89,6 @@ namespace TripickServer.Repos
             // Skip those who were already picked before
             query = query.And(p => !alreadyShown.Contains(p.Id));
 
-            // Skip those who have no photo yet
-            query = query.And(p => p.Images.Any(i => i.Url != "NO_IMAGE"));
-
             // Get places according to query
             List<Place> places = this.TripickContext.Places.AsExpandable()
                 .Where(query)

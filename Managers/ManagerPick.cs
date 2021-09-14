@@ -92,6 +92,69 @@ namespace TripickServer.Managers
             return new NextPicks() { Count = count, ExistingPicksCount = existingPicksCount, Picks = picks };
         }
 
+        public List<Place> SearchMap(int idTrip, Region region)
+        {
+            Trip trip = this.repoTrip.GetByIdWithTiles(idTrip);
+            List<BoundingBox> tripAreas = trip.Tiles.Select(t => new BoundingBox()
+            {
+                MinLat = t.Latitude,
+                MinLon = t.Longitude,
+                MaxLat = t.Latitude + t.Height,
+                MaxLon = t.Longitude + t.Width
+            }).ToList();
+            BoundingBox area = new BoundingBox()
+            {
+                MinLat = region.Latitude - region.LatitudeDelta / 2,
+                MinLon = region.Longitude - region.LongitudeDelta / 2,
+                MaxLat = region.Latitude + region.LatitudeDelta / 2,
+                MaxLon = region.Longitude + region.LongitudeDelta / 2
+            };
+            // Only show places who are in the area to search AND in the tiles of the trip
+            List<BoundingBox> areas = new List<BoundingBox>();
+            foreach (BoundingBox bb in tripAreas)
+            {
+                if (bb.MinLat < area.MinLat && bb.MinLon < area.MinLon && bb.MaxLat > area.MaxLat && bb.MaxLon > area.MaxLon) //area is Contained
+                {
+                    areas = new List<BoundingBox>();
+                    areas.Add(new BoundingBox()
+                    {
+                        MinLat = area.MinLat,
+                        MinLon = area.MinLon,
+                        MaxLat = area.MaxLat,
+                        MaxLon = area.MaxLon
+                    });
+                    break;
+                }
+                else if(area.MinLat < bb.MinLat && area.MinLon < bb.MinLon && area.MaxLat > bb.MaxLat && area.MaxLon > bb.MaxLon) //area is Containing
+                {
+                    areas.Add(new BoundingBox()
+                    {
+                        MinLat = bb.MinLat,
+                        MinLon = bb.MinLon,
+                        MaxLat = bb.MaxLat,
+                        MaxLon = bb.MaxLon
+                    });
+                }
+                else if (!(area.MinLat > bb.MaxLat || area.MaxLat < bb.MinLat || area.MinLon > bb.MaxLon || area.MaxLon < bb.MinLon)) //area is Crossing
+                {
+                    areas.Add(new BoundingBox()
+                    {
+                        MinLat = Math.Max(area.MinLat, bb.MinLat),
+                        MinLon = Math.Max(area.MinLon, bb.MinLon),
+                        MaxLat = Math.Min(area.MaxLat, bb.MaxLat),
+                        MaxLon = Math.Min(area.MaxLon, bb.MaxLon)
+                    });
+                }
+            }
+
+            // Get existing picks for this user and trip
+            List<int> existingPicksIds = this.repoPick.GetAllByTrip(idTrip).Select(x => x.IdPlace).ToList();
+
+            // Get places respecting area
+            List<Place> places = this.repoPlace.GetNextsToPick(existingPicksIds, areas, null, 10);
+            return places;
+        }
+
         public Pick GetSingle(int id)
         {
             Place place = this.repoPlace.GetComplete(id);
