@@ -31,15 +31,18 @@ namespace TripickServer.Managers
 
         #region Public
 
-        public List<Place> SearchAutocomplete(string text, int quantity)
+        public List<Place> SearchAutocomplete(string text, int quantity, bool loadPlace)
         {
             List<Place> places = this.repoPlace.SearchAutocomplete(text, Math.Min(10, quantity));
-            places = places.Select(p => new Place()
+            if(!loadPlace)
             {
-                Id = p.Id,
-                Country = p.Country,
-                Name = text.ToLower().StartsWith(p.Name.ToLower()) ? p.Name : p.NameTranslated
-            }).ToList();
+                places = places.Select(p => new Place()
+                {
+                    Id = p.Id,
+                    Country = p.Country,
+                    Name = text.ToLower().StartsWith(p.Name.ToLower()) ? p.Name : p.NameTranslated
+                }).ToList();
+            }
             return places;
         }
 

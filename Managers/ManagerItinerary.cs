@@ -457,21 +457,43 @@ namespace TripickServer.Managers
             ItineraryDay day = this.repoItineraryDay.GetWithSteps(idDay);
             day.Steps.RemoveAll(step => !steps.Any(s => s.Id == step.Id));
 
+            // Create new steps
+            List<ItineraryDayStep> stepsToCreate = steps.Where(step => step.Id == -1).ToList();
+            day.Steps.AddRange(stepsToCreate.Select(s => new ItineraryDayStep()
+            {
+                Index = s.Index,
+                Time = s.Time,
+                IdDay = day.Id,
+                IsVisit = s.IsVisit,
+                Visit = new Pick()
+                {
+                    // Index = 0, This is only used to order the picks to be displayed to the user on the pick page, no need for index here
+                    IdTrip = idTrip,
+                    IdPlace = s.Visit.IdPlace,
+                    IdUser = this.ConnectedUser().Id,
+                    Rating = 5 // The place has been selected especially by the user, we assume that he really wants to go there so gets the maximum rate
+                }
+            }).ToList());
+            this.TripickContext.SaveChanges();
+
             // Import existing steps from other days
-            List<ItineraryDayStep> stepsToImport = steps.Where(step => !day.Steps.Any(s => s.Id == step.Id)).ToList();
+            List<ItineraryDayStep> stepsToImport = steps.Where(step => step.Id != -1 && !day.Steps.Any(s => s.Id == step.Id)).ToList();
             List<int> stepsIdsToImport = stepsToImport.Select(s => s.Id).ToList();
             List<ItineraryDayStep> importedSteps = this.TripickContext.ItineraryDaySteps.Where(step => stepsIdsToImport.Contains(step.Id)).ToList();
 
             // Make sure that IsVisit and Index match the new list
             day.Steps.Union(importedSteps).ToList().ForEach(step =>
             {
-                ItineraryDayStep newStep = steps.First(s => s.Id == step.Id);
-                step.IdDay = day.Id;
-                step.Index = newStep.Index;
-                step.IsVisit = newStep.IsVisit;
-                step.Latitude = newStep.Latitude;
-                step.Longitude = newStep.Longitude;
-                step.Time = newStep.Time;
+                ItineraryDayStep newStep = steps.FirstOrDefault(s => s.Id == step.Id);
+                if(newStep != null)
+                {
+                    step.IdDay = day.Id;
+                    step.Index = newStep.Index;
+                    step.IsVisit = newStep.IsVisit;
+                    step.Latitude = newStep.Latitude;
+                    step.Longitude = newStep.Longitude;
+                    step.Time = newStep.Time;
+                }
             });
 
             this.TripickContext.SaveChanges();

@@ -38,7 +38,7 @@ namespace TripickServer.Controllers
         {
             if (request.Data == null)
                 return Error("Place - GetNext : Data required.");
-            return managerPlace.SafeCall(() => managerPlace.SearchAutocomplete(request.Data.Text, request.Data.Quantity));
+            return managerPlace.SafeCall(() => managerPlace.SearchAutocomplete(request.Data.Text, request.Data.Quantity, request.Data.LoadPlace));
         }
 
         [HttpPost]

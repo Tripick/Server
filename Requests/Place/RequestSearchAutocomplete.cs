@@ -10,5 +10,7 @@ namespace TripickServer.Requests.Place
         public string Text { get; set; }
         [Required]
         public int Quantity { get; set; }
+        [Required]
+        public bool LoadPlace { get; set; }
     }
 }
