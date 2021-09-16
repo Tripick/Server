@@ -474,10 +474,25 @@ namespace TripickServer.Managers
                     Rating = 5 // The place has been selected especially by the user, we assume that he really wants to go there so gets the maximum rate
                 }
             }).ToList());
+
+            // Create personnal steps
+            List<ItineraryDayStep> personnalStepsToCreate = steps.Where(step => step.Id == -2).ToList();
+            day.Steps.AddRange(personnalStepsToCreate.Select(s => new ItineraryDayStep()
+            {
+                Index = s.Index,
+                Name = s.Name,
+                Latitude = s.Latitude,
+                Longitude = s.Longitude,
+                Time = s.Time == null ? day.Date.Date : s.Time,
+                Description = s.Description,
+                Link = s.Link,
+                IdDay = day.Id,
+                IsVisit = s.IsVisit
+            }).ToList());
             this.TripickContext.SaveChanges();
 
             // Import existing steps from other days
-            List<ItineraryDayStep> stepsToImport = steps.Where(step => step.Id != -1 && !day.Steps.Any(s => s.Id == step.Id)).ToList();
+            List<ItineraryDayStep> stepsToImport = steps.Where(step => step.Id != -1 && step.Id != -2 && !day.Steps.Any(s => s.Id == step.Id)).ToList();
             List<int> stepsIdsToImport = stepsToImport.Select(s => s.Id).ToList();
             List<ItineraryDayStep> importedSteps = this.TripickContext.ItineraryDaySteps.Where(step => stepsIdsToImport.Contains(step.Id)).ToList();
 
@@ -489,6 +504,9 @@ namespace TripickServer.Managers
                 {
                     step.IdDay = day.Id;
                     step.Index = newStep.Index;
+                    step.Name = newStep.Name;
+                    step.Description = newStep.Description;
+                    step.Link = newStep.Link;
                     step.IsVisit = newStep.IsVisit;
                     step.Latitude = newStep.Latitude;
                     step.Longitude = newStep.Longitude;
