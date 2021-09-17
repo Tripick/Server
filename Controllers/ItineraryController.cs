@@ -54,7 +54,7 @@ namespace TripickServer.Controllers
         {
             if (request.Data == null)
                 return Error("Itinerary - SaveDays : Data required.");
-            return managerItinerary.SafeCallValueType(() => managerItinerary.SaveDays(request.Data.IdTrip, request.Data.Days));
+            return managerItinerary.SafeCall(() => managerItinerary.SaveDays(request.Data.IdTrip, request.Data.Days));
         }
 
         [HttpPost]
@@ -72,7 +72,16 @@ namespace TripickServer.Controllers
         {
             if (request.Data == null)
                 return Error("Itinerary - SaveSteps : Data required.");
-            return managerItinerary.SafeCallValueType(() => managerItinerary.SaveSteps(request.Data.IdTrip, request.Data.IdDay, request.Data.Steps));
+            return managerItinerary.SafeCall(() => managerItinerary.SaveSteps(request.Data.IdTrip, request.Data.IdDay, request.Data.Steps));
+        }
+
+        [HttpPost]
+        [Route("SaveStep")]
+        public JsonResult SaveStep([FromBody] Request<RequestSaveStep> request)
+        {
+            if (request.Data == null)
+                return Error("Itinerary - SaveStep : Data required.");
+            return managerItinerary.SafeCallValueType(() => managerItinerary.SaveStep(request.Data.IdTrip, request.Data.IdDay, request.Data.Step));
         }
 
         [HttpPost]

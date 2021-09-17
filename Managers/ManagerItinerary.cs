@@ -20,6 +20,7 @@ namespace TripickServer.Managers
         private RepoPick repoPick;
         private RepoItinerary repoItinerary;
         private RepoItineraryDay repoItineraryDay;
+        private RepoItineraryDayStep repoItineraryDayStep;
 
         #endregion
 
@@ -31,6 +32,7 @@ namespace TripickServer.Managers
             this.repoPick = new RepoPick(this.ConnectedUser, tripickContext);
             this.repoItinerary = new RepoItinerary(this.ConnectedUser, tripickContext);
             this.repoItineraryDay = new RepoItineraryDay(this.ConnectedUser, tripickContext);
+            this.repoItineraryDayStep = new RepoItineraryDayStep(this.ConnectedUser, tripickContext);
         }
 
         #endregion
@@ -159,8 +161,28 @@ namespace TripickServer.Managers
             // Remove start and end points from activities
             days.ForEach(d =>
             {
-                d.Steps = d.Steps.Where(s => !s.IsStart && !s.IsEnd).OrderByDescending(s => s.Visit.Rating).ToList();
-                if(d.Steps.Any()) d.Steps.First().IsPassage = true;
+                List<ItineraryDayStep> orderedSteps = new List<ItineraryDayStep>();
+                ItineraryDayStep startStep = d.Steps.FirstOrDefault(s => s.IsStart);
+                if (startStep != null)
+                {
+                    startStep.Name = "Start of your trip";
+                    orderedSteps.Add(startStep);
+                    orderedSteps.AddRange(d.Steps.Where(s => !s.IsStart && !s.IsEnd).OrderByDescending(s => s.Visit.Rating).ToList());
+                }
+                ItineraryDayStep endStep = d.Steps.FirstOrDefault(s => s.IsEnd);
+                if (endStep != null)
+                {
+                    endStep.Name = "End of your trip";
+                    orderedSteps.AddRange(d.Steps.Where(s => !s.IsStart && !s.IsEnd).OrderByDescending(s => s.Visit.Rating).ToList());
+                    orderedSteps.Add(endStep);
+                }
+                if (startStep == null && endStep == null)
+                {
+                    orderedSteps = d.Steps.OrderByDescending(s => s.Visit.Rating).ToList();
+                    if (orderedSteps.Any())
+                        orderedSteps.First().IsPassage = true;
+                }
+                d.Steps = orderedSteps;
             });
 
             i = 0;
@@ -342,7 +364,7 @@ namespace TripickServer.Managers
             return distances;
         }
 
-        public bool SaveDays(int idTrip, List<ItineraryDay> days)
+        public List<ItineraryDay> SaveDays(int idTrip, List<ItineraryDay> days)
         {
             Trip trip = this.TripickContext.Trips.FirstOrDefault(x => x.Id == idTrip && x.IdOwner == this.ConnectedUser().Id);
             if (trip == null)
@@ -425,7 +447,7 @@ namespace TripickServer.Managers
                 .ToList()
                 .ForEach(d => { d.Index = days.First(x => x.Id == d.Id).Index; d.Date = days.First(x => x.Id == d.Id).Date; });
             this.TripickContext.SaveChanges();
-            return true;
+            return existingItinerary.Days.OrderBy(d => d.Index).ToList();
         }
 
         public bool SaveDay(int idTrip, ItineraryDay day)
@@ -444,7 +466,7 @@ namespace TripickServer.Managers
             return true;
         }
 
-        public bool SaveSteps(int idTrip, int idDay, List<ItineraryDayStep> steps)
+        public ItineraryDay SaveSteps(int idTrip, int idDay, List<ItineraryDayStep> steps)
         {
             Trip trip = this.TripickContext.Trips.FirstOrDefault(x => x.Id == idTrip && x.IdOwner == this.ConnectedUser().Id);
             if (trip == null)
@@ -513,6 +535,25 @@ namespace TripickServer.Managers
                     step.Time = newStep.Time;
                 }
             });
+
+            this.TripickContext.SaveChanges();
+            day = this.repoItineraryDay.GetWithSteps(day.Id);
+            day.Steps = day.Steps.OrderBy(s => s.Index).ToList();
+            return day;
+        }
+
+        public bool SaveStep(int idTrip, int idDay, ItineraryDayStep step)
+        {
+            Trip trip = this.TripickContext.Trips.FirstOrDefault(x => x.Id == idTrip && x.IdOwner == this.ConnectedUser().Id);
+            if (trip == null)
+                throw new NullReferenceException("The trip to update is not yours.");
+            bool doesDayExist = this.repoItineraryDay.GetById(idDay) != null;
+            if (!doesDayExist)
+                throw new NullReferenceException("The day to update does not exist.");
+
+            ItineraryDayStep existingStep = this.repoItineraryDayStep.GetById(step.Id);
+            existingStep.Name = step.Name;
+            existingStep.Time = step.Time;
 
             this.TripickContext.SaveChanges();
             return true;
