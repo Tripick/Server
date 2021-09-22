@@ -7,6 +7,7 @@ namespace TripickServer.Models
     public class Friend : ModelBase<Friend>
     {
         public int Id { get; set; }
+        public int? NeedToConfirm { get; set; }
         public string UserName { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
@@ -17,6 +18,17 @@ namespace TripickServer.Models
         public Friend(AppUser user)
         {
             this.Id = user.Id;
+            this.NeedToConfirm = null;
+            this.UserName = user.UserName;
+            this.FirstName = user.FirstName;
+            this.LastName = user.LastName;
+            this.Photo = string.IsNullOrWhiteSpace(user.Photo?.Image) ? "_" : user.Photo.Image;
+        }
+
+        public Friend(AppUser user, Friendship friendship)
+        {
+            this.Id = user.Id;
+            this.NeedToConfirm = friendship.NeedToConfirm;
             this.UserName = user.UserName;
             this.FirstName = user.FirstName;
             this.LastName = user.LastName;

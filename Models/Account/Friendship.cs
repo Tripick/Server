@@ -13,13 +13,15 @@ namespace TripickServer.Models
         public AppUser Owner { get; set; }
 
         public int IdFriend { get; set; }
+        public int? NeedToConfirm { get; set; }
 
         public Friendship ToDTO()
         {
             return new Friendship()
             {
                 IdOwner = this.IdOwner,
-                IdFriend = this.IdFriend
+                IdFriend = this.IdFriend,
+                NeedToConfirm = this.NeedToConfirm
             };
         }
     }

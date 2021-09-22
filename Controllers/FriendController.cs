@@ -53,12 +53,30 @@ namespace TripickServer.Controllers
         }
 
         [HttpPost]
+        [Route("Confirm")]
+        public JsonResult Confirm([FromBody] Request<RequestAdd> request)
+        {
+            if (request.Data == null)
+                return Error("Friend - Confirm : Data required.");
+            return managerFriend.SafeCall(() => managerFriend.Confirm(request.Data.Id));
+        }
+
+        [HttpPost]
         [Route("Delete")]
         public JsonResult Delete([FromBody] Request<RequestAdd> request)
         {
             if (request.Data == null)
                 return Error("Friend - Delete : Data required.");
-            return managerFriend.SafeCall(() => managerFriend.Delete(request.Data.Id));
+            return managerFriend.SafeCallValueType(() => managerFriend.Delete(request.Data.Id));
+        }
+
+        [HttpPost]
+        [Route("Search")]
+        public JsonResult Search([FromBody] Request<RequestSearch> request)
+        {
+            if (request.Data == null)
+                return Error("Friend - Search : Data required.");
+            return managerFriend.SafeCall(() => managerFriend.Search(request.Data.UserName));
         }
     }
 }

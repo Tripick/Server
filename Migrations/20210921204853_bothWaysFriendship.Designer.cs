@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TripickServer.Models;
@@ -9,9 +10,10 @@ using TripickServer.Models;
 namespace TripickServer.Migrations
 {
     [DbContext(typeof(TripickContext))]
-    partial class TripickContextModelSnapshot : ModelSnapshot
+    [Migration("20210921204853_bothWaysFriendship")]
+    partial class bothWaysFriendship
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -481,8 +483,8 @@ namespace TripickServer.Migrations
                     b.Property<int>("IdFriend")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("NeedToConfirm")
-                        .HasColumnType("integer");
+                    b.Property<bool>("IsConfirmed")
+                        .HasColumnType("boolean");
 
                     b.HasKey("IdOwner", "IdFriend");
 
