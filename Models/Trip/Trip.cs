@@ -14,12 +14,8 @@ namespace TripickServer.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public DateTime CreationDate { get; set; } = DateTime.Now;
-        public bool IsDeleted { get; set; }
-        public DateTime? DeleteDate { get; set; }
-        public bool IsPublic { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public string Note { get; set; }
         public string CoverImage { get; set; }
 
         public DateTime? StartDate { get; set; }
@@ -53,9 +49,21 @@ namespace TripickServer.Models
         public virtual List<AppUser> Subscribers { get; set; }
         [NotMapped]
         public List<Follower> Followers { get; set; }
-        public bool IsItineraryGenerated { get; set; }
 
         public virtual Itinerary Itinerary { get; set; }
+        public bool IsItineraryGenerated { get; set; }
+
+        public override bool Equals(object t) { return t != null && t is Trip && this.GetHashCode() == ((Trip)t).GetHashCode(); }
+        public override int GetHashCode() { return HashCode.Combine(
+                this.Name,
+                this.Description,
+                this.CoverImage,
+                this.StartDate,
+                this.EndDate,
+                this.Members == null ? null : this.Members.Select(m => m.Id).OrderBy(x => x).ToList(),
+                this.IsItineraryGenerated
+            );
+        }
 
         public Trip ToDTO()
         {
@@ -66,7 +74,6 @@ namespace TripickServer.Models
                 CreationDate = this.CreationDate,
                 Name = this.Name,
                 Description = this.Description,
-                Note = this.Note,
                 CoverImage = this.CoverImage,
                 StartDate = this.StartDate,
                 StartLatitude = this.StartLatitude,

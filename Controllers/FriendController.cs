@@ -78,5 +78,14 @@ namespace TripickServer.Controllers
                 return Error("Friend - Search : Data required.");
             return managerFriend.SafeCall(() => managerFriend.Search(request.Data.UserName));
         }
+
+        [HttpPost]
+        [Route("Sync")]
+        public JsonResult Sync([FromBody] Request<RequestSync> request)
+        {
+            if (request.Data == null)
+                return Error("Friend - Sync : Data required.");
+            return managerFriend.SafeCall(() => managerFriend.Sync(request.Data.Friends));
+        }
     }
 }

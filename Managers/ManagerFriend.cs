@@ -142,6 +142,33 @@ namespace TripickServer.Managers
             return users.Select(u => new Friend(u)).ToList();
         }
 
+        public List<Friend> Sync(List<Friend> friends)
+        {
+            AppUser user = this.TripickContext.Users.Where(x => x.Id == this.ConnectedUser().Id)
+                .Include(t => t.Friendships)
+                .SingleOrDefault();
+            if (user == null)
+                throw new NullReferenceException($"The user [Id={this.ConnectedUser().Id}] does not exist");
+
+            List<int> ids = user.Friendships.Select(fs => fs.IdFriend).ToList();
+            List<AppUser> friendsUsers = this.TripickContext.Users.Where(x => ids.Contains(x.Id)).Include(t => t.Photo).ToList();
+            List<Friend> upToDateFriends = friendsUsers.Select(x => new Friend(x, user.Friendships.First(fs => fs.IdFriend == x.Id))).ToList();
+            List<Friend> needSyncFriends = new List<Friend>();
+            upToDateFriends.ForEach(nf =>
+            {
+                // Send all friends but don't send photos when there is no change (faster and lighter)
+                Friend existingFriend = friends.FirstOrDefault(x => x.Id == nf.Id);
+                if (nf.Equals(existingFriend))
+                {
+                    nf.Photo = null;
+                    nf.SharedTrips = null;
+                }
+                needSyncFriends.Add(nf);
+            });
+
+            return needSyncFriends.OrderBy(f => f.UserName).ToList();
+        }
+
         #endregion
     }
 }

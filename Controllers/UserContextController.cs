@@ -52,7 +52,7 @@ namespace TripickServer.Controllers
                 {
                     List<int> ids = user.Friendships.Select(x => x.IdFriend).ToList();
                     List<AppUser> friendsUsers = userManager.Users.Where(x => ids.Contains(x.Id)).Include(t => t.Photo).ToList();
-                    friends = friendsUsers.Select(x => new Friend(x, user.Friendships.First(fs => fs.IdFriend == x.Id))).ToList();
+                    friends = friendsUsers.Select(x => new Friend(x, user.Friendships.First(fs => fs.IdFriend == x.Id))).OrderBy(f => f.UserName).ToList();
                 }
 
                 // Get all trips

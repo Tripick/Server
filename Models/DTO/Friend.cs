@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using TripickServer.Models.Common;
 
 namespace TripickServer.Models
@@ -12,6 +13,20 @@ namespace TripickServer.Models
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Photo { get; set; }
+        public List<Trip> SharedTrips { get; set; }
+
+        public override bool Equals(object f) { return f != null && f is Friend && this.GetHashCode() == ((Friend)f).GetHashCode(); }
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(
+                this.Id,
+                this.NeedToConfirm,
+                this.UserName,
+                this.FirstName,
+                this.LastName,
+                this.SharedTrips == null ? null : this.SharedTrips.OrderBy(x => x.Id).Select(t => t.GetHashCode()).ToList()
+            );
+        }
 
         public Friend() { }
 
@@ -23,6 +38,7 @@ namespace TripickServer.Models
             this.FirstName = user.FirstName;
             this.LastName = user.LastName;
             this.Photo = string.IsNullOrWhiteSpace(user.Photo?.Image) ? "_" : user.Photo.Image;
+            this.SharedTrips = new List<Trip>();
         }
 
         public Friend(AppUser user, Friendship friendship)
@@ -33,6 +49,7 @@ namespace TripickServer.Models
             this.FirstName = user.FirstName;
             this.LastName = user.LastName;
             this.Photo = string.IsNullOrWhiteSpace(user.Photo?.Image) ? "_" : user.Photo.Image;
+            this.SharedTrips = new List<Trip>();
         }
 
         public Friend ToDTO() { return this; }

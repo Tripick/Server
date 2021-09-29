@@ -62,11 +62,9 @@ namespace TripickServer.Managers
             Trip trip = new Trip()
             {
                 IdOwner = this.ConnectedUser().Id,
-                IsPublic = false,
                 CoverImage = photo,
                 Name = name,
-                Description = string.Empty,
-                Note = string.Empty
+                Description = string.Empty
             };
             this.repoTrip.Add(trip);
 
@@ -90,10 +88,8 @@ namespace TripickServer.Managers
                 throw new NullReferenceException("The trip does not belong to you");
 
             //CoverImage = existing.CoverImage;
-            existing.IsPublic = trip.IsPublic;
             existing.Name = trip.Name;
             existing.Description = trip.Description;
-            existing.Note = trip.Note;
 
             existing.StartDate = trip.StartDate;
             existing.StartLatitude = trip.StartLatitude;

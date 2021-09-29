@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using TripickServer.Models.Common;
@@ -18,6 +19,8 @@ namespace TripickServer.Models
         [ForeignKey("Trip")]
         public int? IdTrip { get; set; }
         public virtual Trip Trip { get; set; }
+        public override bool Equals(object l) { return l != null && l is Location && this.GetHashCode() == ((Location)l).GetHashCode(); }
+        public override int GetHashCode() { return HashCode.Combine(this.Id, this.IdTrip, this.Latitude, this.Longitude, this.LatitudeDelta, this.LongitudeDelta); }
 
         public Location ToDTO()
         {

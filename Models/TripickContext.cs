@@ -53,6 +53,7 @@ namespace TripickServer.Models
         public DbSet<Configuration> Configurations { get; set; }
         public DbSet<ConfigFlag> ConfigReviewFlags { get; set; }
         public DbSet<Hashtag> Hashtags { get; set; }
+        public DbSet<Retribution> Retributions { get; set; }
 
         // Countries
         public DbSet<Country> Countries { get; set; }

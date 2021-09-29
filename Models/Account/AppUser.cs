@@ -17,6 +17,7 @@ namespace TripickServer.Models
         public virtual List<Trip> GuestTrips { get; set; }
         public virtual List<Trip> WatchedTrips { get; set; }
         public virtual List<Friendship> Friendships { get; set; }
+        public virtual List<Retribution> Retributions { get; set; }
 
         public AppUser ToDTO()
         {
@@ -33,6 +34,7 @@ namespace TripickServer.Models
                 GuestTrips = this.GuestTrips?.ToDTO(),
                 WatchedTrips = this.WatchedTrips?.ToDTO(),
                 Friendships = this.Friendships?.ToDTO(),
+                Retributions = this.Retributions?.ToDTO(),
             };
         }
     }

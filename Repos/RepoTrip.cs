@@ -16,13 +16,13 @@ namespace TripickServer.Repos
 
         public int Count()
         {
-            return this.TripickContext.Trips.Where(t => !t.IsDeleted && t.IdOwner == this.ConnectedUser().Id).Count();
+            return this.TripickContext.Trips.Where(t => t.IdOwner == this.ConnectedUser().Id).Count();
         }
 
         public List<Trip> GetAll(int pageIndex = 0, int pageSize = 10)
         {
             List<Trip> trips = this.TripickContext.Trips
-                .Where(t => !t.IsDeleted && t.IdOwner == this.ConnectedUser().Id)
+                .Where(t => t.IdOwner == this.ConnectedUser().Id)
                 .OrderByDescending(x => x.CreationDate)
                 .Skip(pageIndex * pageSize)
                 .Take(pageSize)
@@ -52,7 +52,7 @@ namespace TripickServer.Repos
                 .Include(t => t.Members)
                 .Include(t => t.Subscribers)
                 .FirstOrDefault();
-            if (trip.IsDeleted || trip.IdOwner != this.ConnectedUser().Id)
+            if (trip.IdOwner != this.ConnectedUser().Id)
                 return null;
 
             // Region
