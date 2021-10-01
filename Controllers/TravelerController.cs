@@ -34,21 +34,12 @@ namespace TripickServer.Controllers
         #endregion
 
         [HttpPost]
-        [Route("Add")]
-        public JsonResult Add([FromBody] Request<RequestAdd> request)
+        [Route("Save")]
+        public JsonResult Save([FromBody] Request<RequestSave> request)
         {
             if (request.Data == null)
-                return Error("Traveler - Add : Data required.");
-            return managerTraveler.SafeCall(() => managerTraveler.Add(request.Data.IdTrip, request.Data.IdFriend));
-        }
-
-        [HttpPost]
-        [Route("Delete")]
-        public JsonResult Delete([FromBody] Request<RequestAdd> request)
-        {
-            if (request.Data == null)
-                return Error("Traveler - Delete : Data required.");
-            return managerTraveler.SafeCallValueType(() => managerTraveler.Delete(request.Data.IdTrip, request.Data.IdFriend));
+                return Error("Traveler - Save : Data required.");
+            return managerTraveler.SafeCallValueType(() => managerTraveler.Save(request.Data.IdTrip, request.Data.IdsFriends));
         }
     }
 }

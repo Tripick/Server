@@ -31,19 +31,17 @@ namespace TripickServer.Managers
 
         #region Private
 
-        public Traveler Add(int idTrip, int idFriend)
+        public bool Save(int idTrip, List<int> idsFriends)
         {
             Trip trip = repoTrip.GetById(idTrip);
-
             AppUser user = this.TripickContext.Users.Include(x => x.Friendships).Where(x => x.Id == this.ConnectedUser().Id).SingleOrDefault();
-            if (!user.Friendships.Any(x => x.IdFriend == idFriend))
-                throw new NullReferenceException("Impossible to add the traveler to the trip if he is not your friend.");
-
-            AppUser friend = this.TripickContext.Users.Where(x => x.Id == idFriend).Include(x => x.Photo).SingleOrDefault();
-            trip.Members.Add(friend);
+            if (idsFriends.Any(f => !user.Friendships.Any(x => x.IdFriend == f)))
+                throw new NullReferenceException("Impossible to add a traveler to the trip if he is not your friend.");
+            List<AppUser> friends = this.TripickContext.Users.Where(x => idsFriends.Contains(x.Id)).Include(x => x.Photo).ToList();
+            trip.Members.Clear();
+            trip.Members.AddRange(friends);
             this.TripickContext.SaveChanges();
-
-            return new Traveler(friend);
+            return true;
         }
 
         public bool Delete(int idTrip, int idFriend)

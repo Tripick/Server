@@ -4,11 +4,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace TripickServer.Requests.Traveler
 {
-    public class RequestAdd
+    public class RequestSave
     {
         [Required]
         public int IdTrip { get; set; }
         [Required]
-        public int IdFriend { get; set; }
+        public List<int> IdsFriends { get; set; }
     }
 }
