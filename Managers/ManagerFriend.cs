@@ -31,6 +31,7 @@ namespace TripickServer.Managers
         {
             AppUser user = this.TripickContext.Users.Where(x => x.Id == this.ConnectedUser().Id)
                 .Include(t => t.Friendships)
+                .Include(t => t.Trips).ThenInclude(t => t.Members)
                 .SingleOrDefault();
             if (user == null)
                 throw new NullReferenceException($"The user [Id={this.ConnectedUser().Id}] does not exist");
@@ -66,7 +67,15 @@ namespace TripickServer.Managers
             }
 
             this.TripickContext.SaveChanges();
-            Friend returnedFriend = new Friend(this.TripickContext.Users.Where(x => x.Id == newFriend.Id).Include(t => t.Photo).FirstOrDefault(), meToFriend);
+            AppUser friendUser = this.TripickContext.Users
+                .Where(x => x.Id == newFriend.Id)
+                .Include(t => t.Photo)
+                .Include(t => t.Trips)
+                .ThenInclude(t => t.Members)
+                .FirstOrDefault();
+            friendUser.Trips = friendUser.Trips.Where(t => t.Members.Any(m => m.Id == this.ConnectedUser().Id)).ToList();
+            friendUser.Trips.AddRange(user.Trips.Where(t => t.Members.Any(m => m.Id == friendUser.Id)).ToList());
+            Friend returnedFriend = new Friend(friendUser, meToFriend);
             return returnedFriend;
         }
 
@@ -140,33 +149,6 @@ namespace TripickServer.Managers
                 .Take(10)
                 .ToList();
             return users.Select(u => new Friend(u)).ToList();
-        }
-
-        public List<Friend> Sync(List<Friend> friends)
-        {
-            AppUser user = this.TripickContext.Users.Where(x => x.Id == this.ConnectedUser().Id)
-                .Include(t => t.Friendships)
-                .SingleOrDefault();
-            if (user == null)
-                throw new NullReferenceException($"The user [Id={this.ConnectedUser().Id}] does not exist");
-
-            List<int> ids = user.Friendships.Select(fs => fs.IdFriend).ToList();
-            List<AppUser> friendsUsers = this.TripickContext.Users.Where(x => ids.Contains(x.Id)).Include(t => t.Photo).ToList();
-            List<Friend> upToDateFriends = friendsUsers.Select(x => new Friend(x, user.Friendships.First(fs => fs.IdFriend == x.Id))).ToList();
-            List<Friend> needSyncFriends = new List<Friend>();
-            upToDateFriends.ForEach(nf =>
-            {
-                // Send all friends but don't send photos when there is no change (faster and lighter)
-                Friend existingFriend = friends.FirstOrDefault(x => x.Id == nf.Id);
-                if (nf.Equals(existingFriend))
-                {
-                    nf.Photo = null;
-                    nf.SharedTrips = null;
-                }
-                needSyncFriends.Add(nf);
-            });
-
-            return needSyncFriends.OrderBy(f => f.UserName).ToList();
         }
 
         #endregion

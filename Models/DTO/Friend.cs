@@ -49,7 +49,7 @@ namespace TripickServer.Models
             this.FirstName = user.FirstName;
             this.LastName = user.LastName;
             this.Photo = string.IsNullOrWhiteSpace(user.Photo?.Image) ? "_" : user.Photo.Image;
-            this.SharedTrips = new List<Trip>();
+            this.SharedTrips = user.Trips == null ? new List<Trip>() : user.Trips;
         }
 
         public Friend ToDTO() { return this; }
