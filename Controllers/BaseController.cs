@@ -51,7 +51,7 @@ namespace TripickServer.Controllers
             if (user == null)
                 return false;
 
-            string existingToken = await userManager.GetAuthenticationTokenAsync(user, Constants.AppName, Constants.AuthenticationTokenName);
+            string existingToken = await userManager.GetAuthenticationTokenAsync(user, TokenOptions.DefaultProvider, Constants.AuthenticationTokenName);
             bool authenticationKeysValid = existingToken == authenticationKeys.AccessToken;
 
             if (authenticationKeysValid)

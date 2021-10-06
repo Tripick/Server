@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using System.Data.SqlClient;
+using TripickServer.Models.Common;
 
 namespace TripickServer.Managers
 {
@@ -109,14 +110,27 @@ namespace TripickServer.Managers
                 throw new InvalidOperationException("Incorrect login or password.");
 
             // Generate new token
-            await userManager.RemoveAuthenticationTokenAsync(user, Constants.AppName, Constants.AuthenticationTokenName);
-            var newToken = await userManager.GenerateUserTokenAsync(user, Constants.AppName, Constants.AuthenticationTokenName);
-            await userManager.SetAuthenticationTokenAsync(user, Constants.AppName, Constants.AuthenticationTokenName, newToken);
+            await userManager.RemoveAuthenticationTokenAsync(user, TokenOptions.DefaultProvider, Constants.AuthenticationTokenName);
+            var newToken = await userManager.GenerateUserTokenAsync(user, TokenOptions.DefaultProvider, Constants.AuthenticationTokenName);
+            await userManager.SetAuthenticationTokenAsync(user, TokenOptions.DefaultProvider, Constants.AuthenticationTokenName, newToken);
 
             // Send User and AuthenticationKeys
             AppUser fullUser = NotConnectedGet(user.Id);
             user.Photo = fullUser.Photo;
             return new UserContext(user, newToken, LoadConfiguration());
+        }
+
+        public async Task<bool> Reset(string email)
+        {
+            throw new NotImplementedException("Resetting password needs to send emails.");
+            if (string.IsNullOrWhiteSpace(email))
+                throw new ArgumentNullException("Invalid email address.");
+            AppUser user = await userManager.FindByEmailAsync(email);
+            if (user == null)
+                throw new NullReferenceException("This account doesn't exist.");
+            string resetToken = await userManager.GeneratePasswordResetTokenAsync(user);
+            await userManager.ResetPasswordAsync(user, resetToken, "bounouahugo13");
+            return true;
         }
 
         public async Task<UserContext> LoginByToken(int id, string token)
@@ -128,7 +142,7 @@ namespace TripickServer.Managers
             if (user == null)
                 throw new NullReferenceException("This account doesn't exist.");
 
-            string existingToken = await userManager.GetAuthenticationTokenAsync(user, Constants.AppName, Constants.AuthenticationTokenName);
+            string existingToken = await userManager.GetAuthenticationTokenAsync(user, TokenOptions.DefaultProvider, Constants.AuthenticationTokenName);
             if (existingToken == token)
             {
                 await signInManager.SignInAsync(user, isPersistent: true);
@@ -150,9 +164,9 @@ namespace TripickServer.Managers
                 throw new NullReferenceException("This account doesn't exist.");
 
             // Generate new token
-            await userManager.RemoveAuthenticationTokenAsync(user, Constants.AppName, Constants.AuthenticationTokenName);
-            var newToken = await userManager.GenerateUserTokenAsync(user, Constants.AppName, Constants.AuthenticationTokenName);
-            await userManager.SetAuthenticationTokenAsync(user, Constants.AppName, Constants.AuthenticationTokenName, newToken);
+            await userManager.RemoveAuthenticationTokenAsync(user, TokenOptions.DefaultProvider, Constants.AuthenticationTokenName);
+            var newToken = await userManager.GenerateUserTokenAsync(user, TokenOptions.DefaultProvider, Constants.AuthenticationTokenName);
+            await userManager.SetAuthenticationTokenAsync(user, TokenOptions.DefaultProvider, Constants.AuthenticationTokenName, newToken);
 
             return "Logged out.";
         }

@@ -22,8 +22,18 @@ namespace TripickServer
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services
-                .AddIdentity<AppUser, AppRole>(options =>
+            //services
+            //    .AddIdentity<AppUser, AppRole>(options =>
+            //    {
+            //        options.User.RequireUniqueEmail = true;
+            //        options.Password.RequireNonAlphanumeric = false;
+            //        options.Password.RequireUppercase = false;
+            //        options.Password.RequiredLength = 8;
+            //    })
+            //    .AddEntityFrameworkStores<TripickContext>()
+            //    .AddTokenProvider(Constants.AppName, typeof(DataProtectorTokenProvider<AppUser>));
+
+            services.AddIdentity<AppUser, AppRole>(options =>
                 {
                     options.User.RequireUniqueEmail = true;
                     options.Password.RequireNonAlphanumeric = false;
@@ -31,7 +41,7 @@ namespace TripickServer
                     options.Password.RequiredLength = 8;
                 })
                 .AddEntityFrameworkStores<TripickContext>()
-                .AddTokenProvider(Constants.AppName, typeof(DataProtectorTokenProvider<AppUser>));
+                .AddTokenProvider<DataProtectorTokenProvider<AppUser>>(TokenOptions.DefaultProvider);
 
             services.AddDbContextPool<TripickContext>(options => options.UseNpgsql( // Remove "Pool" from "AddDbContextPool" when doing a migration
                     Configuration.GetConnectionString("DefaultConnection"),

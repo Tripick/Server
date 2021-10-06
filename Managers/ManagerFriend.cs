@@ -70,11 +70,10 @@ namespace TripickServer.Managers
             AppUser friendUser = this.TripickContext.Users
                 .Where(x => x.Id == newFriend.Id)
                 .Include(t => t.Photo)
-                .Include(t => t.Trips)
-                .ThenInclude(t => t.Members)
+                //.Include(t => t.Trips).ThenInclude(t => t.Members)
                 .FirstOrDefault();
-            friendUser.Trips = friendUser.Trips.Where(t => t.Members.Any(m => m.Id == this.ConnectedUser().Id)).ToList();
-            friendUser.Trips.AddRange(user.Trips.Where(t => t.Members.Any(m => m.Id == friendUser.Id)).ToList());
+            //friendUser.Trips = friendUser.Trips.Where(t => t.Members.Any(m => m.Id == this.ConnectedUser().Id)).ToList();
+            //friendUser.Trips.AddRange(user.Trips.Where(t => t.Members.Any(m => m.Id == friendUser.Id)).ToList());
             Friend returnedFriend = new Friend(friendUser, meToFriend);
             return returnedFriend;
         }

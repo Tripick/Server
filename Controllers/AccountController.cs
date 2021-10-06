@@ -99,6 +99,15 @@ namespace TripickServer.Controllers
         }
 
         [HttpPost]
+        [Route("Reset")]
+        public async Task<JsonResult> Reset([FromBody] RequestReset request)
+        {
+            if (request == null)
+                return ServerResponse<UserContext>.ToJson(false, "Reset : Email required.");
+            return await accountManager.SafeCallValueTypeAsync(async () => await accountManager.Reset(request.Email));
+        }
+
+        [HttpPost]
         [Route("Delete")]
         public async Task<JsonResult> Delete([FromBody] RequestLogin credentials)
         {

@@ -23,11 +23,11 @@ namespace TripickServer.Repos
         {
             List<Trip> trips = this.TripickContext.Trips
                 .Where(t => t.IdOwner == this.ConnectedUser().Id)
-                .OrderByDescending(x => x.CreationDate)
+                .OrderByDescending(x => x.StartDate)
                 .Skip(pageIndex * pageSize)
                 .Take(pageSize)
                 .Include(t => t.Members)
-                .Include(t => t.Subscribers)
+                //.Include(t => t.Subscribers)
                 //.Include(t => t.Itinerary).ThenInclude(i => i.Days).ThenInclude(d => d.Steps).ThenInclude(s => s.Visit).ThenInclude(v => v.Place)
                 .ToList();
 
@@ -50,9 +50,9 @@ namespace TripickServer.Repos
             Trip trip = this.TripickContext.Trips
                 .Where(t => t.Id == id)
                 .Include(t => t.Members)
-                .Include(t => t.Subscribers)
+                //.Include(t => t.Subscribers)
                 .FirstOrDefault();
-            if (trip.IdOwner != this.ConnectedUser().Id)
+            if (trip.IdOwner != this.ConnectedUser().Id && !trip.Members.Any(m => m.Id == this.ConnectedUser().Id))
                 return null;
 
             // Region
@@ -69,8 +69,6 @@ namespace TripickServer.Repos
         public Trip GetByIdWithTiles(int id)
         {
             Trip trip = GetById(id);
-
-            // Tiles
             List<MapTile> tiles = new List<MapTile>();
             if(trip != null)
                 tiles = this.TripickContext.MapTiles.Where(t => t.IdTrip == trip.Id).ToList();

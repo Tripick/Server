@@ -37,7 +37,7 @@ namespace TripickServer.Managers
 
         public List<Trip> GetAll(int pageIndex = 0, int pageSize = 10)
         {
-            List<Trip> trips = this.repoTrip.GetAll(pageIndex, pageSize).OrderByDescending(x => x.CreationDate).ToList();
+            List<Trip> trips = this.repoTrip.GetAll(pageIndex, pageSize).OrderByDescending(x => x.StartDate).ToList();
             trips.ForEach(trip =>
             {
                 trip.NbPicks = this.repoPick.CountNotZeroByTrip(trip.Id);

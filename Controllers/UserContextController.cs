@@ -49,30 +49,21 @@ namespace TripickServer.Controllers
                 List<Trip> trips = managerTrip.GetAll(0, int.MaxValue);
 
                 // Get user friends list
-                AppUser user = await userManager.Users.Include(x => x.Friendships).SingleAsync(x => x.Id == this.ConnectedUser.Id);
+                AppUser user = await userManager.Users
+                    .Include(x => x.Friendships)
+                    .Include(x => x.GuestTrips).ThenInclude(gt => gt.Members)
+                    .SingleAsync(x => x.Id == this.ConnectedUser.Id);
+                trips.AddRange(user.GuestTrips);
+
                 List<Friend> friends = new List<Friend>();
                 if (user != null && user.Friendships != null)
                 {
                     List<int> ids = user.Friendships.Select(x => x.IdFriend).ToList();
-                    List<AppUser> friendsUsers = userManager.Users
-                        .Where(x => ids.Contains(x.Id))
-                        .Include(t => t.Photo)
-                        .Include(t => t.Trips)
-                        .ThenInclude(t => t.Members)
-                        .ToList();
-                    friendsUsers.ForEach(fu =>
-                    {
-                        fu.Trips = fu.Trips.Where(t => t.Members.Any(m => m.Id == this.ConnectedUser.Id)).ToList();
-                        fu.Trips.AddRange(trips.Where(t => t.Members.Any(m => m.Id == fu.Id)).ToList());
-                        fu.Trips = fu.Trips.Select(t => new Trip()
-                        {
-                            Id = t.Id,
-                            Name = t.Name,
-                            StartDate = t.StartDate,
-                            EndDate = t.EndDate,
-                            CoverImage = t.CoverImage
-                        }).ToList();
-                    });
+                    List<AppUser> friendsUsers = userManager.Users.Where(x => ids.Contains(x.Id)).Include(t => t.Photo).ToList();
+                    friendsUsers.ForEach(fu => fu.Trips = trips
+                        .Where(t => t.IdOwner == fu.Id || t.Members.Any(m => m.Id == fu.Id))
+                        .Select(t => new Trip() { Id = t.Id, IdOwner = t.IdOwner })
+                        .ToList());
                     friends = friendsUsers.Select(x => new Friend(x, user.Friendships.First(fs => fs.IdFriend == x.Id))).OrderBy(f => f.UserName).ToList();
                 }
                 UserContext userContext = new UserContext(managerTrip.LoadConfiguration(), friends, trips, new List<Guide>());

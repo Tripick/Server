@@ -62,7 +62,7 @@ namespace TripickServer.Managers
             List<int> existingPicksIds = existingPicks.Select(x => x.IdPlace).ToList();
             int existingPicksCount = existingPicks.Count(p => p.Rating > 0);
 
-            // Exclude ids to exclude
+            // Exclude ids of already loaded places
             if(alreadyLoaded != null && alreadyLoaded.Any())
                 existingPicksIds.AddRange(alreadyLoaded);
 
@@ -88,7 +88,6 @@ namespace TripickServer.Managers
             {
                 picks.Add(new Pick() { Index = i, IdPlace = places[i].Id, IdTrip = idTrip, IdUser = this.ConnectedUser().Id, Rating = -1, Place = places[i] });
             }
-
             return new NextPicks() { Count = count, ExistingPicksCount = existingPicksCount, Picks = picks };
         }
 
@@ -165,16 +164,13 @@ namespace TripickServer.Managers
         {
             // Save pick
             Pick pick = new Pick() { IdPlace = idPlace, IdUser = this.ConnectedUser().Id, IdTrip = idTrip, Rating = rating };
-
             Pick existingPick = this.repoPick.Find(idTrip, idPlace);
             if(existingPick != null)
                 existingPick.Rating = pick.Rating;
             else
                 this.repoPick.Add(pick);
-
             // Commit
             this.TripickContext.SaveChanges();
-
             // Send pick count
             return this.repoPick.CountNotZeroByTrip(idTrip);
         }
