@@ -9,6 +9,7 @@ namespace TripickServer.Utils
     {
         public const string AppName = "Tripick";
         public const bool AuthenticationConfirmEmail = false;
+        public const string TokenProviderName = "Default";
         public const string AuthenticationTokenName = "TripickAuthentication";
     }
 }

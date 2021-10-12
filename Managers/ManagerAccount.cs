@@ -110,9 +110,9 @@ namespace TripickServer.Managers
                 throw new InvalidOperationException("Incorrect login or password.");
 
             // Generate new token
-            await userManager.RemoveAuthenticationTokenAsync(user, TokenOptions.DefaultProvider, Constants.AuthenticationTokenName);
-            var newToken = await userManager.GenerateUserTokenAsync(user, TokenOptions.DefaultProvider, Constants.AuthenticationTokenName);
-            await userManager.SetAuthenticationTokenAsync(user, TokenOptions.DefaultProvider, Constants.AuthenticationTokenName, newToken);
+            await userManager.RemoveAuthenticationTokenAsync(user, Constants.TokenProviderName, Constants.AuthenticationTokenName);
+            var newToken = await userManager.GenerateUserTokenAsync(user, Constants.TokenProviderName, Constants.AuthenticationTokenName);
+            await userManager.SetAuthenticationTokenAsync(user, Constants.TokenProviderName, Constants.AuthenticationTokenName, newToken);
 
             // Send User and AuthenticationKeys
             AppUser fullUser = NotConnectedGet(user.Id);
@@ -142,7 +142,7 @@ namespace TripickServer.Managers
             if (user == null)
                 throw new NullReferenceException("This account doesn't exist.");
 
-            string existingToken = await userManager.GetAuthenticationTokenAsync(user, TokenOptions.DefaultProvider, Constants.AuthenticationTokenName);
+            string existingToken = await userManager.GetAuthenticationTokenAsync(user, Constants.TokenProviderName, Constants.AuthenticationTokenName);
             if (existingToken == token)
             {
                 await signInManager.SignInAsync(user, isPersistent: true);
@@ -151,7 +151,7 @@ namespace TripickServer.Managers
                 return new UserContext(user, token, LoadConfiguration());
             }
             else
-                throw new InvalidOperationException("Token invalid or expired.");
+                throw new InvalidOperationException("Authentication keys invalid or expired.");
         }
 
         public async Task<string> Logout(int id, string token)
@@ -164,9 +164,9 @@ namespace TripickServer.Managers
                 throw new NullReferenceException("This account doesn't exist.");
 
             // Generate new token
-            await userManager.RemoveAuthenticationTokenAsync(user, TokenOptions.DefaultProvider, Constants.AuthenticationTokenName);
-            var newToken = await userManager.GenerateUserTokenAsync(user, TokenOptions.DefaultProvider, Constants.AuthenticationTokenName);
-            await userManager.SetAuthenticationTokenAsync(user, TokenOptions.DefaultProvider, Constants.AuthenticationTokenName, newToken);
+            await userManager.RemoveAuthenticationTokenAsync(user, Constants.TokenProviderName, Constants.AuthenticationTokenName);
+            var newToken = await userManager.GenerateUserTokenAsync(user, Constants.TokenProviderName, Constants.AuthenticationTokenName);
+            await userManager.SetAuthenticationTokenAsync(user, Constants.TokenProviderName, Constants.AuthenticationTokenName, newToken);
 
             return "Logged out.";
         }

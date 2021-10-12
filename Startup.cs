@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
 using System.Security.Cryptography.X509Certificates;
 using TripickServer.Models;
 using TripickServer.Utils;
@@ -32,16 +33,19 @@ namespace TripickServer
             //    })
             //    .AddEntityFrameworkStores<TripickContext>()
             //    .AddTokenProvider(Constants.AppName, typeof(DataProtectorTokenProvider<AppUser>));
-
+            services.Configure<IdentityOptions>(options => { options.Tokens.PasswordResetTokenProvider = Constants.TokenProviderName; });
+            services.Configure<DefaultDataProtectorTokenProviderOptions>(options => { options.TokenLifespan = TimeSpan.FromDays(1); });
             services.AddIdentity<AppUser, AppRole>(options =>
                 {
                     options.User.RequireUniqueEmail = true;
                     options.Password.RequireNonAlphanumeric = false;
                     options.Password.RequireUppercase = false;
                     options.Password.RequiredLength = 8;
+                    options.Tokens.PasswordResetTokenProvider = Constants.TokenProviderName;
                 })
                 .AddEntityFrameworkStores<TripickContext>()
-                .AddTokenProvider<DataProtectorTokenProvider<AppUser>>(TokenOptions.DefaultProvider);
+                .AddDefaultTokenProviders()
+                .AddTokenProvider<DataProtectorTokenProvider<AppUser>>(Constants.TokenProviderName); // TokenOptions.DefaultProvider
 
             services.AddDbContextPool<TripickContext>(options => options.UseNpgsql( // Remove "Pool" from "AddDbContextPool" when doing a migration
                     Configuration.GetConnectionString("DefaultConnection"),
