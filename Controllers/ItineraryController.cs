@@ -36,7 +36,7 @@ namespace TripickServer.Controllers
         {
             if (request.Data == null)
                 return Error("Itinerary - GetItinerary : Data required.");
-            return managerItinerary.SafeCall(() => managerItinerary.GetItinerary(request.Data.IdTrip, request.Data.ForceRegeneration));
+            return managerItinerary.SafeCall(() => managerItinerary.Get(request.Data.IdTrip, request.Data.ForceRegeneration));
         }
 
         [HttpPost]

@@ -16,12 +16,16 @@ namespace TripickServer.Managers
     {
         #region Properties
 
+        private RepoTrip repoTrip;
+
         #endregion
 
         #region Constructor
 
         public ManagerFriend(ILogger<ServerLogger> logger, Func<AppUser> user, TripickContext tripickContext) : base(logger, user, tripickContext)
-        {}
+        {
+            this.repoTrip = new RepoTrip(this.ConnectedUser, tripickContext);
+        }
 
         #endregion
 
@@ -121,9 +125,19 @@ namespace TripickServer.Managers
             if (user == null)
                 throw new NullReferenceException($"The user [Id={this.ConnectedUser().Id}] does not exist");
 
+            // Remove this friend from any shared trips that are mine or theirs
+            List<Trip> trips = this.TripickContext.Trips
+                .Where(t =>
+                    (t.IdOwner == this.ConnectedUser().Id && t.Members.Any(x => x.Id == newFriend.Id))
+                    ||
+                    (t.IdOwner == newFriend.Id && t.Members.Any(x => x.Id == this.ConnectedUser().Id)))
+                .Include(t => t.Members)
+                .ToList();
+            trips.ForEach(t => t.Members = t.Members.Where(m => m.Id != this.ConnectedUser().Id && m.Id != newFriend.Id).ToList());
+
+            // Remove friendship both ways
             if (user.Friendships.Any(x => x.IdFriend == newFriend.Id))
                 user.Friendships.RemoveAt(user.Friendships.IndexOf(user.Friendships.First(x => x.IdFriend == newFriend.Id)));
-
             if (newFriend.Friendships.Any(x => x.IdFriend == user.Id))
                 newFriend.Friendships.RemoveAt(newFriend.Friendships.IndexOf(newFriend.Friendships.First(x => x.IdFriend == user.Id)));
 

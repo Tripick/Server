@@ -122,7 +122,7 @@ namespace TripickServer.Managers
 
         public async Task<bool> Reset(string email)
         {
-            throw new NotImplementedException("Resetting password needs to send emails.");
+            //throw new NotImplementedException("Resetting password needs to send emails.");
             if (string.IsNullOrWhiteSpace(email))
                 throw new ArgumentNullException("Invalid email address.");
             AppUser user = await userManager.FindByEmailAsync(email);
